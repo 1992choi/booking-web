@@ -15,10 +15,10 @@ interface CategoryTab {
 }
 
 const CATEGORY_TABS: CategoryTab[] = [
-  { value: 'ALL',      label: '전체',  img: '/icons/all.jpeg' },
-  { value: 'PENSION',  label: '펜션',  img: '/icons/pension.jpeg' },
+  { value: 'ALL',      label: '전체',   img: '/icons/all.jpeg' },
+  { value: 'PENSION',  label: '펜션',   img: '/icons/pension.jpeg' },
   { value: 'CLASS',    label: '클래스', img: '/icons/class.webp' },
-  { value: 'FACILITY', label: '시설',  img: '/icons/facility.jpeg' },
+  { value: 'FACILITY', label: '시설',   img: '/icons/facility.jpeg' },
 ];
 
 const VISIBLE_TYPES = new Set<OwnerType>(['PENSION', 'CLASS', 'FACILITY']);
@@ -36,7 +36,6 @@ export default function HomePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // 4개 탭 항상 고정 표시
   const visibleTabs = CATEGORY_TABS;
 
   const filtered =
@@ -100,7 +99,6 @@ export default function HomePage() {
                 href={`/owners/${owner.id}`}
                 className="group flex flex-col items-center justify-center aspect-square rounded-2xl border border-gray-200 bg-white hover:border-blue-400 hover:shadow-md transition-all"
               >
-                {/* 이니셜 아이콘 */}
                 <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center mb-3 group-hover:bg-blue-100 transition-colors">
                   <span className="text-lg font-semibold text-blue-500">
                     {owner.name[0]}

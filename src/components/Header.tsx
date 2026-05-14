@@ -11,7 +11,6 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // 바깥 클릭 시 닫기 (모바일 대응)
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -41,7 +40,6 @@ export default function Header() {
         <div className="flex items-center gap-3">
           {isAuthenticated ? (
             <div ref={dropdownRef} className="relative">
-              {/* 유저 아이콘 버튼 */}
               <button
                 onClick={() => setOpen((v) => !v)}
                 onMouseEnter={() => setOpen(true)}
@@ -52,7 +50,6 @@ export default function Header() {
                 <img src="/icons/user.webp" alt="유저" className="w-full h-full object-cover" />
               </button>
 
-              {/* 드롭다운 */}
               {open && (
                 <div
                   onMouseLeave={() => setOpen(false)}
