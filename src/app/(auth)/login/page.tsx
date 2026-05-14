@@ -90,7 +90,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium rounded-lg py-2.5 text-sm transition-colors"
+          className="w-full bg-blue-500 hover:bg-blue-700 disabled:bg-blue-300 text-white font-medium rounded-lg py-2.5 text-sm transition-colors"
         >
           {isSubmitting ? '처리 중...' : '로그인'}
         </button>
@@ -98,7 +98,7 @@ export default function LoginPage() {
 
       <p className="mt-6 text-center text-sm text-gray-500">
         계정이 없으신가요?{' '}
-        <Link href="/signup" className="text-blue-600 hover:underline font-medium">
+        <Link href="/signup" className="text-blue-500 hover:underline font-medium">
           회원가입
         </Link>
       </p>

@@ -3,7 +3,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "Booking Platform",
+  title: "Bookit",
   description: "범용 예약 플랫폼",
 };
 
