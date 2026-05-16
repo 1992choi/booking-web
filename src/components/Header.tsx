@@ -58,11 +58,11 @@ export default function Header() {
                     <p className="text-sm font-medium text-gray-800 truncate">{user?.name}</p>
                   </div>
                   <Link
-                    href="/my"
+                    href="/my/reservations"
                     onClick={() => setOpen(false)}
                     className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                   >
-                    회원정보
+                    내 예약
                   </Link>
                   <button
                     onClick={handleLogout}
