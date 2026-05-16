@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Header from '@/components/Header';
 import { getMyReservations } from '@/lib/api/reservations';
 import type { Reservation, ReservationStatus } from '@/lib/types/reservation';
@@ -41,7 +42,9 @@ function formatDate(isoString: string) {
 
 function ReservationCard({ reservation }: { reservation: Reservation }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-200 hover:shadow-sm transition-all">
+    <Link
+      href={`/my/reservations/${reservation.id}`}
+      className="block bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-200 hover:shadow-sm transition-all">
       <div className="flex items-start justify-between gap-3 mb-3">
         <h3 className="text-base font-semibold text-gray-900 truncate">{reservation.resourceName}</h3>
         <span className={`flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLES[reservation.status]}`}>
@@ -69,7 +72,7 @@ function ReservationCard({ reservation }: { reservation: Reservation }) {
           <span className="text-blue-500 font-bold">{formatPrice(reservation.amount)}</span>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -86,7 +89,20 @@ export default function MyReservationsPage() {
     setLoading(true);
     setError('');
     setPage(0);
-    getMyReservations(tab === 'ALL' ? undefined : tab, 0)
+
+    const fetch =
+      tab === 'ALL'
+        ? Promise.all([
+            getMyReservations('PENDING', 0, 100),
+            getMyReservations('CONFIRMED', 0, 100),
+            getMyReservations('CANCELLED', 0, 100),
+          ]).then(([a, b, c]) => ({
+            content: [...a.content, ...b.content, ...c.content],
+            last: true,
+          }))
+        : getMyReservations(tab, 0);
+
+    fetch
       .then((res) => {
         setReservations(res.content);
         setIsLast(res.last);
@@ -97,7 +113,7 @@ export default function MyReservationsPage() {
 
   function loadMore() {
     const next = page + 1;
-    getMyReservations(tab === 'ALL' ? undefined : tab, next)
+    getMyReservations(tab as ReservationStatus, next)
       .then((res) => {
         setReservations((prev) => [...prev, ...res.content]);
         setIsLast(res.last);
