@@ -42,7 +42,6 @@ export default function Header() {
             <div ref={dropdownRef} className="relative">
               <button
                 onClick={() => setOpen((v) => !v)}
-                onMouseEnter={() => setOpen(true)}
                 className="w-9 h-9 rounded-full overflow-hidden hover:opacity-80 transition-opacity"
                 aria-label="사용자 메뉴"
               >
@@ -52,7 +51,6 @@ export default function Header() {
 
               {open && (
                 <div
-                  onMouseLeave={() => setOpen(false)}
                   className="absolute right-0 mt-1 w-36 bg-white border border-gray-100 rounded-xl shadow-lg overflow-hidden"
                 >
                   <div className="px-4 py-2.5 border-b border-gray-50">

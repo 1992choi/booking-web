@@ -8,6 +8,20 @@ import type { OwnerSummary, OwnerType } from '@/lib/types/owner';
 
 type FilterType = OwnerType | 'ALL';
 
+const TYPE_LABELS: Record<OwnerType, string> = {
+  PENSION: '펜션',
+  CLASS: '클래스',
+  FACILITY: '시설',
+  CONSULTING: '컨설팅',
+};
+
+const TYPE_COLORS: Record<OwnerType, string> = {
+  PENSION:    'bg-blue-50 text-blue-600',
+  CLASS:      'bg-green-50 text-green-600',
+  FACILITY:   'bg-purple-50 text-purple-600',
+  CONSULTING: 'bg-orange-50 text-orange-600',
+};
+
 interface CategoryTab {
   value: FilterType;
   label: string;
@@ -48,7 +62,7 @@ export default function HomePage() {
       <Header />
 
       {/* 카테고리 탭 */}
-      <div className="sticky top-14 z-40 bg-white border-b border-gray-100">
+      <div className="sticky top-14 z-40 bg-white border-b border-gray-100 pt-[70px]">
         <div className="max-w-screen-lg mx-auto px-4">
           <div className="flex justify-center">
             {visibleTabs.map((tab) => {
@@ -64,7 +78,7 @@ export default function HomePage() {
                   }`}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={tab.img} alt={tab.label} className="w-10 h-10 object-contain" />
+                  <img src={tab.img} alt={tab.label} className="w-13 h-14 object-contain" />
                   <span className="text-xs font-medium">{tab.label}</span>
                 </button>
               );
@@ -106,6 +120,9 @@ export default function HomePage() {
                 </div>
                 <span className="text-sm font-medium text-gray-800 text-center px-4 leading-snug">
                   {owner.name}
+                </span>
+                <span className={`mt-3 text-xs font-semibold px-2 py-0.5 rounded-full ${TYPE_COLORS[owner.type]}`}>
+                  {TYPE_LABELS[owner.type]}
                 </span>
               </Link>
             ))}
