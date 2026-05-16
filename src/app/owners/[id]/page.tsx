@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
-import { getAvailableTimes, getOwner } from '@/lib/api/owners';
+import { createReservation, getAvailableTimes, getOwner } from '@/lib/api/owners';
+import { getErrorMessage } from '@/lib/api/axios';
 import type { AvailableTime, OwnerDetail, Resource } from '@/lib/types/owner';
 
 const TYPE_LABELS = {
@@ -45,10 +46,14 @@ function AvailableTimesModal({
   const [times, setTimes] = useState<AvailableTime[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [booking, setBooking] = useState(false);
+  const [bookingError, setBookingError] = useState('');
 
   useEffect(() => {
     setLoading(true);
     setError('');
+    setSelectedIds(new Set());
     getAvailableTimes(resource.id, date)
       .then(setTimes)
       .catch(() => setError('조회에 실패했습니다.'))
@@ -56,6 +61,38 @@ function AvailableTimesModal({
   }, [resource.id, date]);
 
   const openTimes = times.filter((t) => t.status === 'OPEN');
+
+  function toggleSlot(id: number) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  async function handleReserve() {
+    if (selectedIds.size === 0) return;
+    setBooking(true);
+    setBookingError('');
+    const payload = {
+      resourceId: resource.id,
+      availableTimeIds: Array.from(selectedIds),
+      headCount: 1,
+    };
+    console.log('[예약 요청]', payload);
+    try {
+      await createReservation(payload);
+      onClose();
+    } catch (err) {
+      console.error('[예약 오류]', err);
+      setBookingError(getErrorMessage(err));
+    } finally {
+      setBooking(false);
+    }
+  }
+
+  const totalPrice = resource.price * selectedIds.size;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
@@ -107,22 +144,56 @@ function AvailableTimesModal({
 
           {!loading && !error && openTimes.length > 0 && (
             <div className="space-y-2">
-              {openTimes.map((t) => (
-                <button
-                  key={t.id}
-                  className="w-full flex items-center justify-between border border-gray-200 rounded-xl px-4 py-3 hover:border-blue-400 hover:bg-blue-50 transition-colors group"
-                >
-                  <span className="text-sm font-medium text-gray-800 group-hover:text-blue-600">
-                    {formatTime(t.startTime)} ~ {formatTime(t.endTime)}
-                  </span>
-                  <span className="text-xs font-semibold text-blue-500 bg-blue-50 group-hover:bg-white px-2 py-1 rounded-lg transition-colors">
-                    예약하기
-                  </span>
-                </button>
-              ))}
+              {openTimes.map((t) => {
+                const isSelected = selectedIds.has(t.id);
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => toggleSlot(t.id)}
+                    className={`w-full flex items-center justify-between rounded-xl px-4 py-3 transition-colors border ${
+                      isSelected
+                        ? 'border-blue-500 bg-blue-50'
+                        : 'border-gray-200 hover:border-blue-400 hover:bg-blue-50'
+                    }`}
+                  >
+                    <span className={`text-sm font-medium ${isSelected ? 'text-blue-600' : 'text-gray-800'}`}>
+                      {formatTime(t.startTime)} ~ {formatTime(t.endTime)}
+                    </span>
+                    <span className={`text-xs font-semibold px-2 py-1 rounded-lg transition-colors ${
+                      isSelected ? 'bg-blue-500 text-white' : 'bg-blue-50 text-blue-500'
+                    }`}>
+                      {isSelected ? '선택됨' : '선택'}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
+
+        {/* 예약 버튼 영역 */}
+        {!loading && !error && openTimes.length > 0 && (
+          <div className="mt-5 pt-4 border-t border-gray-100">
+            {bookingError && (
+              <p className="text-sm text-red-400 text-center mb-3">{bookingError}</p>
+            )}
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm text-gray-500">
+                {selectedIds.size > 0 ? `${selectedIds.size}개 선택` : '시간대를 선택하세요'}
+              </span>
+              {selectedIds.size > 0 && (
+                <span className="text-sm font-bold text-blue-500">{formatPrice(totalPrice)}</span>
+              )}
+            </div>
+            <button
+              onClick={handleReserve}
+              disabled={selectedIds.size === 0 || booking}
+              className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-xl py-3 transition-colors"
+            >
+              {booking ? '예약 중...' : '예약하기'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

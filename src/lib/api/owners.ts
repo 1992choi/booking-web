@@ -1,5 +1,5 @@
 import apiClient from './axios';
-import type { AvailableTime, OwnerDetail, OwnerSummary } from '@/lib/types/owner';
+import type { AvailableTime, CreateReservationRequest, OwnerDetail, OwnerSummary } from '@/lib/types/owner';
 
 /** GET /api/v1/owners */
 export async function getOwners(): Promise<OwnerSummary[]> {
@@ -19,4 +19,9 @@ export async function getAvailableTimes(resourceId: number, date: string): Promi
     params: { date },
   });
   return data;
+}
+
+/** POST /api/v1/reservations */
+export async function createReservation(params: CreateReservationRequest): Promise<void> {
+  await apiClient.post('/reservations', params);
 }

@@ -28,3 +28,9 @@ export interface OwnerDetail {
   type: OwnerType;
   resources: Resource[];
 }
+
+export interface CreateReservationRequest {
+  resourceId: number;
+  availableTimeIds: number[];
+  headCount: number;
+}
