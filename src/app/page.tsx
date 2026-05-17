@@ -3,19 +3,19 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
-import { getOwners } from '@/lib/api/owners';
-import type { OwnerSummary, OwnerType } from '@/lib/types/owner';
+import { getMerchants } from '@/lib/api/merchants';
+import type { MerchantSummary, MerchantType } from '@/lib/types/merchant';
 
-type FilterType = OwnerType | 'ALL';
+type FilterType = MerchantType | 'ALL';
 
-const TYPE_LABELS: Record<OwnerType, string> = {
+const TYPE_LABELS: Record<MerchantType, string> = {
   PENSION: '펜션',
   CLASS: '클래스',
   FACILITY: '시설',
   CONSULTING: '컨설팅',
 };
 
-const TYPE_COLORS: Record<OwnerType, string> = {
+const TYPE_COLORS: Record<MerchantType, string> = {
   PENSION:    'bg-blue-50 text-blue-600',
   CLASS:      'bg-green-50 text-green-600',
   FACILITY:   'bg-purple-50 text-purple-600',
@@ -35,17 +35,17 @@ const CATEGORY_TABS: CategoryTab[] = [
   { value: 'FACILITY', label: '시설',   img: '/icons/facility.jpeg' },
 ];
 
-const VISIBLE_TYPES = new Set<OwnerType>(['PENSION', 'CLASS', 'FACILITY']);
+const VISIBLE_TYPES = new Set<MerchantType>(['PENSION', 'CLASS', 'FACILITY']);
 
 export default function HomePage() {
-  const [owners, setOwners] = useState<OwnerSummary[]>([]);
+  const [merchants, setMerchants] = useState<MerchantSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selected, setSelected] = useState<FilterType>('ALL');
 
   useEffect(() => {
-    getOwners()
-      .then(setOwners)
+    getMerchants()
+      .then(setMerchants)
       .catch(() => setError('업체 목록을 불러오지 못했습니다.'))
       .finally(() => setLoading(false));
   }, []);
@@ -54,8 +54,8 @@ export default function HomePage() {
 
   const filtered =
     selected === 'ALL'
-      ? owners.filter((o) => VISIBLE_TYPES.has(o.type as OwnerType))
-      : owners.filter((o) => o.type === selected);
+      ? merchants.filter((o) => VISIBLE_TYPES.has(o.type as MerchantType))
+      : merchants.filter((o) => o.type === selected);
 
   return (
     <>
@@ -107,22 +107,22 @@ export default function HomePage() {
 
         {!loading && !error && filtered.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {filtered.map((owner) => (
+            {filtered.map((merchant) => (
               <Link
-                key={owner.id}
-                href={`/owners/${owner.id}`}
+                key={merchant.id}
+                href={`/owners/${merchant.id}`}
                 className="group flex flex-col items-center justify-center aspect-square rounded-2xl border border-gray-200 bg-white hover:border-blue-400 hover:shadow-md transition-all"
               >
                 <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center mb-3 group-hover:bg-blue-100 transition-colors">
                   <span className="text-lg font-semibold text-blue-500">
-                    {owner.name[0]}
+                    {merchant.name[0]}
                   </span>
                 </div>
                 <span className="text-sm font-medium text-gray-800 text-center px-4 leading-snug">
-                  {owner.name}
+                  {merchant.name}
                 </span>
-                <span className={`mt-3 text-xs font-semibold px-2 py-0.5 rounded-full ${TYPE_COLORS[owner.type]}`}>
-                  {TYPE_LABELS[owner.type]}
+                <span className={`mt-3 text-xs font-semibold px-2 py-0.5 rounded-full ${TYPE_COLORS[merchant.type]}`}>
+                  {TYPE_LABELS[merchant.type]}
                 </span>
               </Link>
             ))}

@@ -72,9 +72,9 @@ export default function Header() {
                     >
                       내 예약
                     </Link>
-                    {(role === 'OWNER' || role === 'ADMIN') && (
+                    {(role === 'MERCHANT' || role === 'ADMIN') && (
                       <Link
-                        href="/owner/dashboard"
+                        href="/merchant/dashboard"
                         onClick={() => setOpen(false)}
                         className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-t border-gray-50"
                       >

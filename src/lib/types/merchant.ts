@@ -1,14 +1,14 @@
-export type OwnerType = 'PENSION' | 'CLASS' | 'FACILITY' | 'CONSULTING';
+export type MerchantType = 'PENSION' | 'CLASS' | 'FACILITY' | 'CONSULTING';
 
-export interface OwnerSummary {
+export interface MerchantSummary {
   id: number;
   name: string;
-  type: OwnerType;
+  type: MerchantType;
 }
 
 export interface Resource {
   id: number;
-  ownerId: number;
+  merchantId: number;
   name: string;
   description: string | null;
   price: number;
@@ -22,17 +22,17 @@ export interface AvailableTime {
   status: 'OPEN' | 'BLOCKED';
 }
 
-export interface OwnerDetail {
+export interface MerchantDetail {
   id: number;
   name: string;
-  type: OwnerType;
+  type: MerchantType;
   resources: Resource[];
 }
 
-export interface OwnerRequest {
+export interface MerchantRequest {
   name: string;
   phone: string;
-  type: OwnerType;
+  type: MerchantType;
 }
 
 export interface CreateReservationRequest {

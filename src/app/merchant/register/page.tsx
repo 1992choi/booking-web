@@ -3,21 +3,21 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
-import { createOwner } from '@/lib/api/owners';
+import { createMerchant } from '@/lib/api/merchants';
 import { getErrorMessage } from '@/lib/api/axios';
-import type { OwnerType } from '@/lib/types/owner';
+import type { MerchantType } from '@/lib/types/merchant';
 
-const TYPE_OPTIONS: { value: OwnerType; label: string }[] = [
+const TYPE_OPTIONS: { value: MerchantType; label: string }[] = [
   { value: 'PENSION',  label: '펜션' },
   { value: 'CLASS',    label: '클래스' },
   { value: 'FACILITY', label: '시설' },
 ];
 
-export default function OwnerRegisterPage() {
+export default function MerchantRegisterPage() {
   const router = useRouter();
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [type, setType] = useState<OwnerType>('PENSION');
+  const [type, setType] = useState<MerchantType>('PENSION');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -27,8 +27,8 @@ export default function OwnerRegisterPage() {
     setLoading(true);
     setError('');
     try {
-      await createOwner({ name: name.trim(), phone: phone.trim(), type });
-      router.push('/owner/dashboard');
+      await createMerchant({ name: name.trim(), phone: phone.trim(), type });
+      router.push('/merchant/dashboard');
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {
@@ -51,7 +51,6 @@ export default function OwnerRegisterPage() {
         <h1 className="text-xl font-bold text-gray-900 mb-6">업체 등록</h1>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* 업체명 */}
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1.5">업체명</label>
             <input
@@ -64,7 +63,6 @@ export default function OwnerRegisterPage() {
             />
           </div>
 
-          {/* 전화번호 */}
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1.5">전화번호</label>
             <input
@@ -77,7 +75,6 @@ export default function OwnerRegisterPage() {
             />
           </div>
 
-          {/* 업체 유형 */}
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1.5">업체 유형</label>
             <div className="grid grid-cols-2 gap-2">

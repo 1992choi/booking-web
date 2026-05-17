@@ -2,18 +2,20 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Header from '@/components/Header';
-import { getOwner } from '@/lib/api/owners';
-import type { OwnerDetail, OwnerType, Resource } from '@/lib/types/owner';
+import { getMerchant } from '@/lib/api/merchants';
+import { useAuthStore } from '@/lib/store/auth';
+import type { MerchantDetail, MerchantType, Resource } from '@/lib/types/merchant';
 
-const TYPE_LABELS: Record<OwnerType, string> = {
+const TYPE_LABELS: Record<MerchantType, string> = {
   PENSION:    '펜션',
   CLASS:      '클래스',
   FACILITY:   '시설',
   CONSULTING: '컨설팅',
 };
 
-const TYPE_COLORS: Record<OwnerType, string> = {
+const TYPE_COLORS: Record<MerchantType, string> = {
   PENSION:    'bg-blue-50 text-blue-600',
   CLASS:      'bg-green-50 text-green-600',
   FACILITY:   'bg-purple-50 text-purple-600',
@@ -38,17 +40,20 @@ function ResourceRow({ resource }: { resource: Resource }) {
   );
 }
 
-export default function OwnerDetailPage() {
+export default function MerchantDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const [owner, setOwner] = useState<OwnerDetail | null>(null);
+  const { role } = useAuthStore();
+  const isMerchant = role === 'MERCHANT';
+
+  const [merchant, setMerchant] = useState<MerchantDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (!id) return;
-    getOwner(Number(id))
-      .then(setOwner)
+    getMerchant(Number(id))
+      .then(setMerchant)
       .catch(() => setError('업체 정보를 불러오지 못했습니다.'))
       .finally(() => setLoading(false));
   }, [id]);
@@ -76,29 +81,35 @@ export default function OwnerDetailPage() {
           <p className="text-sm text-red-400 text-center py-20">{error}</p>
         )}
 
-        {!loading && !error && owner && (
+        {!loading && !error && merchant && (
           <>
-            {/* 업체 정보 */}
             <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-4">
-              <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-gray-900">{owner.name}</h2>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${TYPE_COLORS[owner.type]}`}>
-                  {TYPE_LABELS[owner.type]}
-                </span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-lg font-bold text-gray-900">{merchant.name}</h2>
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${TYPE_COLORS[merchant.type]}`}>
+                    {TYPE_LABELS[merchant.type]}
+                  </span>
+                </div>
+                {isMerchant && (
+                  <Link
+                    href={`/merchant/${id}/edit`}
+                    className="text-sm text-blue-500 hover:text-blue-600 font-medium transition-colors"
+                  >
+                    수정
+                  </Link>
+                )}
               </div>
             </div>
 
-            {/* 예약 대상 목록 */}
             <div className="bg-white border border-gray-200 rounded-2xl p-5">
-              <div className="mb-3">
-                <h3 className="text-sm font-semibold text-gray-700">예약 대상</h3>
-              </div>
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">예약 대상</h3>
 
-              {owner.resources.length === 0 ? (
+              {merchant.resources.length === 0 ? (
                 <p className="text-sm text-gray-400 text-center py-6">등록된 예약 대상이 없습니다.</p>
               ) : (
                 <div>
-                  {owner.resources.map((r) => (
+                  {merchant.resources.map((r) => (
                     <ResourceRow key={r.id} resource={r} />
                   ))}
                 </div>

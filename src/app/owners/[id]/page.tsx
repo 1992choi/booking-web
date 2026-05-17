@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
-import { createReservation, getAvailableTimes, getOwner } from '@/lib/api/owners';
+import { createReservation, getAvailableTimes, getMerchant } from '@/lib/api/merchants';
 import { getErrorMessage } from '@/lib/api/axios';
-import type { AvailableTime, OwnerDetail, Resource } from '@/lib/types/owner';
+import type { AvailableTime, MerchantDetail, Resource } from '@/lib/types/merchant';
 
 const TYPE_LABELS = {
   PENSION: '펜션',
@@ -236,19 +236,19 @@ function ResourceCard({
 }
 
 // ─── 상세 페이지 ──────────────────────────────────────────────────────
-export default function OwnerDetailPage() {
+export default function MerchantPublicDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
 
-  const [owner, setOwner] = useState<OwnerDetail | null>(null);
+  const [merchant, setMerchant] = useState<MerchantDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
 
   useEffect(() => {
     if (!id) return;
-    getOwner(Number(id))
-      .then(setOwner)
+    getMerchant(Number(id))
+      .then(setMerchant)
       .catch(() => setError('업체 정보를 불러오지 못했습니다.'))
       .finally(() => setLoading(false));
   }, [id]);
@@ -258,7 +258,6 @@ export default function OwnerDetailPage() {
       <Header />
 
       <main className="max-w-screen-sm mx-auto px-4 py-6">
-        {/* 뒤로가기 */}
         <button
           onClick={() => router.back()}
           className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 mb-5 transition-colors"
@@ -266,7 +265,6 @@ export default function OwnerDetailPage() {
           ← 목록으로
         </button>
 
-        {/* 로딩 스켈레톤 */}
         {loading && (
           <div className="space-y-4">
             <div className="h-8 w-48 bg-gray-100 rounded-lg animate-pulse" />
@@ -280,30 +278,27 @@ export default function OwnerDetailPage() {
           <p className="text-sm text-red-400 text-center py-20">{error}</p>
         )}
 
-        {!loading && !error && owner && (
+        {!loading && !error && merchant && (
           <>
-            {/* 업체 헤더 */}
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-2xl font-bold text-gray-900">{owner.name}</h1>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${TYPE_COLORS[owner.type]}`}>
-                  {TYPE_LABELS[owner.type]}
+                <h1 className="text-2xl font-bold text-gray-900">{merchant.name}</h1>
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${TYPE_COLORS[merchant.type]}`}>
+                  {TYPE_LABELS[merchant.type]}
                 </span>
               </div>
               <p className="text-sm text-gray-400">
-                {owner.resources.length}개의 예약 가능 항목
+                {merchant.resources.length}개의 예약 가능 항목
               </p>
             </div>
 
-            {/* 구분선 */}
             <div className="border-t border-gray-100 mb-6" />
 
-            {/* 리소스 목록 */}
-            {owner.resources.length === 0 ? (
+            {merchant.resources.length === 0 ? (
               <p className="text-sm text-gray-400 text-center py-16">등록된 항목이 없습니다.</p>
             ) : (
               <div className="space-y-4">
-                {owner.resources.map((resource) => (
+                {merchant.resources.map((resource) => (
                   <ResourceCard
                     key={resource.id}
                     resource={resource}
@@ -316,7 +311,6 @@ export default function OwnerDetailPage() {
         )}
       </main>
 
-      {/* 예약 가능 시간 모달 */}
       {selectedResource && (
         <AvailableTimesModal
           resource={selectedResource}

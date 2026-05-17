@@ -2,10 +2,10 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 /** Routes that require authentication */
-const PROTECTED_PREFIXES = ['/my', '/owner', '/admin'];
+const PROTECTED_PREFIXES = ['/my', '/merchant', '/admin'];
 
-/** Routes that require OWNER role */
-const OWNER_ONLY_PREFIXES = ['/owner'];
+/** Routes that require MERCHANT or ADMIN role */
+const MERCHANT_PREFIXES = ['/merchant'];
 
 /** Routes that require ADMIN role */
 const ADMIN_ONLY_PREFIXES = ['/admin'];
@@ -30,13 +30,13 @@ export function middleware(request: NextRequest) {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const role: string = payload.role ?? '';
 
-      const needsOwner = OWNER_ONLY_PREFIXES.some((p) => pathname.startsWith(p));
+      const needsMerchant = MERCHANT_PREFIXES.some((p) => pathname.startsWith(p));
       const needsAdmin = ADMIN_ONLY_PREFIXES.some((p) => pathname.startsWith(p));
 
       if (needsAdmin && role !== 'ADMIN') {
         return NextResponse.redirect(new URL('/', request.url));
       }
-      if (needsOwner && role !== 'OWNER' && role !== 'ADMIN') {
+      if (needsMerchant && role !== 'MERCHANT' && role !== 'ADMIN') {
         return NextResponse.redirect(new URL('/', request.url));
       }
     } catch {
@@ -51,5 +51,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/my/:path*', '/owner/:path*', '/admin/:path*'],
+  matcher: ['/my/:path*', '/merchant/:path*', '/admin/:path*'],
 };
