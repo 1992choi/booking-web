@@ -1,6 +1,12 @@
 import apiClient from './axios';
 import type { LoginRequest, SignupRequest, TokenResponse, UserResponse } from '@/lib/types/auth';
 
+/** GET /api/v1/users/me */
+export async function getMe(): Promise<UserResponse> {
+  const { data } = await apiClient.get<UserResponse>('/users/me');
+  return data;
+}
+
 /** POST /api/v1/auth/signup */
 export async function signup(data: SignupRequest): Promise<void> {
   await apiClient.post('/auth/signup', data);
