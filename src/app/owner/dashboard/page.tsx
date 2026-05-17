@@ -1,0 +1,98 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import Header from '@/components/Header';
+import { getOwners } from '@/lib/api/owners';
+import type { OwnerSummary, OwnerType } from '@/lib/types/owner';
+
+const TYPE_LABELS: Record<OwnerType, string> = {
+  PENSION:    '펜션',
+  CLASS:      '클래스',
+  FACILITY:   '시설',
+  CONSULTING: '컨설팅',
+};
+
+const TYPE_COLORS: Record<OwnerType, string> = {
+  PENSION:    'bg-blue-50 text-blue-600',
+  CLASS:      'bg-green-50 text-green-600',
+  FACILITY:   'bg-purple-50 text-purple-600',
+  CONSULTING: 'bg-orange-50 text-orange-600',
+};
+
+function OwnerCard({ owner }: { owner: OwnerSummary }) {
+  return (
+    <Link
+      href={`/owner/${owner.id}`}
+      className="flex items-center gap-2 bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-200 hover:shadow-sm transition-all"
+    >
+      <h2 className="text-base font-semibold text-gray-900 truncate">{owner.name}</h2>
+      <span className={`flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full ${TYPE_COLORS[owner.type]}`}>
+        {TYPE_LABELS[owner.type]}
+      </span>
+    </Link>
+  );
+}
+
+export default function OwnerDashboardPage() {
+  const [owners, setOwners] = useState<OwnerSummary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    getOwners()
+      .then(setOwners)
+      .catch(() => setError('업체 목록을 불러오지 못했습니다.'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <>
+      <Header />
+
+      <main className="max-w-screen-sm mx-auto px-4 py-6">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-xl font-bold text-gray-900">업체 관리</h1>
+          <Link
+            href="/owner/register"
+            className="text-sm bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-xl transition-colors"
+          >
+            + 업체 등록
+          </Link>
+        </div>
+
+        {loading && (
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-20 bg-gray-100 rounded-2xl animate-pulse" />
+            ))}
+          </div>
+        )}
+
+        {!loading && error && (
+          <p className="text-sm text-red-400 text-center py-16">{error}</p>
+        )}
+
+        {!loading && !error && owners.length === 0 && (
+          <div className="text-center py-20">
+            <p className="text-sm text-gray-400 mb-4">등록된 업체가 없습니다.</p>
+            <Link
+              href="/owner/register"
+              className="text-sm bg-blue-500 hover:bg-blue-600 text-white px-5 py-2.5 rounded-xl transition-colors"
+            >
+              업체 등록하기
+            </Link>
+          </div>
+        )}
+
+        {!loading && !error && owners.length > 0 && (
+          <div className="space-y-3">
+            {owners.map((owner) => (
+              <OwnerCard key={owner.id} owner={owner} />
+            ))}
+          </div>
+        )}
+      </main>
+    </>
+  );
+}

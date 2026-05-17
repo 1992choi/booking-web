@@ -29,6 +29,12 @@ export interface OwnerDetail {
   resources: Resource[];
 }
 
+export interface OwnerRequest {
+  name: string;
+  phone: string;
+  type: OwnerType;
+}
+
 export interface CreateReservationRequest {
   resourceId: number;
   availableTimeIds: number[];

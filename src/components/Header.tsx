@@ -7,7 +7,7 @@ import { useAuthStore } from '@/lib/store/auth';
 
 export default function Header() {
   const router = useRouter();
-  const { isAuthenticated, user, clearAuth } = useAuthStore();
+  const { isAuthenticated, user, role, clearAuth } = useAuthStore();
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -72,6 +72,15 @@ export default function Header() {
                     >
                       내 예약
                     </Link>
+                    {(role === 'OWNER' || role === 'ADMIN') && (
+                      <Link
+                        href="/owner/dashboard"
+                        onClick={() => setOpen(false)}
+                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-t border-gray-50"
+                      >
+                        업체 관리
+                      </Link>
+                    )}
                     <button
                       onClick={handleLogout}
                       className="w-full flex items-center px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition-colors"

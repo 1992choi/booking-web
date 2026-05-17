@@ -1,9 +1,15 @@
 import apiClient from './axios';
-import type { AvailableTime, CreateReservationRequest, OwnerDetail, OwnerSummary } from '@/lib/types/owner';
+import type { AvailableTime, CreateReservationRequest, OwnerDetail, OwnerRequest, OwnerSummary } from '@/lib/types/owner';
 
 /** GET /api/v1/owners */
 export async function getOwners(): Promise<OwnerSummary[]> {
   const { data } = await apiClient.get<OwnerSummary[]>('/owners');
+  return data;
+}
+
+/** POST /api/v1/owners */
+export async function createOwner(params: OwnerRequest): Promise<OwnerDetail> {
+  const { data } = await apiClient.post<OwnerDetail>('/owners', params);
   return data;
 }
 
