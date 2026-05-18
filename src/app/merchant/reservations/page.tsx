@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
-import { getMerchantReservations, updateReservationStatus } from '@/lib/api/merchantReservations';
+import { getMerchantReservations, confirmReservation, cancelReservation } from '@/lib/api/merchantReservations';
 import { getErrorMessage } from '@/lib/api/axios';
 import type { MerchantReservation, ReservationStatus } from '@/lib/types/reservation';
+type Action = 'confirm' | 'cancel';
 
 const STATUS_TABS: { value: ReservationStatus | 'ALL'; label: string }[] = [
   { value: 'ALL',       label: '전체' },
@@ -43,13 +44,11 @@ function formatDate(isoString: string) {
 
 function ReservationCard({
   reservation,
-  onConfirm,
-  onCancel,
+  onAction,
   disabled,
 }: {
   reservation: MerchantReservation;
-  onConfirm: () => void;
-  onCancel: () => void;
+  onAction: (action: Action) => void;
   disabled: boolean;
 }) {
   return (
@@ -89,7 +88,7 @@ function ReservationCard({
         <div className="flex gap-2 mt-4 pt-3 border-t border-gray-50">
           {reservation.status === 'PENDING' && (
             <button
-              onClick={onConfirm}
+              onClick={() => onAction('confirm')}
               disabled={disabled}
               className="flex-1 text-sm font-medium py-2 rounded-xl border border-blue-200 text-blue-500 hover:bg-blue-50 disabled:opacity-50 transition-colors"
             >
@@ -97,7 +96,7 @@ function ReservationCard({
             </button>
           )}
           <button
-            onClick={onCancel}
+            onClick={() => onAction('cancel')}
             disabled={disabled}
             className="flex-1 text-sm font-medium py-2 rounded-xl border border-gray-200 text-gray-500 hover:border-red-200 hover:text-red-500 disabled:opacity-50 transition-colors"
           >
@@ -132,8 +131,8 @@ export default function MerchantReservationsPage() {
   });
 
   const { mutate: changeStatus, isPending: isMutating } = useMutation({
-    mutationFn: ({ id, status }: { id: number; status: ReservationStatus }) =>
-      updateReservationStatus(id, status),
+    mutationFn: ({ id, action }: { id: number; action: Action }) =>
+      action === 'confirm' ? confirmReservation(id) : cancelReservation(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['merchant-reservations'] });
       setActionError('');
@@ -203,8 +202,7 @@ export default function MerchantReservationsPage() {
                 key={r.id}
                 reservation={r}
                 disabled={isMutating}
-                onConfirm={() => changeStatus({ id: r.id, status: 'CONFIRMED' })}
-                onCancel={() => changeStatus({ id: r.id, status: 'CANCELLED' })}
+                onAction={(action) => changeStatus({ id: r.id, action })}
               />
             ))}
           </div>
