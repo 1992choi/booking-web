@@ -1,4 +1,4 @@
-export type MerchantType = 'PENSION' | 'CLASS' | 'FACILITY' | 'CONSULTING';
+export type MerchantType = 'PENSION' | 'CLASS' | 'FACILITY';
 
 export interface MerchantSummary {
   id: number;

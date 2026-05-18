@@ -11,14 +11,12 @@ const TYPE_LABELS = {
   PENSION: '펜션',
   CLASS: '클래스',
   FACILITY: '시설',
-  CONSULTING: '컨설팅',
 } as const;
 
 const TYPE_COLORS = {
-  PENSION:    'bg-blue-50 text-blue-600',
-  CLASS:      'bg-green-50 text-green-600',
-  FACILITY:   'bg-purple-50 text-purple-600',
-  CONSULTING: 'bg-orange-50 text-orange-600',
+  PENSION:  'bg-blue-50 text-blue-600',
+  CLASS:    'bg-green-50 text-green-600',
+  FACILITY: 'bg-purple-50 text-purple-600',
 } as const;
 
 function formatPrice(price: number) {
