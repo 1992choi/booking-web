@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import { getMerchantReservations, confirmReservation, cancelReservation } from '@/lib/api/merchantReservations';
 import { getErrorMessage } from '@/lib/api/axios';
 import type { MerchantReservation, ReservationStatus } from '@/lib/types/reservation';
+
 type Action = 'confirm' | 'cancel';
 
 const STATUS_TABS: { value: ReservationStatus | 'ALL'; label: string }[] = [
@@ -109,23 +110,25 @@ function ReservationCard({
 }
 
 export default function MerchantReservationsPage() {
+  const { id } = useParams<{ id: string }>();
+  const merchantId = Number(id);
   const router = useRouter();
   const [tab, setTab] = useState<ReservationStatus | 'ALL'>('ALL');
   const [actionError, setActionError] = useState('');
   const queryClient = useQueryClient();
 
   const { data: reservations = [], isLoading, isError } = useQuery({
-    queryKey: ['merchant-reservations', tab],
+    queryKey: ['merchant-reservations', merchantId, tab],
     queryFn: async () => {
       if (tab === 'ALL') {
         const [pending, confirmed, cancelled] = await Promise.all([
-          getMerchantReservations('PENDING'),
-          getMerchantReservations('CONFIRMED'),
-          getMerchantReservations('CANCELLED'),
+          getMerchantReservations(merchantId, 'PENDING'),
+          getMerchantReservations(merchantId, 'CONFIRMED'),
+          getMerchantReservations(merchantId, 'CANCELLED'),
         ]);
         return [...pending.content, ...confirmed.content, ...cancelled.content];
       }
-      const res = await getMerchantReservations(tab);
+      const res = await getMerchantReservations(merchantId, tab);
       return res.content;
     },
   });
@@ -134,7 +137,7 @@ export default function MerchantReservationsPage() {
     mutationFn: ({ id, action }: { id: number; action: Action }) =>
       action === 'confirm' ? confirmReservation(id) : cancelReservation(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['merchant-reservations'] });
+      queryClient.invalidateQueries({ queryKey: ['merchant-reservations', merchantId] });
       setActionError('');
     },
     onError: (err) => setActionError(getErrorMessage(err)),
@@ -154,7 +157,6 @@ export default function MerchantReservationsPage() {
 
         <h1 className="text-xl font-bold text-gray-900 mb-5">예약 관리</h1>
 
-        {/* 상태 필터 탭 */}
         <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
           {STATUS_TABS.map((t) => (
             <button
@@ -175,7 +177,6 @@ export default function MerchantReservationsPage() {
           <p className="text-sm text-red-400 text-center mb-4">{actionError}</p>
         )}
 
-        {/* 로딩 */}
         {isLoading && (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
@@ -184,17 +185,14 @@ export default function MerchantReservationsPage() {
           </div>
         )}
 
-        {/* 에러 */}
         {!isLoading && isError && (
           <p className="text-sm text-red-400 text-center py-16">예약 목록을 불러오지 못했습니다.</p>
         )}
 
-        {/* 빈 목록 */}
         {!isLoading && !isError && reservations.length === 0 && (
           <p className="text-sm text-gray-400 text-center py-16">예약 내역이 없습니다.</p>
         )}
 
-        {/* 목록 */}
         {!isLoading && !isError && reservations.length > 0 && (
           <div className="space-y-3">
             {reservations.map((r) => (

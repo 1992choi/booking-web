@@ -65,14 +65,24 @@ export default function Header() {
                     >
                       내 정보
                     </Link>
-                    <Link
-                      href="/my/reservations"
-                      onClick={() => setOpen(false)}
-                      className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                    >
-                      내 예약
-                    </Link>
-                    {(role === 'MERCHANT' || role === 'ADMIN') && (
+                    {role === 'MERCHANT' ? (
+                      <Link
+                        href="/merchant/dashboard"
+                        onClick={() => setOpen(false)}
+                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        예약 관리
+                      </Link>
+                    ) : (
+                      <Link
+                        href="/my/reservations"
+                        onClick={() => setOpen(false)}
+                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        내 예약
+                      </Link>
+                    )}
+                    {role === 'ADMIN' && (
                       <Link
                         href="/merchant/dashboard"
                         onClick={() => setOpen(false)}

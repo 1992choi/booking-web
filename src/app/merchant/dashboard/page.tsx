@@ -19,23 +19,41 @@ const TYPE_COLORS: Record<MerchantType, string> = {
   FACILITY: 'bg-purple-50 text-purple-600',
 };
 
-function MerchantCard({ merchant }: { merchant: MerchantSummary }) {
+function MerchantCard({ merchant, isMerchant }: { merchant: MerchantSummary; isMerchant: boolean }) {
   return (
-    <Link
-      href={`/merchant/${merchant.id}`}
-      className="flex items-center gap-2 bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-200 hover:shadow-sm transition-all"
-    >
-      <h2 className="text-base font-semibold text-gray-900 truncate">{merchant.name}</h2>
-      <span className={`flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full ${TYPE_COLORS[merchant.type]}`}>
-        {TYPE_LABELS[merchant.type]}
-      </span>
-    </Link>
+    <div className="bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-200 hover:shadow-sm transition-all">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 min-w-0">
+          <h2 className="text-base font-semibold text-gray-900 truncate">{merchant.name}</h2>
+          <span className={`flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full ${TYPE_COLORS[merchant.type]}`}>
+            {TYPE_LABELS[merchant.type]}
+          </span>
+        </div>
+        <div className="flex items-center gap-3 ml-3 flex-shrink-0">
+          {isMerchant && (
+            <Link
+              href={`/merchant/${merchant.id}/reservations`}
+              className="text-xs font-medium text-blue-500 hover:text-blue-600 transition-colors"
+            >
+              예약 관리
+            </Link>
+          )}
+          <Link
+            href={`/merchant/${merchant.id}`}
+            className="text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors"
+          >
+            상세
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }
 
 export default function MerchantDashboardPage() {
   const { role } = useAuthStore();
   const isAdmin = role === 'ADMIN';
+  const isMerchant = role === 'MERCHANT';
 
   const [merchants, setMerchants] = useState<MerchantSummary[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,7 +117,7 @@ export default function MerchantDashboardPage() {
         {!loading && !error && merchants.length > 0 && (
           <div className="space-y-3">
             {merchants.map((merchant) => (
-              <MerchantCard key={merchant.id} merchant={merchant} />
+              <MerchantCard key={merchant.id} merchant={merchant} isMerchant={isMerchant} />
             ))}
           </div>
         )}
