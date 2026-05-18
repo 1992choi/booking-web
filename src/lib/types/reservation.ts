@@ -9,3 +9,7 @@ export interface Reservation {
   startTime: string;
   endTime: string;
 }
+
+export interface MerchantReservation extends Reservation {
+  userName: string;
+}
