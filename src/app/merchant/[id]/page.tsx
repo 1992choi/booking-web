@@ -5,11 +5,19 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import { getMerchant } from '@/lib/api/merchants';
-import { createResource, updateResource, deleteResource } from '@/lib/api/resources';
+import {
+  createResource,
+  updateResource,
+  deleteResource,
+  getAvailableTimes,
+  createAvailableTime,
+  updateAvailableTime,
+  deleteAvailableTime,
+} from '@/lib/api/resources';
 import type { ResourceRequest } from '@/lib/api/resources';
 import { getErrorMessage } from '@/lib/api/axios';
 import { useAuthStore } from '@/lib/store/auth';
-import type { MerchantDetail, MerchantType, Resource } from '@/lib/types/merchant';
+import type { MerchantDetail, MerchantType, Resource, AvailableTime } from '@/lib/types/merchant';
 
 const TYPE_LABELS: Record<MerchantType, string> = {
   PENSION:  '펜션',
@@ -23,8 +31,34 @@ const TYPE_COLORS: Record<MerchantType, string> = {
   FACILITY: 'bg-purple-50 text-purple-600',
 };
 
+const STATUS_LABELS: Record<AvailableTime['status'], string> = {
+  OPEN:    '예약 가능',
+  BLOCKED: '차단',
+};
+
+const STATUS_COLORS: Record<AvailableTime['status'], string> = {
+  OPEN:    'bg-green-50 text-green-600',
+  BLOCKED: 'bg-red-50 text-red-500',
+};
+
 function formatPrice(price: number) {
   return price.toLocaleString('ko-KR') + '원';
+}
+
+function formatTime(dt: string) {
+  return dt.slice(11, 16);
+}
+
+function toDatetimeLocal(dt: string) {
+  return dt.slice(0, 16);
+}
+
+function toBackendTime(dt: string) {
+  return dt + ':00';
+}
+
+function todayString() {
+  return new Date().toISOString().slice(0, 10);
 }
 
 // ─── 리소스 폼 모달 ───────────────────────────────────────────────────
@@ -146,50 +180,7 @@ function ResourceFormModal({
   );
 }
 
-// ─── 리소스 행 ────────────────────────────────────────────────────────
-function ResourceRow({
-  resource,
-  isMerchant,
-  onEdit,
-  onDelete,
-}: {
-  resource: Resource;
-  isMerchant: boolean;
-  onEdit: (r: Resource) => void;
-  onDelete: (r: Resource) => void;
-}) {
-  return (
-    <div className="py-3.5 border-b border-gray-50 last:border-0 flex items-center justify-between gap-3">
-      <div className="min-w-0">
-        <p className="text-sm font-medium text-gray-800 truncate">{resource.name}</p>
-        {resource.description && (
-          <p className="text-xs text-gray-400 mt-0.5 truncate">{resource.description}</p>
-        )}
-        <p className="text-xs text-gray-400 mt-0.5">
-          최대 {resource.maxCapacity}인 · {formatPrice(resource.price)}
-        </p>
-      </div>
-      {isMerchant && (
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <button
-            onClick={() => onEdit(resource)}
-            className="text-xs text-gray-400 hover:text-blue-500 transition-colors"
-          >
-            수정
-          </button>
-          <button
-            onClick={() => onDelete(resource)}
-            className="text-xs text-gray-400 hover:text-red-500 transition-colors"
-          >
-            삭제
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── 삭제 확인 모달 ───────────────────────────────────────────────────
+// ─── 삭제 확인 모달 (리소스) ──────────────────────────────────────────
 function DeleteConfirmModal({
   resource,
   onClose,
@@ -229,6 +220,326 @@ function DeleteConfirmModal({
   );
 }
 
+// ─── 이용 시간 추가/수정 모달 ─────────────────────────────────────────
+function AvailableTimeFormModal({
+  resourceId,
+  initial,
+  defaultDate,
+  onClose,
+  onSaved,
+}: {
+  resourceId: number;
+  initial: AvailableTime | null;
+  defaultDate: string;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const isEdit = initial !== null;
+  const [startTime, setStartTime] = useState(
+    initial ? toDatetimeLocal(initial.startTime) : `${defaultDate}T09:00`
+  );
+  const [endTime, setEndTime] = useState(
+    initial ? toDatetimeLocal(initial.endTime) : `${defaultDate}T10:00`
+  );
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      if (isEdit) {
+        await updateAvailableTime(initial!.id, toBackendTime(startTime), toBackendTime(endTime));
+      } else {
+        await createAvailableTime(resourceId, toBackendTime(startTime), toBackendTime(endTime));
+      }
+      onSaved();
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl shadow-xl p-6">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-base font-bold text-gray-900">
+            {isEdit ? '이용 시간 수정' : '이용 시간 추가'}
+          </h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5">시작 시간</label>
+            <input
+              type="datetime-local"
+              value={startTime}
+              onChange={(e) => setStartTime(e.target.value)}
+              required
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1.5">종료 시간</label>
+            <input
+              type="datetime-local"
+              value={endTime}
+              onChange={(e) => setEndTime(e.target.value)}
+              required
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {error && <p className="text-sm text-red-400 text-center">{error}</p>}
+
+          <button
+            type="submit"
+            disabled={loading || !startTime || !endTime}
+            className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-200 disabled:text-gray-400 text-white text-sm font-medium rounded-xl py-3 transition-colors"
+          >
+            {loading ? '저장 중...' : isEdit ? '수정 완료' : '추가'}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ─── 이용 시간 삭제 확인 모달 ─────────────────────────────────────────
+function AvailableTimeDeleteModal({
+  time,
+  onClose,
+  onConfirm,
+  loading,
+}: {
+  time: AvailableTime;
+  onClose: () => void;
+  onConfirm: () => void;
+  loading: boolean;
+}) {
+  return (
+    <div className="fixed inset-0 z-[70] flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-xl p-6 mx-4">
+        <h2 className="text-base font-bold text-gray-900 mb-2">이용 시간 삭제</h2>
+        <p className="text-sm text-gray-500 mb-6">
+          <span className="font-medium text-gray-800">
+            {formatTime(time.startTime)} ~ {formatTime(time.endTime)}
+          </span> 시간대를 삭제하시겠습니까?
+        </p>
+        <div className="flex gap-2">
+          <button
+            onClick={onClose}
+            className="flex-1 text-sm font-medium py-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
+          >
+            취소
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={loading}
+            className="flex-1 text-sm font-medium py-2.5 rounded-xl bg-red-500 hover:bg-red-600 disabled:bg-gray-200 text-white transition-colors"
+          >
+            {loading ? '삭제 중...' : '삭제'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── 이용 시간 관리 모달 ──────────────────────────────────────────────
+function AvailableTimeManagerModal({
+  resource,
+  onClose,
+}: {
+  resource: Resource;
+  onClose: () => void;
+}) {
+  const [date, setDate] = useState(todayString());
+  const [times, setTimes] = useState<AvailableTime[]>([]);
+  const [timesLoading, setTimesLoading] = useState(false);
+  const [timesError, setTimesError] = useState('');
+  const [formTarget, setFormTarget] = useState<AvailableTime | null | 'new'>(undefined as any);
+  const [deleteTarget, setDeleteTarget] = useState<AvailableTime | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  async function fetchTimes(d: string) {
+    setTimesLoading(true);
+    setTimesError('');
+    try {
+      setTimes(await getAvailableTimes(resource.id, d));
+    } catch {
+      setTimesError('이용 시간을 불러오지 못했습니다.');
+    } finally {
+      setTimesLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchTimes(date);
+  }, [date]);
+
+  async function handleDelete() {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
+    try {
+      await deleteAvailableTime(deleteTarget.id);
+      setDeleteTarget(null);
+      fetchTimes(date);
+    } catch {
+      // 삭제 실패 시 모달 유지
+    } finally {
+      setDeleteLoading(false);
+    }
+  }
+
+  return (
+    <>
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+        <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+        <div className="relative w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl shadow-xl p-6">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-base font-bold text-gray-900 truncate pr-2">
+              {resource.name} — 이용 시간 관리
+            </h2>
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none flex-shrink-0">✕</button>
+          </div>
+
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+          />
+
+          {timesLoading ? (
+            <div className="space-y-2 mb-4">
+              <div className="h-10 bg-gray-100 rounded-xl animate-pulse" />
+              <div className="h-10 bg-gray-100 rounded-xl animate-pulse" />
+            </div>
+          ) : timesError ? (
+            <p className="text-sm text-red-400 text-center py-4 mb-4">{timesError}</p>
+          ) : times.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-6 mb-4">해당 날짜에 등록된 이용 시간이 없습니다.</p>
+          ) : (
+            <div className="divide-y divide-gray-50 mb-4 max-h-60 overflow-y-auto">
+              {times.map((t) => (
+                <div key={t.id} className="py-3 flex items-center justify-between gap-2">
+                  <p className="text-sm text-gray-800 min-w-0 truncate">
+                    {formatTime(t.startTime)} ~ {formatTime(t.endTime)}
+                  </p>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[t.status]}`}>
+                      {STATUS_LABELS[t.status]}
+                    </span>
+                    <button
+                      onClick={() => setFormTarget(t)}
+                      className="text-xs text-gray-400 hover:text-blue-500 transition-colors"
+                    >
+                      수정
+                    </button>
+                    <button
+                      onClick={() => setDeleteTarget(t)}
+                      className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      삭제
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <button
+            onClick={() => setFormTarget('new')}
+            className="w-full border border-dashed border-blue-300 text-blue-500 hover:bg-blue-50 text-sm font-medium rounded-xl py-2.5 transition-colors"
+          >
+            + 시간 추가
+          </button>
+        </div>
+      </div>
+
+      {(formTarget === 'new' || (formTarget && formTarget !== undefined)) && (
+        <AvailableTimeFormModal
+          resourceId={resource.id}
+          initial={formTarget === 'new' ? null : formTarget as AvailableTime}
+          defaultDate={date}
+          onClose={() => setFormTarget(undefined as any)}
+          onSaved={() => {
+            setFormTarget(undefined as any);
+            fetchTimes(date);
+          }}
+        />
+      )}
+
+      {deleteTarget && (
+        <AvailableTimeDeleteModal
+          time={deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+          onConfirm={handleDelete}
+          loading={deleteLoading}
+        />
+      )}
+    </>
+  );
+}
+
+// ─── 리소스 행 ────────────────────────────────────────────────────────
+function ResourceRow({
+  resource,
+  isMerchant,
+  onEdit,
+  onDelete,
+  onManageTimes,
+}: {
+  resource: Resource;
+  isMerchant: boolean;
+  onEdit: (r: Resource) => void;
+  onDelete: (r: Resource) => void;
+  onManageTimes: (r: Resource) => void;
+}) {
+  return (
+    <div className="py-3.5 border-b border-gray-50 last:border-0 flex items-center justify-between gap-3">
+      <div className="min-w-0">
+        <p className="text-sm font-medium text-gray-800 truncate">{resource.name}</p>
+        {resource.description && (
+          <p className="text-xs text-gray-400 mt-0.5 truncate">{resource.description}</p>
+        )}
+        <p className="text-xs text-gray-400 mt-0.5">
+          최대 {resource.maxCapacity}인 · {formatPrice(resource.price)}
+        </p>
+      </div>
+      {isMerchant && (
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <button
+            onClick={() => onManageTimes(resource)}
+            className="text-xs text-gray-400 hover:text-blue-500 transition-colors"
+          >
+            이용시간
+          </button>
+          <button
+            onClick={() => onEdit(resource)}
+            className="text-xs text-gray-400 hover:text-blue-500 transition-colors"
+          >
+            수정
+          </button>
+          <button
+            onClick={() => onDelete(resource)}
+            className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+          >
+            삭제
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── 메인 페이지 ──────────────────────────────────────────────────────
 export default function MerchantDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -243,6 +554,7 @@ export default function MerchantDetailPage() {
   const [formTarget, setFormTarget] = useState<Resource | null | 'new'>(undefined as any);
   const [deleteTarget, setDeleteTarget] = useState<Resource | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [timeManageTarget, setTimeManageTarget] = useState<Resource | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -350,6 +662,7 @@ export default function MerchantDetailPage() {
                       isMerchant={isMerchant}
                       onEdit={setFormTarget}
                       onDelete={setDeleteTarget}
+                      onManageTimes={setTimeManageTarget}
                     />
                   ))}
                 </div>
@@ -359,7 +672,7 @@ export default function MerchantDetailPage() {
         )}
       </main>
 
-      {/* 추가/수정 모달 */}
+      {/* 리소스 추가/수정 모달 */}
       {(formTarget === 'new' || (formTarget && formTarget !== undefined)) && merchant && (
         <ResourceFormModal
           merchantId={Number(id)}
@@ -369,13 +682,21 @@ export default function MerchantDetailPage() {
         />
       )}
 
-      {/* 삭제 확인 모달 */}
+      {/* 리소스 삭제 확인 모달 */}
       {deleteTarget && (
         <DeleteConfirmModal
           resource={deleteTarget}
           onClose={() => setDeleteTarget(null)}
           onConfirm={handleDelete}
           loading={deleteLoading}
+        />
+      )}
+
+      {/* 이용 시간 관리 모달 */}
+      {timeManageTarget && (
+        <AvailableTimeManagerModal
+          resource={timeManageTarget}
+          onClose={() => setTimeManageTarget(null)}
         />
       )}
     </>
