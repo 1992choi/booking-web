@@ -2,6 +2,13 @@ export type Role = 'USER' | 'MERCHANT' | 'ADMIN';
 
 export interface TokenResponse {
   accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+}
+
+export interface RefreshResponse {
+  accessToken: string;
+  expiresIn: number;
 }
 
 export interface UserResponse {

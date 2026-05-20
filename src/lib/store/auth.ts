@@ -4,11 +4,13 @@ import type { Role, UserResponse } from '@/lib/types/auth';
 
 interface AuthState {
   accessToken: string | null;
+  refreshToken: string | null;
   user: UserResponse | null;
   role: Role | null;
   isAuthenticated: boolean;
 
-  setAuth: (accessToken: string, user: UserResponse) => void;
+  setAuth: (accessToken: string, refreshToken: string, user: UserResponse) => void;
+  setAccessToken: (accessToken: string) => void;
   clearAuth: () => void;
 }
 
@@ -26,28 +28,24 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       accessToken: null,
+      refreshToken: null,
       user: null,
       role: null,
       isAuthenticated: false,
 
-      setAuth: (accessToken, user) => {
+      setAuth: (accessToken, refreshToken, user) => {
         setCookie(accessToken);
-        set({
-          accessToken,
-          user,
-          role: user.role,
-          isAuthenticated: true,
-        });
+        set({ accessToken, refreshToken, user, role: user.role, isAuthenticated: true });
+      },
+
+      setAccessToken: (accessToken) => {
+        setCookie(accessToken);
+        set({ accessToken });
       },
 
       clearAuth: () => {
         deleteCookie();
-        set({
-          accessToken: null,
-          user: null,
-          role: null,
-          isAuthenticated: false,
-        });
+        set({ accessToken: null, refreshToken: null, user: null, role: null, isAuthenticated: false });
       },
     }),
     {
@@ -55,6 +53,7 @@ export const useAuthStore = create<AuthState>()(
       // only persist token + user; cookie is synced on hydration
       partialize: (state) => ({
         accessToken: state.accessToken,
+        refreshToken: state.refreshToken,
         user: state.user,
         role: state.role,
         isAuthenticated: state.isAuthenticated,

@@ -1,4 +1,5 @@
 import axios, { AxiosError } from 'axios';
+import type { InternalAxiosRequestConfig } from 'axios';
 import type { ApiError } from '@/lib/types/common';
 
 /** Korean error messages keyed by backend error code */
@@ -44,16 +45,71 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-/** On 401: clear auth and redirect to login */
+type RetryableRequest = InternalAxiosRequestConfig & { _retry?: boolean };
+
+let isRefreshing = false;
+let queue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = [];
+
+function flushQueue(err: unknown, token: string | null) {
+  queue.forEach(({ resolve, reject }) => (err ? reject(err) : resolve(token!)));
+  queue = [];
+}
+
+/** On 401: attempt token refresh once, then retry; fall back to login redirect */
 apiClient.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => {
-    if (error.response?.status === 401 && typeof window !== 'undefined') {
+  async (error: AxiosError) => {
+    if (error.response?.status !== 401 || typeof window === 'undefined') {
+      return Promise.reject(error);
+    }
+
+    const original = error.config as RetryableRequest;
+
+    // Refresh endpoint itself returned 401 — token is invalid, force logout
+    if (original?.url?.includes('/auth/refresh')) {
       const { useAuthStore } = require('@/lib/store/auth');
       useAuthStore.getState().clearAuth();
       window.location.href = '/login';
+      return Promise.reject(error);
     }
-    return Promise.reject(error);
+
+    // Another refresh is already in flight — queue this request
+    if (isRefreshing) {
+      return new Promise((resolve, reject) => {
+        queue.push({ resolve, reject });
+      }).then((token) => {
+        original.headers.Authorization = `Bearer ${token}`;
+        return apiClient(original);
+      });
+    }
+
+    original._retry = true;
+    isRefreshing = true;
+
+    const { useAuthStore } = require('@/lib/store/auth');
+    const { refreshToken, clearAuth, setAccessToken } = useAuthStore.getState();
+
+    if (!refreshToken) {
+      clearAuth();
+      window.location.href = '/login';
+      return Promise.reject(error);
+    }
+
+    try {
+      const { refresh } = require('@/lib/api/auth');
+      const { accessToken } = await refresh(refreshToken);
+      setAccessToken(accessToken);
+      flushQueue(null, accessToken);
+      original.headers.Authorization = `Bearer ${accessToken}`;
+      return apiClient(original);
+    } catch (refreshError) {
+      flushQueue(refreshError, null);
+      clearAuth();
+      window.location.href = '/login';
+      return Promise.reject(refreshError);
+    } finally {
+      isRefreshing = false;
+    }
   }
 );
 

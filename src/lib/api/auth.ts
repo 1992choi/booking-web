@@ -1,9 +1,15 @@
 import apiClient from './axios';
-import type { LoginRequest, SignupRequest, TokenResponse, UserResponse } from '@/lib/types/auth';
+import type { LoginRequest, RefreshResponse, SignupRequest, TokenResponse, UserResponse } from '@/lib/types/auth';
 
 /** GET /api/v1/users/me */
 export async function getMe(): Promise<UserResponse> {
   const { data } = await apiClient.get<UserResponse>('/users/me');
+  return data;
+}
+
+/** POST /api/v1/auth/refresh */
+export async function refresh(refreshToken: string): Promise<RefreshResponse> {
+  const { data } = await apiClient.post<RefreshResponse>('/auth/refresh', { refreshToken });
   return data;
 }
 
