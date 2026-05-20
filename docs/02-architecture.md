@@ -25,70 +25,69 @@ CORS 문제 없이 모두 `localhost:3000/api/v1/...`로 호출 가능.
 ```
 booking-web/
 ├── src/
-│   ├── app/                         # Next.js App Router (폴더 = 라우트)
-│   │   ├── layout.tsx               # 루트 레이아웃 (공통 Provider 포함)
-│   │   ├── page.tsx                 # 홈 (/)
-│   │   ├── globals.css
+│   ├── app/                          # Next.js App Router (폴더 = 라우트)
+│   │   ├── layout.tsx                # 루트 레이아웃 (공통 Provider 포함)
+│   │   ├── page.tsx                  # 홈 (/)
+│   │   ├── providers.tsx             # TanStack Query Provider
 │   │   │
-│   │   ├── (auth)/                  # 인증 라우트 그룹 (헤더 없음)
-│   │   │   ├── login/page.tsx       # /login
-│   │   │   └── signup/page.tsx      # /signup
-│   │   │
-│   │   ├── (user)/                  # 일반 사용자 라우트 그룹
-│   │   │   ├── layout.tsx           # 공통 헤더/푸터
-│   │   │   ├── owners/
-│   │   │   │   ├── page.tsx         # /owners (업체 목록)
-│   │   │   │   └── [id]/page.tsx    # /owners/{id} (업체 상세)
-│   │   │   ├── reservations/
-│   │   │   │   ├── page.tsx         # /reservations (내 예약 목록)
-│   │   │   │   └── [id]/page.tsx    # /reservations/{id} (예약 상세)
-│   │   │   └── notifications/
-│   │   │       └── page.tsx         # /notifications (내 알림)
-│   │   │
-│   │   ├── (owner)/                 # 업체 운영자 라우트 그룹 (role=OWNER)
+│   │   ├── (auth)/                   # 인증 라우트 그룹 (헤더 없음)
 │   │   │   ├── layout.tsx
-│   │   │   └── owner/
-│   │   │       ├── dashboard/page.tsx
-│   │   │       └── resources/page.tsx
+│   │   │   ├── login/page.tsx        # /login
+│   │   │   └── signup/page.tsx       # /signup
 │   │   │
-│   │   └── (admin)/                 # 관리자 라우트 그룹 (role=ADMIN)
-│   │       ├── layout.tsx
-│   │       └── admin/
-│   │           ├── reservations/page.tsx
-│   │           └── calendar/page.tsx
+│   │   ├── owners/
+│   │   │   └── [id]/page.tsx         # /owners/{id} (업체 상세 + 예약)
+│   │   │
+│   │   ├── my/                       # 일반 사용자 마이페이지 (로그인 필수)
+│   │   │   ├── page.tsx              # /my (내 정보)
+│   │   │   ├── reservations/
+│   │   │   │   ├── page.tsx          # /my/reservations (내 예약 목록)
+│   │   │   │   └── [id]/page.tsx     # /my/reservations/{id} (예약 상세 + 결제)
+│   │   │   └── notifications/
+│   │   │       └── page.tsx          # /my/notifications (내 알림)
+│   │   │
+│   │   └── merchant/                 # 업체 운영자 (role=MERCHANT 이상)
+│   │       ├── register/page.tsx     # /merchant/register (업체 등록)
+│   │       ├── dashboard/page.tsx    # /merchant/dashboard (내 업체 목록)
+│   │       ├── calendar/page.tsx     # /merchant/calendar (예약 현황 캘린더)
+│   │       └── [id]/
+│   │           ├── page.tsx          # /merchant/{id} (업체 상세 관리)
+│   │           ├── edit/page.tsx     # /merchant/{id}/edit (업체·리소스 수정)
+│   │           └── reservations/
+│   │               └── page.tsx      # /merchant/{id}/reservations (업체별 예약 목록)
 │   │
 │   ├── components/
-│   │   ├── ui/                      # shadcn/ui 기본 컴포넌트
-│   │   ├── common/                  # 헤더, 푸터, 에러바운더리, 스켈레톤
-│   │   ├── reservation/             # 예약 관련 컴포넌트
-│   │   ├── owner/                   # 업체·리소스 관련 컴포넌트
-│   │   └── admin/                   # 관리자 캘린더 등
+│   │   └── Header.tsx
 │   │
 │   ├── lib/
-│   │   ├── api/                     # API 호출 함수 (서비스별 분리)
-│   │   │   ├── axios.ts             # Axios 인스턴스 + JWT 인터셉터
-│   │   │   ├── auth.ts              # 회원가입, 로그인
-│   │   │   ├── owners.ts            # 업체 CRUD
-│   │   │   ├── resources.ts         # 예약 대상, 가능시간
-│   │   │   ├── reservations.ts      # 예약 CRUD
-│   │   │   ├── payments.ts          # 결제 조회, 환불
-│   │   │   └── notifications.ts     # 알림 조회
+│   │   ├── api/                      # API 호출 함수 (서비스별 분리)
+│   │   │   ├── axios.ts              # Axios 인스턴스 + JWT 인터셉터
+│   │   │   ├── auth.ts               # 회원가입, 로그인, 내 정보 조회
+│   │   │   ├── merchants.ts          # 업체 CRUD, 가능시간 조회, 예약 생성
+│   │   │   ├── resources.ts          # 예약 대상 CRUD, 가능시간 CRUD
+│   │   │   ├── reservations.ts       # 내 예약 조회/취소
+│   │   │   ├── merchantReservations.ts # 업체별 예약 조회, 확정/취소
+│   │   │   ├── adminReservations.ts  # 관리자 캘린더 조회
+│   │   │   ├── payments.ts           # 결제 조회, 환불
+│   │   │   └── notifications.ts      # 알림 조회
 │   │   │
 │   │   ├── store/
-│   │   │   └── auth.ts              # Zustand: accessToken, user 정보
+│   │   │   └── auth.ts               # Zustand: accessToken, user 정보
 │   │   │
-│   │   └── types/                   # 백엔드 DTO 기반 TypeScript 타입
+│   │   └── types/                    # 백엔드 DTO 기반 TypeScript 타입
 │   │       ├── auth.ts
-│   │       ├── owner.ts
+│   │       ├── merchant.ts
 │   │       ├── reservation.ts
 │   │       ├── payment.ts
-│   │       └── notification.ts
+│   │       ├── notification.ts
+│   │       ├── admin.ts
+│   │       └── common.ts
 │   │
-│   └── middleware.ts                 # 라우트 보호 (미인증 → /login 리디렉션)
+│   └── middleware.ts                  # 라우트 보호 (미인증 → /login 리디렉션)
 │
-├── docs/                             # 프론트엔드 문서
-├── public/                           # 정적 파일
-├── next.config.ts                    # Next.js 설정 (백엔드 프록시 포함)
+├── docs/                              # 프론트엔드 문서
+├── public/                            # 정적 파일
+├── next.config.ts                     # Next.js 설정 (백엔드 프록시 포함)
 ├── tailwind.config.ts
 ├── tsconfig.json
 └── package.json
@@ -98,15 +97,18 @@ booking-web/
 
 ## 라우트 보호 전략
 
-`middleware.ts`에서 JWT 토큰 유무를 확인해 미인증 사용자를 `/login`으로 리디렉션한다.
-role 기반 접근 제어는 각 페이지 컴포넌트 또는 layout.tsx에서 처리한다.
+`middleware.ts`에서 JWT 토큰 유무 및 role을 확인한다.
 
 ```
-/login, /signup          → 누구나 접근 가능 (로그인 시 / 로 리디렉션)
-/owners, /reservations   → 로그인 필수 (role=USER 이상)
-/owner/**                → role=OWNER 필수
+/login, /signup          → 누구나 접근 가능
+/owners/{id}             → 누구나 접근 가능
+/my/**                   → 로그인 필수
+/merchant/**             → role=MERCHANT 또는 ADMIN 필수
 /admin/**                → role=ADMIN 필수
 ```
+
+미인증 접근 시 `/login?redirect={pathname}`으로 리디렉션.
+role 불충족 시 `/`로 리디렉션.
 
 ---
 

@@ -27,41 +27,63 @@ CORS 문제 없이 백엔드 4개 서비스로 자동 프록시된다.
 
 ### auth.ts
 ```
-signup(name, email, password, phone) → UserResponse
-login(email, password) → TokenResponse
+getMe() → UserResponse
+signup(data: SignupRequest) → void
+login(data: LoginRequest) → { token: TokenResponse; user: UserResponse }
 ```
 
-### owners.ts
+### merchants.ts
 ```
-getOwners() → OwnerSummaryResponse[]
-getOwner(id) → OwnerDetailResponse
-createOwner(name, phone, type) → OwnerResponse
+getMerchants() → MerchantSummary[]
+getMyMerchants() → MerchantSummary[]
+createMerchant(params: MerchantRequest) → MerchantDetail
+getMerchant(id) → MerchantDetail
+updateMerchant(id, params: MerchantRequest) → MerchantDetail
+getAvailableTimes(resourceId, date) → AvailableTime[]
+createReservation(params: CreateReservationRequest) → void
 ```
 
 ### resources.ts
 ```
-createResource(ownerId, name, description, price, maxCapacity) → ResourceResponse
-getAvailableTimes(resourceId, date) → AvailableTimeResponse[]
-addAvailableTime(resourceId, startTime, endTime) → AvailableTimeResponse
+createResource(merchantId, params: ResourceRequest) → Resource
+updateResource(resourceId, params: ResourceRequest) → Resource
+deleteResource(resourceId) → void
+getAvailableTimes(resourceId, date) → AvailableTime[]
+createAvailableTime(resourceId, startTime, endTime) → AvailableTime
+updateAvailableTime(id, startTime, endTime) → AvailableTime
+deleteAvailableTime(id) → void
 ```
 
 ### reservations.ts
 ```
-createReservation(resourceId, startTime, endTime, headCount) → ReservationResponse
-getMyReservations(status?, page?, size?) → PageResponse<ReservationResponse>
-getReservation(id) → ReservationResponse
-cancelReservation(id) → ReservationResponse
+getReservation(id) → Reservation
+cancelReservation(id) → void
+getMyReservations(status?, page?, size?) → PageResponse<Reservation>
+```
+
+### merchantReservations.ts
+```
+getMerchantReservations(merchantId, status?, page?, size?) → PageResponse<MerchantReservation>
+confirmReservation(reservationId) → void
+cancelReservation(reservationId) → void
+```
+
+### adminReservations.ts
+```
+getAdminCalendar(year, month) → AdminCalendarData
+confirmReservation(reservationId) → void
+cancelReservation(reservationId) → void
 ```
 
 ### payments.ts
 ```
-getPayment(reservationId) → PaymentResponse
-refund(reservationId) → PaymentResponse
+getPayment(reservationId) → Payment
+refund(reservationId) → void
 ```
 
 ### notifications.ts
 ```
-getMyNotifications() → NotificationResponse[]
+getMyNotifications() → Notification[]
 ```
 
 ---
