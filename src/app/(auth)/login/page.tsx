@@ -36,7 +36,7 @@ export default function LoginPage() {
     setErrorMsg('');
     try {
       const { token, user } = await login(values);
-      setAuth(token.accessToken, user);
+      setAuth(token.accessToken, token.refreshToken, user);
       router.replace(redirectTo);
     } catch (err) {
       setErrorMsg(getErrorMessage(err));
