@@ -14,10 +14,3 @@ export async function getMerchantReservations(
   return data;
 }
 
-export async function confirmReservation(reservationId: number): Promise<void> {
-  await apiClient.put(`/admin/reservations/${reservationId}/confirm`);
-}
-
-export async function cancelReservation(reservationId: number): Promise<void> {
-  await apiClient.put(`/admin/reservations/${reservationId}/cancel`);
-}

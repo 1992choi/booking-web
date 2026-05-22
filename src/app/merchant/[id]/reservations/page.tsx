@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
-import { getMerchantReservations, confirmReservation, cancelReservation } from '@/lib/api/merchantReservations';
+import { getMerchantReservations } from '@/lib/api/merchantReservations';
+import { confirmReservation, cancelReservation } from '@/lib/api/adminReservations';
 import { getErrorMessage } from '@/lib/api/axios';
 import type { MerchantReservation, ReservationStatus } from '@/lib/types/reservation';
 
