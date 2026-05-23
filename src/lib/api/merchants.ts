@@ -1,9 +1,9 @@
 import apiClient from './axios';
 import type {
-  AvailableTime,
   CreateReservationRequest,
   MerchantDetail,
   MerchantRequest,
+  MerchantResponse,
   MerchantSummary,
 } from '@/lib/types/merchant';
 
@@ -14,14 +14,14 @@ export async function getMerchants(): Promise<MerchantSummary[]> {
 }
 
 /** GET /api/v1/merchants/me — current user's merchants (MERCHANT) */
-export async function getMyMerchants(): Promise<MerchantSummary[]> {
-  const { data } = await apiClient.get<MerchantSummary[]>('/merchants/me');
+export async function getMyMerchants(): Promise<MerchantResponse[]> {
+  const { data } = await apiClient.get<MerchantResponse[]>('/merchants/me');
   return data;
 }
 
 /** POST /api/v1/merchants */
-export async function createMerchant(params: MerchantRequest): Promise<MerchantDetail> {
-  const { data } = await apiClient.post<MerchantDetail>('/merchants', params);
+export async function createMerchant(params: MerchantRequest): Promise<MerchantResponse> {
+  const { data } = await apiClient.post<MerchantResponse>('/merchants', params);
   return data;
 }
 
@@ -32,16 +32,8 @@ export async function getMerchant(id: number): Promise<MerchantDetail> {
 }
 
 /** PUT /api/v1/merchants/:id */
-export async function updateMerchant(id: number, params: MerchantRequest): Promise<MerchantDetail> {
-  const { data } = await apiClient.put<MerchantDetail>(`/merchants/${id}`, params);
-  return data;
-}
-
-/** GET /api/v1/resources/:resourceId/available-times?date=YYYY-MM-DD */
-export async function getAvailableTimes(resourceId: number, date: string): Promise<AvailableTime[]> {
-  const { data } = await apiClient.get<AvailableTime[]>(`/resources/${resourceId}/available-times`, {
-    params: { date },
-  });
+export async function updateMerchant(id: number, params: MerchantRequest): Promise<MerchantResponse> {
+  const { data } = await apiClient.put<MerchantResponse>(`/merchants/${id}`, params);
   return data;
 }
 

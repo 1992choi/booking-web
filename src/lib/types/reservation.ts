@@ -11,5 +11,6 @@ export interface Reservation {
 }
 
 export interface MerchantReservation extends Reservation {
-  userName: string;
+  userId: number;
+  userName: string | null;
 }

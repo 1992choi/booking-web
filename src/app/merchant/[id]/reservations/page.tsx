@@ -58,7 +58,7 @@ function ReservationCard({
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="min-w-0">
           <p className="text-base font-semibold text-gray-900 truncate">{reservation.resourceName}</p>
-          <p className="text-xs text-gray-400 mt-0.5">{reservation.userName}</p>
+          <p className="text-xs text-gray-400 mt-0.5">{reservation.userName ?? '—'}</p>
         </div>
         <span className={`flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLES[reservation.status]}`}>
           {STATUS_LABELS[reservation.status]}

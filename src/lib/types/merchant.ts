@@ -1,5 +1,14 @@
 export type MerchantType = 'PENSION' | 'CLASS' | 'FACILITY';
 
+export interface MerchantResponse {
+  id: number;
+  userId: number;
+  name: string;
+  phone: string;
+  type: MerchantType;
+  createdAt: string;
+}
+
 export interface MerchantSummary {
   id: number;
   name: string;

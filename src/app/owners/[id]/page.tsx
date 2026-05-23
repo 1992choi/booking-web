@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
-import { createReservation, getAvailableTimes, getMerchant } from '@/lib/api/merchants';
+import { createReservation, getMerchant } from '@/lib/api/merchants';
+import { getAvailableTimes } from '@/lib/api/resources';
 import { getErrorMessage } from '@/lib/api/axios';
 import type { AvailableTime, MerchantDetail, Resource } from '@/lib/types/merchant';
 

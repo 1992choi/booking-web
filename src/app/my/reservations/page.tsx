@@ -98,14 +98,15 @@ export default function MyReservationsPage() {
             getMyReservations('CANCELLED', 0, 100),
           ]).then(([a, b, c]) => ({
             content: [...a.content, ...b.content, ...c.content],
-            last: true,
+            totalPages: 1,
+            page: 0,
           }))
         : getMyReservations(tab, 0);
 
     fetch
       .then((res) => {
         setReservations(res.content);
-        setIsLast(res.last);
+        setIsLast(res.page >= res.totalPages - 1);
       })
       .catch(() => setError('예약 목록을 불러오지 못했습니다.'))
       .finally(() => setLoading(false));
@@ -116,7 +117,7 @@ export default function MyReservationsPage() {
     getMyReservations(tab as ReservationStatus, next)
       .then((res) => {
         setReservations((prev) => [...prev, ...res.content]);
-        setIsLast(res.last);
+        setIsLast(res.page >= res.totalPages - 1);
         setPage(next);
       })
       .catch(() => setError('불러오기에 실패했습니다.'));
