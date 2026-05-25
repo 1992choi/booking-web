@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { createReservation, getMerchant } from '@/lib/api/merchants';
 import { getAvailableTimes } from '@/lib/api/resources';
 import { getErrorMessage } from '@/lib/api/axios';
+import { useAuthStore } from '@/lib/store/auth';
 import type { AvailableTime, MerchantDetail, Resource } from '@/lib/types/merchant';
 
 const TYPE_LABELS = {
@@ -41,6 +42,10 @@ function AvailableTimesModal({
   resource: Resource;
   onClose: () => void;
 }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { isAuthenticated } = useAuthStore();
+
   const [date, setDate] = useState(today());
   const [times, setTimes] = useState<AvailableTime[]>([]);
   const [loading, setLoading] = useState(false);
@@ -71,6 +76,10 @@ function AvailableTimesModal({
   }
 
   async function handleReserve() {
+    if (!isAuthenticated) {
+      router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
+      return;
+    }
     if (selectedIds.size === 0) return;
     setBooking(true);
     setBookingError('');
