@@ -31,3 +31,8 @@ export interface LoginRequest {
   email: string;
   password: string;
 }
+
+export interface UserUpdateRequest {
+  name: string;
+  phone: string;
+}

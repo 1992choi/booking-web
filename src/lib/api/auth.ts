@@ -1,10 +1,21 @@
 import apiClient from './axios';
-import type { LoginRequest, RefreshResponse, SignupRequest, TokenResponse, UserResponse } from '@/lib/types/auth';
+import type { LoginRequest, RefreshResponse, SignupRequest, TokenResponse, UserResponse, UserUpdateRequest } from '@/lib/types/auth';
 
 /** GET /api/v1/users/me */
 export async function getMe(): Promise<UserResponse> {
   const { data } = await apiClient.get<UserResponse>('/users/me');
   return data;
+}
+
+/** PUT /api/v1/users/me */
+export async function updateMe(body: UserUpdateRequest): Promise<UserResponse> {
+  const { data } = await apiClient.put<UserResponse>('/users/me', body);
+  return data;
+}
+
+/** DELETE /api/v1/users/me */
+export async function deleteMe(): Promise<void> {
+  await apiClient.delete('/users/me');
 }
 
 /** POST /api/v1/auth/refresh */

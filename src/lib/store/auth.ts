@@ -11,6 +11,7 @@ interface AuthState {
 
   setAuth: (accessToken: string, refreshToken: string, user: UserResponse) => void;
   setAccessToken: (accessToken: string) => void;
+  updateUser: (user: UserResponse) => void;
   clearAuth: () => void;
 }
 
@@ -41,6 +42,10 @@ export const useAuthStore = create<AuthState>()(
       setAccessToken: (accessToken) => {
         setCookie(accessToken);
         set({ accessToken });
+      },
+
+      updateUser: (user) => {
+        set({ user, role: user.role });
       },
 
       clearAuth: () => {
