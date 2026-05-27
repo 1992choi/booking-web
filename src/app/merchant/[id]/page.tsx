@@ -67,11 +67,13 @@ function ResourceFormModal({
   initial,
   onClose,
   onSaved,
+  onDelete,
 }: {
   merchantId: number;
   initial: Resource | null;
   onClose: () => void;
   onSaved: (resource: Resource) => void;
+  onDelete?: () => void;
 }) {
   const isEdit = initial !== null;
   const [name, setName] = useState(initial?.name ?? '');
@@ -174,6 +176,16 @@ function ResourceFormModal({
           >
             {loading ? '저장 중...' : isEdit ? '수정 완료' : '추가'}
           </button>
+
+          {isEdit && onDelete && (
+            <button
+              type="button"
+              onClick={onDelete}
+              className="w-full border border-red-200 text-red-400 hover:bg-red-50 hover:text-red-500 text-sm font-medium rounded-xl py-3 transition-colors"
+            >
+              삭제
+            </button>
+          )}
         </form>
       </div>
     </div>
@@ -494,18 +506,19 @@ function ResourceRow({
   resource,
   isMerchant,
   onEdit,
-  onDelete,
   onManageTimes,
 }: {
   resource: Resource;
   isMerchant: boolean;
   onEdit: (r: Resource) => void;
-  onDelete: (r: Resource) => void;
   onManageTimes: (r: Resource) => void;
 }) {
   return (
     <div className="py-3.5 border-b border-gray-50 last:border-0 flex items-center justify-between gap-3">
-      <div className="min-w-0">
+      <div
+        className={`min-w-0 flex-1 ${isMerchant ? 'cursor-pointer' : ''}`}
+        onClick={isMerchant ? () => onEdit(resource) : undefined}
+      >
         <p className="text-sm font-medium text-gray-800 truncate">{resource.name}</p>
         {resource.description && (
           <p className="text-xs text-gray-400 mt-0.5 truncate">{resource.description}</p>
@@ -515,26 +528,12 @@ function ResourceRow({
         </p>
       </div>
       {isMerchant && (
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <button
-            onClick={() => onManageTimes(resource)}
-            className="text-xs text-gray-400 hover:text-blue-500 transition-colors"
-          >
-            이용시간
-          </button>
-          <button
-            onClick={() => onEdit(resource)}
-            className="text-xs text-gray-400 hover:text-blue-500 transition-colors"
-          >
-            수정
-          </button>
-          <button
-            onClick={() => onDelete(resource)}
-            className="text-xs text-gray-400 hover:text-red-500 transition-colors"
-          >
-            삭제
-          </button>
-        </div>
+        <button
+          onClick={() => onManageTimes(resource)}
+          className="text-xs text-gray-400 hover:text-blue-500 transition-colors flex-shrink-0"
+        >
+          이용시간
+        </button>
       )}
     </div>
   );
@@ -661,7 +660,6 @@ export default function MerchantDetailPage() {
                       resource={r}
                       isMerchant={isMerchant}
                       onEdit={setFormTarget}
-                      onDelete={setDeleteTarget}
                       onManageTimes={setTimeManageTarget}
                     />
                   ))}
@@ -679,6 +677,10 @@ export default function MerchantDetailPage() {
           initial={formTarget === 'new' ? null : formTarget as Resource}
           onClose={() => setFormTarget(undefined as any)}
           onSaved={handleSaved}
+          onDelete={formTarget !== 'new' && formTarget ? () => {
+            setDeleteTarget(formTarget as Resource);
+            setFormTarget(undefined as any);
+          } : undefined}
         />
       )}
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { getMerchants, getMyMerchants } from '@/lib/api/merchants';
 import { useAuthStore } from '@/lib/store/auth';
@@ -20,8 +21,12 @@ const TYPE_COLORS: Record<MerchantType, string> = {
 };
 
 function MerchantCard({ merchant, isMerchant }: { merchant: MerchantSummary; isMerchant: boolean }) {
+  const router = useRouter();
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-200 hover:shadow-sm transition-all">
+    <div
+      className="bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-200 hover:shadow-sm transition-all cursor-pointer"
+      onClick={() => router.push(`/merchant/${merchant.id}`)}
+    >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 min-w-0">
           <h2 className="text-base font-semibold text-gray-900 truncate">{merchant.name}</h2>
@@ -29,22 +34,15 @@ function MerchantCard({ merchant, isMerchant }: { merchant: MerchantSummary; isM
             {TYPE_LABELS[merchant.type]}
           </span>
         </div>
-        <div className="flex items-center gap-3 ml-3 flex-shrink-0">
-          {isMerchant && (
-            <Link
-              href={`/merchant/${merchant.id}/reservations`}
-              className="text-xs font-medium text-blue-500 hover:text-blue-600 transition-colors"
-            >
-              예약 관리
-            </Link>
-          )}
+        {isMerchant && (
           <Link
-            href={`/merchant/${merchant.id}`}
-            className="text-xs font-medium text-gray-400 hover:text-gray-600 transition-colors"
+            href={`/merchant/${merchant.id}/reservations`}
+            onClick={(e) => e.stopPropagation()}
+            className="text-xs font-medium text-blue-500 hover:text-blue-600 transition-colors ml-3 flex-shrink-0"
           >
-            상세
+            예약 관리
           </Link>
-        </div>
+        )}
       </div>
     </div>
   );
