@@ -8,7 +8,10 @@
 |--------|------|------|
 | POST | `/api/v1/auth/signup` | 회원가입 |
 | POST | `/api/v1/auth/login` | 로그인 |
+| POST | `/api/v1/auth/refresh` | 토큰 갱신 |
 | GET | `/api/v1/users/me` | 내 정보 조회 |
+| PUT | `/api/v1/users/me` | 내 정보 수정 (name, phone) |
+| DELETE | `/api/v1/users/me` | 회원 탈퇴 |
 | POST | `/api/v1/merchants` | 업체 등록 |
 | GET | `/api/v1/merchants` | 전체 업체 목록 |
 | GET | `/api/v1/merchants/me` | 내 업체 목록 |
@@ -69,7 +72,7 @@
 
 | 페이지 | URL | 사용 API |
 |--------|-----|---------|
-| 내 정보 | `/my` | `GET /users/me` |
+| 내 정보 | `/my` | `GET /users/me`, `PUT /users/me`, `DELETE /users/me` |
 | 내 예약 목록 | `/my/reservations` | `GET /reservations/me` |
 | 예약 상세 + 결제 + 취소/환불 | `/my/reservations/{id}` | `GET /reservations/{id}`, `GET /payments/{id}`, `PUT /reservations/{id}/cancel`, `POST /payments/{id}/refund` |
 | 내 알림 | `/my/notifications` | `GET /notifications/me` |
@@ -94,9 +97,12 @@
 | RSV_001 | 409 | 이미 예약된 시간대입니다. 다른 시간을 선택해 주세요. |
 | RSV_002 | 409 | 동시 요청이 많습니다. 잠시 후 다시 시도해 주세요. |
 | RSV_003 | 422 | 최대 인원을 초과했습니다. |
+| RSV_006 | 404 | 업체를 찾을 수 없습니다. |
+| RSV_007 | 404 | 예약 대상을 찾을 수 없습니다. |
+| RSV_008 | 404 | 이용 가능 시간을 찾을 수 없습니다. |
 | API_001 | 409 | 이미 사용 중인 이메일입니다. |
 | API_002 | 401 | 이메일 또는 비밀번호가 올바르지 않습니다. |
 | PAY_001 | 422 | 결제가 실패했습니다. 다시 시도해 주세요. |
 | PAY_002 | 409 | 환불 가능한 상태가 아닙니다. |
-| AUTH_001 | 401 | 로그인이 필요합니다. → /login 리디렉션 |
+| AUTH_001 | 401 | 로그인이 필요합니다. |
 | AUTH_002 | 403 | 접근 권한이 없습니다. |
