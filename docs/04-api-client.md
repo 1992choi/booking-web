@@ -32,6 +32,7 @@ updateMe(body: UserUpdateRequest) → UserResponse
 deleteMe() → void
 signup(data: SignupRequest) → void
 login(data: LoginRequest) → { token: TokenResponse; user: UserResponse }
+logout() → void
 refresh(refreshToken: string) → RefreshResponse
 ```
 

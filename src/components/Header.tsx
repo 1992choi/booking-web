@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/auth';
+import { logout } from '@/lib/api/auth';
 
 export default function Header() {
   const router = useRouter();
@@ -21,7 +22,8 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try { await logout(); } catch { /* 서버 오류와 무관하게 클라이언트 정리 */ }
     clearAuth();
     setOpen(false);
     router.push('/login');

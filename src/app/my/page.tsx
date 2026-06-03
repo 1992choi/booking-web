@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
-import { getMe, updateMe, deleteMe } from '@/lib/api/auth';
+import { getMe, updateMe, deleteMe, logout } from '@/lib/api/auth';
 import { getErrorMessage } from '@/lib/api/axios';
 import { useAuthStore } from '@/lib/store/auth';
 import type { UserResponse } from '@/lib/types/auth';
@@ -102,7 +102,8 @@ export default function MyPage() {
     }
   }
 
-  function handleLogout() {
+  async function handleLogout() {
+    try { await logout(); } catch { /* 서버 오류와 무관하게 클라이언트 정리 */ }
     clearAuth();
     router.push('/login');
   }

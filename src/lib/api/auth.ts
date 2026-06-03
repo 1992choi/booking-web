@@ -24,6 +24,11 @@ export async function refresh(refreshToken: string): Promise<RefreshResponse> {
   return data;
 }
 
+/** POST /api/v1/auth/logout */
+export async function logout(): Promise<void> {
+  await apiClient.post('/auth/logout');
+}
+
 /** POST /api/v1/auth/signup */
 export async function signup(data: SignupRequest): Promise<void> {
   await apiClient.post('/auth/signup', data);

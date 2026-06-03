@@ -8,6 +8,7 @@
 |--------|------|------|
 | POST | `/api/v1/auth/signup` | 회원가입 |
 | POST | `/api/v1/auth/login` | 로그인 |
+| POST | `/api/v1/auth/logout` | 로그아웃 (서버 토큰 무효화) |
 | POST | `/api/v1/auth/refresh` | 토큰 갱신 |
 | GET | `/api/v1/users/me` | 내 정보 조회 |
 | PUT | `/api/v1/users/me` | 내 정보 수정 (name, phone) |
