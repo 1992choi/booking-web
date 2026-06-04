@@ -4,21 +4,10 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import { getMerchants } from '@/lib/api/merchants';
+import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
 import type { MerchantSummary, MerchantType } from '@/lib/types/merchant';
 
 type FilterType = MerchantType | 'ALL';
-
-const TYPE_LABELS: Record<MerchantType, string> = {
-  PENSION: '펜션',
-  CLASS: '클래스',
-  FACILITY: '시설',
-};
-
-const TYPE_COLORS: Record<MerchantType, string> = {
-  PENSION:  'bg-blue-50 text-blue-600',
-  CLASS:    'bg-green-50 text-green-600',
-  FACILITY: 'bg-purple-50 text-purple-600',
-};
 
 interface CategoryTab {
   value: FilterType;
@@ -48,8 +37,6 @@ export default function HomePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const visibleTabs = CATEGORY_TABS;
-
   const filtered =
     selected === 'ALL'
       ? merchants.filter((o) => VISIBLE_TYPES.has(o.type as MerchantType))
@@ -63,7 +50,7 @@ export default function HomePage() {
       <div className="sticky top-14 z-40 bg-white border-b border-gray-100 pt-[70px]">
         <div className="max-w-screen-lg mx-auto px-4">
           <div className="flex justify-center">
-            {visibleTabs.map((tab) => {
+            {CATEGORY_TABS.map((tab) => {
               const active = selected === tab.value;
               return (
                 <button
@@ -119,8 +106,8 @@ export default function HomePage() {
                 <span className="text-sm font-medium text-gray-800 text-center px-4 leading-snug">
                   {merchant.name}
                 </span>
-                <span className={`mt-3 text-xs font-semibold px-2 py-0.5 rounded-full ${TYPE_COLORS[merchant.type]}`}>
-                  {TYPE_LABELS[merchant.type]}
+                <span className={`mt-3 text-xs font-semibold px-2 py-0.5 rounded-full ${MERCHANT_TYPE_COLORS[merchant.type]}`}>
+                  {MERCHANT_TYPE_LABELS[merchant.type]}
                 </span>
               </Link>
             ))}

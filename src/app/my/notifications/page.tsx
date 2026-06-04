@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
+import BackButton from '@/components/ui/BackButton';
 import { getMyNotifications } from '@/lib/api/notifications';
 import type { Notification } from '@/lib/types/notification';
 
@@ -32,17 +32,13 @@ function NotificationItem({ notification }: { notification: Notification }) {
 }
 
 export default function NotificationsPage() {
-  const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     getMyNotifications()
-      .then((data) => {
-        console.log('[알림 응답]', data[0]);
-        setNotifications(data);
-      })
+      .then(setNotifications)
       .catch(() => setError('알림을 불러오지 못했습니다.'))
       .finally(() => setLoading(false));
   }, []);
@@ -52,12 +48,7 @@ export default function NotificationsPage() {
       <Header />
 
       <main className="max-w-screen-sm mx-auto px-4 py-6">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 mb-5 transition-colors"
-        >
-          ← 돌아가기
-        </button>
+        <BackButton />
 
         <h1 className="text-xl font-bold text-gray-900 mb-5">알림</h1>
 

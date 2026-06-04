@@ -1,5 +1,11 @@
 export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED';
 
+export interface CreateReservationRequest {
+  resourceId: number;
+  availableTimeIds: number[];
+  headCount: number;
+}
+
 export interface Reservation {
   id: number;
   resourceName: string;

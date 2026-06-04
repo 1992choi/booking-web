@@ -1,12 +1,7 @@
 import apiClient from './axios';
-import type { Resource, AvailableTime } from '@/lib/types/merchant';
+import type { Resource, AvailableTime, ResourceRequest } from '@/lib/types/merchant';
 
-export interface ResourceRequest {
-  name: string;
-  description: string;
-  price: number;
-  maxCapacity: number;
-}
+export type { ResourceRequest };
 
 /** POST /api/v1/merchants/:merchantId/resources */
 export async function createResource(merchantId: number, params: ResourceRequest): Promise<Resource> {

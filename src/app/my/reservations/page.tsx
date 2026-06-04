@@ -1,44 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
+import BackButton from '@/components/ui/BackButton';
 import { getMyReservations } from '@/lib/api/reservations';
+import {
+  RESERVATION_STATUS_LABELS,
+  RESERVATION_STATUS_STYLES,
+  RESERVATION_STATUS_TABS,
+} from '@/lib/constants/reservation';
+import { formatDate, formatPrice, formatTime } from '@/lib/utils/format';
 import type { Reservation, ReservationStatus } from '@/lib/types/reservation';
-
-const STATUS_TABS: { value: ReservationStatus | 'ALL'; label: string }[] = [
-  { value: 'ALL',       label: '전체' },
-  { value: 'PENDING',   label: '대기 중' },
-  { value: 'CONFIRMED', label: '확정' },
-  { value: 'CANCELLED', label: '취소' },
-];
-
-const STATUS_STYLES: Record<ReservationStatus, string> = {
-  PENDING:   'bg-yellow-50 text-yellow-600',
-  CONFIRMED: 'bg-blue-50 text-blue-600',
-  CANCELLED: 'bg-gray-100 text-gray-400',
-};
-
-const STATUS_LABELS: Record<ReservationStatus, string> = {
-  PENDING:   '대기 중',
-  CONFIRMED: '확정',
-  CANCELLED: '취소',
-};
-
-function formatPrice(price: number) {
-  return price.toLocaleString('ko-KR') + '원';
-}
-
-function formatTime(isoString: string) {
-  const d = new Date(isoString);
-  return d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
-}
-
-function formatDate(isoString: string) {
-  const d = new Date(isoString);
-  return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
-}
 
 function ReservationCard({ reservation }: { reservation: Reservation }) {
   return (
@@ -47,8 +20,8 @@ function ReservationCard({ reservation }: { reservation: Reservation }) {
       className="block bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-200 hover:shadow-sm transition-all">
       <div className="flex items-start justify-between gap-3 mb-3">
         <h3 className="text-base font-semibold text-gray-900 truncate">{reservation.resourceName}</h3>
-        <span className={`flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLES[reservation.status]}`}>
-          {STATUS_LABELS[reservation.status]}
+        <span className={`flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${RESERVATION_STATUS_STYLES[reservation.status]}`}>
+          {RESERVATION_STATUS_LABELS[reservation.status]}
         </span>
       </div>
 
@@ -77,7 +50,6 @@ function ReservationCard({ reservation }: { reservation: Reservation }) {
 }
 
 export default function MyReservationsPage() {
-  const router = useRouter();
   const [tab, setTab] = useState<ReservationStatus | 'ALL'>('ALL');
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -128,19 +100,13 @@ export default function MyReservationsPage() {
       <Header />
 
       <main className="max-w-screen-sm mx-auto px-4 py-6">
-        {/* 뒤로가기 */}
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 mb-5 transition-colors"
-        >
-          ← 돌아가기
-        </button>
+        <BackButton />
 
         <h1 className="text-xl font-bold text-gray-900 mb-5">내 예약</h1>
 
         {/* 상태 필터 탭 */}
         <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
-          {STATUS_TABS.map((t) => (
+          {RESERVATION_STATUS_TABS.map((t) => (
             <button
               key={t.value}
               onClick={() => setTab(t.value)}
@@ -155,7 +121,6 @@ export default function MyReservationsPage() {
           ))}
         </div>
 
-        {/* 로딩 */}
         {loading && (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
@@ -164,17 +129,14 @@ export default function MyReservationsPage() {
           </div>
         )}
 
-        {/* 에러 */}
         {!loading && error && (
           <p className="text-sm text-red-400 text-center py-16">{error}</p>
         )}
 
-        {/* 빈 목록 */}
         {!loading && !error && reservations.length === 0 && (
           <p className="text-sm text-gray-400 text-center py-16">예약 내역이 없습니다.</p>
         )}
 
-        {/* 목록 */}
         {!loading && !error && reservations.length > 0 && (
           <>
             <div className="space-y-3">

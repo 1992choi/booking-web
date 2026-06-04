@@ -4,45 +4,19 @@ import { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
+import BackButton from '@/components/ui/BackButton';
 import { getMerchantReservations } from '@/lib/api/merchantReservations';
 import { confirmReservation, cancelReservation } from '@/lib/api/adminReservations';
 import { getErrorMessage } from '@/lib/api/axios';
+import {
+  RESERVATION_STATUS_LABELS,
+  RESERVATION_STATUS_STYLES,
+  RESERVATION_STATUS_TABS,
+} from '@/lib/constants/reservation';
+import { formatDate, formatPrice, formatTime } from '@/lib/utils/format';
 import type { MerchantReservation, ReservationStatus } from '@/lib/types/reservation';
 
 type Action = 'confirm' | 'cancel';
-
-const STATUS_TABS: { value: ReservationStatus | 'ALL'; label: string }[] = [
-  { value: 'ALL',       label: '전체' },
-  { value: 'PENDING',   label: '대기 중' },
-  { value: 'CONFIRMED', label: '확정' },
-  { value: 'CANCELLED', label: '취소' },
-];
-
-const STATUS_STYLES: Record<ReservationStatus, string> = {
-  PENDING:   'bg-yellow-50 text-yellow-600',
-  CONFIRMED: 'bg-blue-50 text-blue-600',
-  CANCELLED: 'bg-gray-100 text-gray-400',
-};
-
-const STATUS_LABELS: Record<ReservationStatus, string> = {
-  PENDING:   '대기 중',
-  CONFIRMED: '확정',
-  CANCELLED: '취소',
-};
-
-function formatPrice(price: number) {
-  return price.toLocaleString('ko-KR') + '원';
-}
-
-function formatTime(isoString: string) {
-  const d = new Date(isoString);
-  return d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
-}
-
-function formatDate(isoString: string) {
-  const d = new Date(isoString);
-  return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
-}
 
 function ReservationCard({
   reservation,
@@ -60,8 +34,8 @@ function ReservationCard({
           <p className="text-base font-semibold text-gray-900 truncate">{reservation.resourceName}</p>
           <p className="text-xs text-gray-400 mt-0.5">{reservation.userName ?? '—'}</p>
         </div>
-        <span className={`flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLES[reservation.status]}`}>
-          {STATUS_LABELS[reservation.status]}
+        <span className={`flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${RESERVATION_STATUS_STYLES[reservation.status]}`}>
+          {RESERVATION_STATUS_LABELS[reservation.status]}
         </span>
       </div>
 
@@ -149,17 +123,12 @@ export default function MerchantReservationsPage() {
       <Header />
 
       <main className="max-w-screen-sm mx-auto px-4 py-6">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 mb-5 transition-colors"
-        >
-          ← 돌아가기
-        </button>
+        <BackButton />
 
         <h1 className="text-xl font-bold text-gray-900 mb-5">예약 관리</h1>
 
         <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
-          {STATUS_TABS.map((t) => (
+          {RESERVATION_STATUS_TABS.map((t) => (
             <button
               key={t.value}
               onClick={() => setTab(t.value)}

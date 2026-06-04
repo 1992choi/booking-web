@@ -5,20 +5,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { getMerchants, getMyMerchants } from '@/lib/api/merchants';
+import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
 import { useAuthStore } from '@/lib/store/auth';
-import type { MerchantSummary, MerchantType } from '@/lib/types/merchant';
-
-const TYPE_LABELS: Record<MerchantType, string> = {
-  PENSION:    '펜션',
-  CLASS:      '클래스',
-  FACILITY:   '시설',
-};
-
-const TYPE_COLORS: Record<MerchantType, string> = {
-  PENSION:  'bg-blue-50 text-blue-600',
-  CLASS:    'bg-green-50 text-green-600',
-  FACILITY: 'bg-purple-50 text-purple-600',
-};
+import type { MerchantSummary } from '@/lib/types/merchant';
 
 function MerchantCard({ merchant, isMerchant }: { merchant: MerchantSummary; isMerchant: boolean }) {
   const router = useRouter();
@@ -30,8 +19,8 @@ function MerchantCard({ merchant, isMerchant }: { merchant: MerchantSummary; isM
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 min-w-0">
           <h2 className="text-base font-semibold text-gray-900 truncate">{merchant.name}</h2>
-          <span className={`flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full ${TYPE_COLORS[merchant.type]}`}>
-            {TYPE_LABELS[merchant.type]}
+          <span className={`flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full ${MERCHANT_TYPE_COLORS[merchant.type]}`}>
+            {MERCHANT_TYPE_LABELS[merchant.type]}
           </span>
         </div>
         {isMerchant && (

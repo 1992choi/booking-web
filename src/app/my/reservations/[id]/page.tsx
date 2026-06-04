@@ -3,23 +3,18 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
+import BackButton from '@/components/ui/BackButton';
+import Row from '@/components/ui/Row';
 import { cancelReservation, getReservation } from '@/lib/api/reservations';
 import { getErrorMessage } from '@/lib/api/axios';
 import { getPayment, refund } from '@/lib/api/payments';
-import type { Reservation, ReservationStatus } from '@/lib/types/reservation';
+import {
+  RESERVATION_STATUS_LABELS,
+  RESERVATION_STATUS_STYLES,
+} from '@/lib/constants/reservation';
+import { formatDate, formatPrice, formatTime } from '@/lib/utils/format';
+import type { Reservation } from '@/lib/types/reservation';
 import type { Payment, PaymentStatus } from '@/lib/types/payment';
-
-const STATUS_STYLES: Record<ReservationStatus, string> = {
-  PENDING:   'bg-yellow-50 text-yellow-600',
-  CONFIRMED: 'bg-blue-50 text-blue-600',
-  CANCELLED: 'bg-gray-100 text-gray-400',
-};
-
-const STATUS_LABELS: Record<ReservationStatus, string> = {
-  PENDING:   '대기 중',
-  CONFIRMED: '확정',
-  CANCELLED: '취소',
-};
 
 const PAYMENT_STATUS_STYLES: Record<PaymentStatus, string> = {
   PENDING:   'bg-yellow-50 text-yellow-600',
@@ -34,29 +29,6 @@ const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
   FAILED:    '결제 실패',
   REFUNDED:  '환불 완료',
 };
-
-function formatPrice(price: number) {
-  return price.toLocaleString('ko-KR') + '원';
-}
-
-function formatTime(isoString: string) {
-  const d = new Date(isoString);
-  return d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
-}
-
-function formatDate(isoString: string) {
-  const d = new Date(isoString);
-  return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
-}
-
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-center justify-between text-sm py-2.5 border-b border-gray-50 last:border-0">
-      <span className="text-gray-400">{label}</span>
-      <span className="text-gray-800 font-medium">{children}</span>
-    </div>
-  );
-}
 
 export default function ReservationDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -77,8 +49,6 @@ export default function ReservationDetailPage() {
       getPayment(numId).catch(() => null),
     ])
       .then(([res, pay]) => {
-        console.log('[예약 상세]', res);
-        console.log('[결제 정보]', pay);
         setReservation(res);
         setPayment(pay);
       })
@@ -122,12 +92,7 @@ export default function ReservationDetailPage() {
       <Header />
 
       <main className="max-w-screen-sm mx-auto px-4 py-6">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 mb-5 transition-colors"
-        >
-          ← 내 예약
-        </button>
+        <BackButton label="내 예약" />
 
         {loading && (
           <div className="space-y-3">
@@ -147,8 +112,8 @@ export default function ReservationDetailPage() {
             <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-4">
               <div className="flex items-start justify-between gap-3 mb-4">
                 <h2 className="text-lg font-bold text-gray-900">{reservation.resourceName}</h2>
-                <span className={`flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_STYLES[reservation.status]}`}>
-                  {STATUS_LABELS[reservation.status]}
+                <span className={`flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${RESERVATION_STATUS_STYLES[reservation.status]}`}>
+                  {RESERVATION_STATUS_LABELS[reservation.status]}
                 </span>
               </div>
               <div>

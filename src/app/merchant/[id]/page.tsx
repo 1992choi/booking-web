@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
+import BackButton from '@/components/ui/BackButton';
 import { getMerchant } from '@/lib/api/merchants';
 import {
   createResource,
@@ -16,20 +17,10 @@ import {
 } from '@/lib/api/resources';
 import type { ResourceRequest } from '@/lib/api/resources';
 import { getErrorMessage } from '@/lib/api/axios';
+import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
+import { formatPrice } from '@/lib/utils/format';
 import { useAuthStore } from '@/lib/store/auth';
 import type { MerchantDetail, MerchantType, Resource, AvailableTime } from '@/lib/types/merchant';
-
-const TYPE_LABELS: Record<MerchantType, string> = {
-  PENSION:  '펜션',
-  CLASS:    '클래스',
-  FACILITY: '시설',
-};
-
-const TYPE_COLORS: Record<MerchantType, string> = {
-  PENSION:  'bg-blue-50 text-blue-600',
-  CLASS:    'bg-green-50 text-green-600',
-  FACILITY: 'bg-purple-50 text-purple-600',
-};
 
 const STATUS_LABELS: Record<AvailableTime['status'], string> = {
   OPEN:    '예약 가능',
@@ -40,10 +31,6 @@ const STATUS_COLORS: Record<AvailableTime['status'], string> = {
   OPEN:    'bg-green-50 text-green-600',
   BLOCKED: 'bg-red-50 text-red-500',
 };
-
-function formatPrice(price: number) {
-  return price.toLocaleString('ko-KR') + '원';
-}
 
 function formatTime(dt: string) {
   return dt.slice(11, 16);
@@ -365,6 +352,9 @@ function AvailableTimeDeleteModal({
 }
 
 // ─── 이용 시간 관리 모달 ──────────────────────────────────────────────
+// null = 모달 닫힘, 'new' = 새로 추가, AvailableTime = 수정 대상
+type TimeFormTarget = AvailableTime | 'new' | null;
+
 function AvailableTimeManagerModal({
   resource,
   onClose,
@@ -376,7 +366,7 @@ function AvailableTimeManagerModal({
   const [times, setTimes] = useState<AvailableTime[]>([]);
   const [timesLoading, setTimesLoading] = useState(false);
   const [timesError, setTimesError] = useState('');
-  const [formTarget, setFormTarget] = useState<AvailableTime | null | 'new'>(undefined as any);
+  const [formTarget, setFormTarget] = useState<TimeFormTarget>(null);
   const [deleteTarget, setDeleteTarget] = useState<AvailableTime | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
@@ -476,14 +466,14 @@ function AvailableTimeManagerModal({
         </div>
       </div>
 
-      {(formTarget === 'new' || (formTarget && formTarget !== undefined)) && (
+      {formTarget !== null && (
         <AvailableTimeFormModal
           resourceId={resource.id}
-          initial={formTarget === 'new' ? null : formTarget as AvailableTime}
+          initial={formTarget === 'new' ? null : formTarget}
           defaultDate={date}
-          onClose={() => setFormTarget(undefined as any)}
+          onClose={() => setFormTarget(null)}
           onSaved={() => {
-            setFormTarget(undefined as any);
+            setFormTarget(null);
             fetchTimes(date);
           }}
         />
@@ -540,6 +530,9 @@ function ResourceRow({
 }
 
 // ─── 메인 페이지 ──────────────────────────────────────────────────────
+// null = 모달 닫힘, 'new' = 새 리소스 추가, Resource = 수정 대상
+type ResourceFormTarget = Resource | 'new' | null;
+
 export default function MerchantDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
@@ -550,7 +543,7 @@ export default function MerchantDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const [formTarget, setFormTarget] = useState<Resource | null | 'new'>(undefined as any);
+  const [formTarget, setFormTarget] = useState<ResourceFormTarget>(null);
   const [deleteTarget, setDeleteTarget] = useState<Resource | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [timeManageTarget, setTimeManageTarget] = useState<Resource | null>(null);
@@ -572,7 +565,7 @@ export default function MerchantDetailPage() {
         : [...prev.resources, saved];
       return { ...prev, resources };
     });
-    setFormTarget(undefined as any);
+    setFormTarget(null);
   }
 
   async function handleDelete() {
@@ -596,12 +589,7 @@ export default function MerchantDetailPage() {
       <Header />
 
       <main className="max-w-screen-sm mx-auto px-4 py-6">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 mb-5 transition-colors"
-        >
-          ← 목록으로
-        </button>
+        <BackButton label="목록으로" />
 
         {loading && (
           <div className="space-y-3">
@@ -621,8 +609,8 @@ export default function MerchantDetailPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-bold text-gray-900">{merchant.name}</h2>
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${TYPE_COLORS[merchant.type]}`}>
-                    {TYPE_LABELS[merchant.type]}
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${MERCHANT_TYPE_COLORS[merchant.type]}`}>
+                    {MERCHANT_TYPE_LABELS[merchant.type]}
                   </span>
                 </div>
                 {isMerchant && (
@@ -671,15 +659,15 @@ export default function MerchantDetailPage() {
       </main>
 
       {/* 리소스 추가/수정 모달 */}
-      {(formTarget === 'new' || (formTarget && formTarget !== undefined)) && merchant && (
+      {formTarget !== null && merchant && (
         <ResourceFormModal
           merchantId={Number(id)}
-          initial={formTarget === 'new' ? null : formTarget as Resource}
-          onClose={() => setFormTarget(undefined as any)}
+          initial={formTarget === 'new' ? null : formTarget}
+          onClose={() => setFormTarget(null)}
           onSaved={handleSaved}
-          onDelete={formTarget !== 'new' && formTarget ? () => {
-            setDeleteTarget(formTarget as Resource);
-            setFormTarget(undefined as any);
+          onDelete={formTarget !== 'new' ? () => {
+            setDeleteTarget(formTarget);
+            setFormTarget(null);
           } : undefined}
         />
       )}

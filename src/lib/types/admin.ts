@@ -1,11 +1,11 @@
-export type AdminReservationStatus = 'PENDING' | 'CONFIRMED' | 'CANCELLED';
+import type { ReservationStatus } from '@/lib/types/reservation';
 
 export interface AdminCalendarEntry {
   reservationId: number;
   resourceName: string;
   startTime: string;
   endTime: string;
-  status: AdminReservationStatus;
+  status: ReservationStatus;
 }
 
 export type AdminCalendarData = Record<string, AdminCalendarEntry[]>;

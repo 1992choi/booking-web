@@ -1,6 +1,5 @@
 import apiClient from './axios';
 import type {
-  CreateReservationRequest,
   MerchantDetail,
   MerchantRequest,
   MerchantResponse,
@@ -35,9 +34,4 @@ export async function getMerchant(id: number): Promise<MerchantDetail> {
 export async function updateMerchant(id: number, params: MerchantRequest): Promise<MerchantResponse> {
   const { data } = await apiClient.put<MerchantResponse>(`/merchants/${id}`, params);
   return data;
-}
-
-/** POST /api/v1/reservations */
-export async function createReservation(params: CreateReservationRequest): Promise<void> {
-  await apiClient.post('/reservations', params);
 }

@@ -3,36 +3,15 @@
 import { useEffect, useState } from 'react';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
-import { createReservation, getMerchant } from '@/lib/api/merchants';
+import BackButton from '@/components/ui/BackButton';
+import { getMerchant } from '@/lib/api/merchants';
 import { getAvailableTimes } from '@/lib/api/resources';
+import { createReservation } from '@/lib/api/reservations';
 import { getErrorMessage } from '@/lib/api/axios';
+import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
+import { formatPrice, formatTime, today } from '@/lib/utils/format';
 import { useAuthStore } from '@/lib/store/auth';
 import type { AvailableTime, MerchantDetail, Resource } from '@/lib/types/merchant';
-
-const TYPE_LABELS = {
-  PENSION: '펜션',
-  CLASS: '클래스',
-  FACILITY: '시설',
-} as const;
-
-const TYPE_COLORS = {
-  PENSION:  'bg-blue-50 text-blue-600',
-  CLASS:    'bg-green-50 text-green-600',
-  FACILITY: 'bg-purple-50 text-purple-600',
-} as const;
-
-function formatPrice(price: number) {
-  return price.toLocaleString('ko-KR') + '원';
-}
-
-function formatTime(isoString: string) {
-  const d = new Date(isoString);
-  return d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', hour12: false });
-}
-
-function today() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 // ─── 예약 가능 시간 모달 ─────────────────────────────────────────────
 function AvailableTimesModal({
@@ -83,14 +62,12 @@ function AvailableTimesModal({
     if (selectedIds.size === 0) return;
     setBooking(true);
     setBookingError('');
-    const payload = {
-      resourceId: resource.id,
-      availableTimeIds: Array.from(selectedIds),
-      headCount: 1,
-    };
-    console.log('[예약 요청]', payload);
     try {
-      await createReservation(payload);
+      await createReservation({
+        resourceId: resource.id,
+        availableTimeIds: Array.from(selectedIds),
+        headCount: 1,
+      });
       onClose();
     } catch (err) {
       console.error('[예약 오류]', err);
@@ -246,8 +223,6 @@ function ResourceCard({
 // ─── 상세 페이지 ──────────────────────────────────────────────────────
 export default function MerchantPublicDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const router = useRouter();
-
   const [merchant, setMerchant] = useState<MerchantDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -266,12 +241,7 @@ export default function MerchantPublicDetailPage() {
       <Header />
 
       <main className="max-w-screen-sm mx-auto px-4 py-6">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 mb-5 transition-colors"
-        >
-          ← 목록으로
-        </button>
+        <BackButton label="목록으로" />
 
         {loading && (
           <div className="space-y-4">
@@ -291,8 +261,8 @@ export default function MerchantPublicDetailPage() {
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-gray-900">{merchant.name}</h1>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${TYPE_COLORS[merchant.type]}`}>
-                  {TYPE_LABELS[merchant.type]}
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${MERCHANT_TYPE_COLORS[merchant.type]}`}>
+                  {MERCHANT_TYPE_LABELS[merchant.type]}
                 </span>
               </div>
               <p className="text-sm text-gray-400">

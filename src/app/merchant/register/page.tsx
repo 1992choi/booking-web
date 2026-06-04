@@ -3,15 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
+import BackButton from '@/components/ui/BackButton';
 import { createMerchant } from '@/lib/api/merchants';
 import { getErrorMessage } from '@/lib/api/axios';
+import { MERCHANT_TYPE_OPTIONS } from '@/lib/constants/merchant';
 import type { MerchantType } from '@/lib/types/merchant';
-
-const TYPE_OPTIONS: { value: MerchantType; label: string }[] = [
-  { value: 'PENSION',  label: '펜션' },
-  { value: 'CLASS',    label: '클래스' },
-  { value: 'FACILITY', label: '시설' },
-];
 
 export default function MerchantRegisterPage() {
   const router = useRouter();
@@ -41,12 +37,7 @@ export default function MerchantRegisterPage() {
       <Header />
 
       <main className="max-w-screen-sm mx-auto px-4 py-6">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-sm text-gray-400 hover:text-gray-600 mb-5 transition-colors"
-        >
-          ← 돌아가기
-        </button>
+        <BackButton />
 
         <h1 className="text-xl font-bold text-gray-900 mb-6">업체 등록</h1>
 
@@ -78,7 +69,7 @@ export default function MerchantRegisterPage() {
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1.5">업체 유형</label>
             <div className="grid grid-cols-2 gap-2">
-              {TYPE_OPTIONS.map((opt) => (
+              {MERCHANT_TYPE_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
                   type="button"

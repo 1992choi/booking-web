@@ -34,6 +34,7 @@ export interface AvailableTime {
 export interface MerchantDetail {
   id: number;
   name: string;
+  phone: string;
   type: MerchantType;
   resources: Resource[];
 }
@@ -44,8 +45,9 @@ export interface MerchantRequest {
   type: MerchantType;
 }
 
-export interface CreateReservationRequest {
-  resourceId: number;
-  availableTimeIds: number[];
-  headCount: number;
+export interface ResourceRequest {
+  name: string;
+  description: string;
+  price: number;
+  maxCapacity: number;
 }

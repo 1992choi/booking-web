@@ -3,8 +3,10 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
+import Row from '@/components/ui/Row';
 import { getMe, updateMe, deleteMe, logout } from '@/lib/api/auth';
 import { getErrorMessage } from '@/lib/api/axios';
+import { formatDate } from '@/lib/utils/format';
 import { useAuthStore } from '@/lib/store/auth';
 import type { UserResponse } from '@/lib/types/auth';
 
@@ -19,21 +21,6 @@ const ROLE_COLORS = {
   MERCHANT: 'bg-blue-50 text-blue-600',
   ADMIN:    'bg-purple-50 text-purple-600',
 } as const;
-
-function formatDate(isoString: string) {
-  return new Date(isoString).toLocaleDateString('ko-KR', {
-    year: 'numeric', month: 'long', day: 'numeric',
-  });
-}
-
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-center justify-between py-3.5 border-b border-gray-50 last:border-0">
-      <span className="text-sm text-gray-400">{label}</span>
-      <span className="text-sm font-medium text-gray-800">{children}</span>
-    </div>
-  );
-}
 
 export default function MyPage() {
   const router = useRouter();

@@ -4,21 +4,17 @@ import { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import { getAdminCalendar, confirmReservation, cancelReservation } from '@/lib/api/adminReservations';
 import { getErrorMessage } from '@/lib/api/axios';
-import type { AdminCalendarEntry, AdminCalendarData, AdminReservationStatus } from '@/lib/types/admin';
+import type { AdminCalendarEntry, AdminCalendarData } from '@/lib/types/admin';
+import type { ReservationStatus } from '@/lib/types/reservation';
+import { RESERVATION_STATUS_LABELS } from '@/lib/constants/reservation';
 
-const STATUS_LABELS: Record<AdminReservationStatus, string> = {
-  PENDING:   '대기',
-  CONFIRMED: '확정',
-  CANCELLED: '취소',
-};
-
-const STATUS_DOT: Record<AdminReservationStatus, string> = {
+const STATUS_DOT: Record<ReservationStatus, string> = {
   PENDING:   'bg-yellow-400',
   CONFIRMED: 'bg-blue-400',
   CANCELLED: 'bg-gray-300',
 };
 
-const STATUS_BADGE: Record<AdminReservationStatus, string> = {
+const STATUS_BADGE: Record<ReservationStatus, string> = {
   PENDING:   'bg-yellow-50 text-yellow-600',
   CONFIRMED: 'bg-blue-50 text-blue-600',
   CANCELLED: 'bg-gray-100 text-gray-400',
@@ -59,8 +55,8 @@ function EntryCard({
     <div className="bg-white border border-gray-100 rounded-xl p-4">
       <div className="flex items-center justify-between mb-2">
         <p className="text-sm font-medium text-gray-900 truncate">{entry.resourceName}</p>
-        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ml-2 flex-shrink-0 ${STATUS_BADGE[entry.status as AdminReservationStatus]}`}>
-          {STATUS_LABELS[entry.status as AdminReservationStatus]}
+        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ml-2 flex-shrink-0 ${STATUS_BADGE[entry.status]}`}>
+          {RESERVATION_STATUS_LABELS[entry.status]}
         </span>
       </div>
       <p className="text-xs text-gray-400 mb-3">
@@ -212,9 +208,7 @@ export default function AdminReservationsPage() {
                             key={di}
                             onClick={() => setSelectedDate(isSelected ? null : dateKey)}
                             className={`min-h-[72px] p-2 text-left border-l border-gray-50 first:border-0 transition-colors ${
-                              isSelected
-                                ? 'bg-blue-50'
-                                : 'hover:bg-gray-50'
+                              isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'
                             }`}
                           >
                             <span className={`text-xs font-medium block mb-1 w-6 h-6 flex items-center justify-center rounded-full ${
