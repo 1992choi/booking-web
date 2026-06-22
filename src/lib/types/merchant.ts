@@ -51,3 +51,10 @@ export interface ResourceRequest {
   price: number;
   maxCapacity: number;
 }
+
+export interface DailyMerchantStats {
+  statDate: string;
+  confirmedCount: number;
+  cancelledCount: number;
+  totalRevenue: number;
+}

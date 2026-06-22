@@ -1,5 +1,6 @@
 import apiClient from './axios';
 import type {
+  DailyMerchantStats,
   MerchantDetail,
   MerchantRequest,
   MerchantResponse,
@@ -33,5 +34,13 @@ export async function getMerchant(id: number): Promise<MerchantDetail> {
 /** PUT /api/v1/merchants/:id */
 export async function updateMerchant(id: number, params: MerchantRequest): Promise<MerchantResponse> {
   const { data } = await apiClient.put<MerchantResponse>(`/merchants/${id}`, params);
+  return data;
+}
+
+/** GET /api/v1/merchants/:id/stats/daily?year=&month= */
+export async function getMerchantDailyStats(id: number, year: number, month: number): Promise<DailyMerchantStats[]> {
+  const { data } = await apiClient.get<DailyMerchantStats[]>(`/merchants/${id}/stats/daily`, {
+    params: { year, month },
+  });
   return data;
 }

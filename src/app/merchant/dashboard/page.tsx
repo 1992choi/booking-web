@@ -24,13 +24,28 @@ function MerchantCard({ merchant, isMerchant }: { merchant: MerchantSummary; isM
           </span>
         </div>
         {isMerchant && (
-          <Link
-            href={`/merchant/${merchant.id}/reservations`}
-            onClick={(e) => e.stopPropagation()}
-            className="text-xs font-medium text-blue-500 hover:text-blue-600 transition-colors ml-3 flex-shrink-0"
-          >
-            예약 관리
-          </Link>
+          <div className="flex items-center ml-3 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+            <Link
+              href={`/merchant/${merchant.id}/reservations`}
+              className="text-xs font-medium text-blue-500 hover:text-blue-600 transition-colors"
+            >
+              예약 관리
+            </Link>
+            <span className="mx-2 text-blue-200 select-none">|</span>
+            <Link
+              href="/merchant/calendar"
+              className="text-xs font-medium text-blue-500 hover:text-blue-600 transition-colors"
+            >
+              예약 현황
+            </Link>
+            <span className="mx-2 text-blue-200 select-none">|</span>
+            <Link
+              href={`/merchant/${merchant.id}/stats`}
+              className="text-xs font-medium text-blue-500 hover:text-blue-600 transition-colors"
+            >
+              매출 통계
+            </Link>
+          </div>
         )}
       </div>
     </div>

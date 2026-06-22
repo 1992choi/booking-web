@@ -74,14 +74,7 @@ export default function Header() {
                           onClick={() => setOpen(false)}
                           className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                         >
-                          예약 관리
-                        </Link>
-                        <Link
-                          href="/merchant/calendar"
-                          onClick={() => setOpen(false)}
-                          className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                        >
-                          예약 현황
+                          업체 관리
                         </Link>
                       </>
                     ) : (
