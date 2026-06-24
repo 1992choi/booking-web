@@ -1,5 +1,10 @@
 import apiClient from './axios';
-import type { LoginRequest, RefreshResponse, SignupRequest, TokenResponse, UserResponse, UserUpdateRequest } from '@/lib/types/auth';
+import type { LoginRequest, RefreshResponse, SignupRequest, TokenResponse, UserResponse, UserUpdateRequest, Role } from '@/lib/types/auth';
+/** GET /api/v1/admin/users?role= (ADMIN only) */
+export async function getUsers(params?: { role?: Role }): Promise<UserResponse[]> {
+  const { data } = await apiClient.get<UserResponse[]>('/admin/users', { params });
+  return data;
+}
 
 /** GET /api/v1/users/me */
 export async function getMe(): Promise<UserResponse> {

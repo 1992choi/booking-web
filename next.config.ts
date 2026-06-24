@@ -17,6 +17,10 @@ const nextConfig: NextConfig = {
         destination: "http://localhost:8081/api/v1/available-times/:path*",
       },
       {
+        source: "/api/v1/admin/users",
+        destination: "http://localhost:8080/api/v1/admin/users",
+      },
+      {
         source: "/api/v1/admin/:path*",
         destination: "http://localhost:8081/api/v1/admin/:path*",
       },

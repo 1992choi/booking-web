@@ -68,6 +68,11 @@ apiClient.interceptors.response.use(
 
     const original = error.config as RetryableRequest;
 
+    // Already retried once — don't loop
+    if (original?._retry) {
+      return Promise.reject(error);
+    }
+
     // Refresh endpoint itself returned 401 — token is invalid, force logout
     if (original?.url?.includes('/auth/refresh')) {
       const { useAuthStore } = require('@/lib/store/auth');

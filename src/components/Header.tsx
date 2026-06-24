@@ -87,13 +87,22 @@ export default function Header() {
                       </Link>
                     )}
                     {role === 'ADMIN' && (
-                      <Link
-                        href="/merchant/dashboard"
-                        onClick={() => setOpen(false)}
-                        className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-t border-gray-50"
-                      >
-                        업체 관리
-                      </Link>
+                      <>
+                        <Link
+                          href="/merchant/dashboard"
+                          onClick={() => setOpen(false)}
+                          className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-t border-gray-50"
+                        >
+                          업체 관리
+                        </Link>
+                        <Link
+                          href="/admin/users"
+                          onClick={() => setOpen(false)}
+                          className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        >
+                          회원 관리
+                        </Link>
+                      </>
                     )}
                     <button
                       onClick={handleLogout}
