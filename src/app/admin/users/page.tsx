@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { getUsers } from '@/lib/api/auth';
 import { formatDate } from '@/lib/utils/format';
@@ -29,6 +30,8 @@ const TABS: { label: string; value: FilterRole }[] = [
 ];
 
 function UserCard({ user }: { user: UserResponse }) {
+  const router = useRouter();
+
   return (
     <div className="bg-white border border-gray-200 rounded-2xl p-4">
       <div className="flex items-start justify-between gap-3">
@@ -42,7 +45,18 @@ function UserCard({ user }: { user: UserResponse }) {
           <p className="text-xs text-gray-500 truncate">{user.email}</p>
           <p className="text-xs text-gray-400 mt-0.5">{user.phone}</p>
         </div>
-        <p className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">{formatDate(user.createdAt)}</p>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <button
+            onClick={() => router.push(`/admin/users/${user.id}/message`)}
+            className="p-1.5 rounded-full text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-colors"
+            title="메시지 보내기"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+          </button>
+          <p className="text-xs text-gray-400 whitespace-nowrap">{formatDate(user.createdAt)}</p>
+        </div>
       </div>
     </div>
   );
