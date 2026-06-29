@@ -6,25 +6,32 @@ import BackButton from '@/components/ui/BackButton';
 import { getMyNotifications } from '@/lib/api/notifications';
 import type { Notification } from '@/lib/types/notification';
 
-function formatDate(isoString: string) {
-  const d = new Date(isoString);
+const TYPE_LABELS: Record<string, string> = {
+  RESERVATION_CONFIRMED: '예약 확정',
+  RESERVATION_CANCELLED: '예약 취소',
+  RESERVATION_REMINDER: '예약 알림',
+  ADMIN_MESSAGE: '관리자 메시지',
+};
+
+function formatDate(sentAt: string) {
+  const d = new Date(sentAt);
+  if (isNaN(d.getTime())) return sentAt;
   return d.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
 function NotificationItem({ notification }: { notification: Notification }) {
+  const label = TYPE_LABELS[notification.type] ?? notification.type;
+
   return (
-    <div className={`rounded-2xl px-5 py-4 border transition-colors ${
-      notification.read
-        ? 'bg-white border-gray-100 text-gray-400'
-        : 'bg-blue-50 border-blue-100 text-gray-800'
-    }`}>
+    <div className="rounded-2xl px-5 py-4 border bg-white border-gray-100">
       <div className="flex items-start gap-3">
-        <span className={`mt-0.5 w-2 h-2 rounded-full flex-shrink-0 ${notification.read ? 'bg-gray-200' : 'bg-blue-400'}`} />
+        <span className="mt-0.5 w-2 h-2 rounded-full flex-shrink-0 bg-blue-400" />
         <div className="flex-1 min-w-0">
-          <p className={`text-sm leading-relaxed ${notification.read ? 'text-gray-400' : 'text-gray-800'}`}>
-            {notification.message}
+          <p className="text-sm text-gray-800 leading-relaxed">
+            <span className="font-medium">[{label}]</span>
+            {notification.message && <span className="text-gray-600"> {notification.message}</span>}
           </p>
-          <p className="text-xs text-gray-300 mt-1.5">{formatDate(notification.createdAt)}</p>
+          <p className="text-xs text-gray-300 mt-1.5">{formatDate(notification.sentAt)}</p>
         </div>
       </div>
     </div>

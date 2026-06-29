@@ -1,6 +1,13 @@
+export type NotificationType = string;
+export type NotificationChannel = string;
+export type NotificationStatus = string;
+
 export interface Notification {
   id: number;
-  message: string;
-  read: boolean;
-  createdAt: string;
+  reservationId: number | null;
+  message: string | null;
+  type: NotificationType;
+  channel: NotificationChannel;
+  status: NotificationStatus;
+  sentAt: string;
 }
