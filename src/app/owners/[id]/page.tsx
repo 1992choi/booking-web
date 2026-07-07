@@ -11,6 +11,7 @@ import { getErrorMessage } from '@/lib/api/axios';
 import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
 import { formatPrice, formatTime, today } from '@/lib/utils/format';
 import { useAuthStore } from '@/lib/store/auth';
+import { useToastStore } from '@/lib/store/toast';
 import type { AvailableTime, MerchantDetail, Resource } from '@/lib/types/merchant';
 
 // ─── 예약 가능 시간 모달 ─────────────────────────────────────────────
@@ -24,6 +25,7 @@ function AvailableTimesModal({
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated } = useAuthStore();
+  const showToast = useToastStore((s) => s.showToast);
 
   const [date, setDate] = useState(today());
   const [times, setTimes] = useState<AvailableTime[]>([]);
@@ -31,7 +33,6 @@ function AvailableTimesModal({
   const [error, setError] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [booking, setBooking] = useState(false);
-  const [bookingError, setBookingError] = useState('');
 
   useEffect(() => {
     setLoading(true);
@@ -61,17 +62,17 @@ function AvailableTimesModal({
     }
     if (selectedIds.size === 0) return;
     setBooking(true);
-    setBookingError('');
     try {
       await createReservation({
         resourceId: resource.id,
         availableTimeIds: Array.from(selectedIds),
         headCount: 1,
       });
+      showToast('success', '예약 요청이 접수되었습니다.\n예약 상태는 내 예약에서 확인해주세요.');
       onClose();
     } catch (err) {
       console.error('[예약 오류]', err);
-      setBookingError(getErrorMessage(err));
+      showToast('error', getErrorMessage(err));
     } finally {
       setBooking(false);
     }
@@ -159,9 +160,6 @@ function AvailableTimesModal({
         {/* 예약 버튼 영역 */}
         {!loading && !error && openTimes.length > 0 && (
           <div className="mt-5 pt-4 border-t border-gray-100">
-            {bookingError && (
-              <p className="text-sm text-red-400 text-center mb-3">{bookingError}</p>
-            )}
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm text-gray-500">
                 {selectedIds.size > 0 ? `${selectedIds.size}개 선택` : '시간대를 선택하세요'}
