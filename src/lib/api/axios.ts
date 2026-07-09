@@ -16,6 +16,10 @@ const ERROR_MESSAGES: Record<string, string> = {
   PAY_002: '환불 가능한 상태가 아닙니다.',
   AUTH_001: '로그인이 필요합니다.',
   AUTH_002: '접근 권한이 없습니다.',
+  REVIEW_001: '리뷰를 찾을 수 없습니다.',
+  REVIEW_002: '본인 리뷰만 수정·삭제할 수 있습니다.',
+  REVIEW_003: '이미 리뷰를 작성한 예약입니다.',
+  REVIEW_004: '예약이 확정된 이후에 리뷰를 작성할 수 있습니다.',
 };
 
 export function getErrorMessage(error: unknown): string {

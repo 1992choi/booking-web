@@ -52,6 +52,15 @@
 |--------|------|------|
 | GET | `/api/v1/notifications/me` | 내 알림 목록 |
 
+### review 서비스 (8084)
+
+| 메서드 | 경로 | 설명 |
+|--------|------|------|
+| POST | `/api/v1/reviews` | 리뷰 작성 (본인의 CONFIRMED 예약 1건당 1개) |
+| GET | `/api/v1/reviews?merchantId=` | 업체별 리뷰 목록 (인증 불필요) |
+| PATCH | `/api/v1/reviews/{reviewId}` | 리뷰 수정 (작성자 본인만) |
+| DELETE | `/api/v1/reviews/{reviewId}` | 리뷰 삭제 (작성자 본인만) |
+
 ---
 
 ## 페이지 목록
@@ -67,7 +76,7 @@
 
 | 페이지 | URL | 사용 API |
 |--------|-----|---------|
-| 업체 상세 + 예약 | `/owners/{id}` | `GET /merchants/{id}`, `GET /resources/{id}/available-times`, `POST /reservations` |
+| 업체 상세 + 예약 + 리뷰 | `/owners/{id}` | `GET /merchants/{id}`, `GET /resources/{id}/available-times`, `POST /reservations`, `GET /reviews?merchantId=`, `PATCH /reviews/{id}`, `DELETE /reviews/{id}` |
 
 ### 마이페이지
 
@@ -75,7 +84,7 @@
 |--------|-----|---------|
 | 내 정보 | `/my` | `GET /users/me`, `PUT /users/me`, `DELETE /users/me` |
 | 내 예약 목록 | `/my/reservations` | `GET /reservations/me` |
-| 예약 상세 + 결제 + 취소/환불 | `/my/reservations/{id}` | `GET /reservations/{id}`, `GET /payments/{id}`, `PUT /reservations/{id}/cancel`, `POST /payments/{id}/refund` |
+| 예약 상세 + 결제 + 취소/환불 + 리뷰 작성 | `/my/reservations/{id}` | `GET /reservations/{id}`, `GET /payments/{id}`, `PUT /reservations/{id}/cancel`, `POST /payments/{id}/refund`, `POST /reviews` |
 | 내 알림 | `/my/notifications` | `GET /notifications/me` |
 
 ### 업체 운영자 (role=MERCHANT 이상)
@@ -107,3 +116,7 @@
 | PAY_002 | 409 | 환불 가능한 상태가 아닙니다. |
 | AUTH_001 | 401 | 로그인이 필요합니다. |
 | AUTH_002 | 403 | 접근 권한이 없습니다. |
+| REVIEW_001 | 404 | 리뷰를 찾을 수 없습니다. |
+| REVIEW_002 | 403 | 본인 리뷰만 수정·삭제할 수 있습니다. |
+| REVIEW_003 | 409 | 이미 리뷰를 작성한 예약입니다. |
+| REVIEW_004 | 422 | 예약이 확정된 이후에 리뷰를 작성할 수 있습니다. |

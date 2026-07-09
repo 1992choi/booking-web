@@ -42,6 +42,15 @@ const nextConfig: NextConfig = {
         source: "/api/v1/notifications/:path*",
         destination: "http://localhost:8083/api/v1/notifications/:path*",
       },
+      // review 서비스 (8084)
+      {
+        source: "/api/v1/reviews/:path*",
+        destination: "http://localhost:8084/api/v1/reviews/:path*",
+      },
+      {
+        source: "/api/v1/reviews",
+        destination: "http://localhost:8084/api/v1/reviews",
+      },
       // api 서비스 (8080) — 나머지 전부
       {
         source: "/api/v1/:path*",

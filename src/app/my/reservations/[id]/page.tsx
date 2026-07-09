@@ -5,9 +5,11 @@ import { useParams, useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import Row from '@/components/ui/Row';
+import axios from 'axios';
 import { cancelReservation, getReservation } from '@/lib/api/reservations';
 import { getErrorMessage } from '@/lib/api/axios';
 import { getPayment, refund } from '@/lib/api/payments';
+import { createReview } from '@/lib/api/reviews';
 import {
   RESERVATION_STATUS_LABELS,
   RESERVATION_STATUS_STYLES,
@@ -15,6 +17,7 @@ import {
 import { formatDate, formatPrice, formatTime } from '@/lib/utils/format';
 import type { Reservation } from '@/lib/types/reservation';
 import type { Payment, PaymentStatus } from '@/lib/types/payment';
+import type { ApiError } from '@/lib/types/common';
 
 const PAYMENT_STATUS_STYLES: Record<PaymentStatus, string> = {
   PENDING:   'bg-yellow-50 text-yellow-600',
@@ -40,6 +43,11 @@ export default function ReservationDetailPage() {
   const [error, setError] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState('');
+
+  const [reviewContent, setReviewContent] = useState('');
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewError, setReviewError] = useState('');
+  const [reviewDone, setReviewDone] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -81,6 +89,25 @@ export default function ReservationDetailPage() {
       setActionError(getErrorMessage(err));
     } finally {
       setActionLoading(false);
+    }
+  }
+
+  async function handleSubmitReview(e: React.FormEvent) {
+    e.preventDefault();
+    if (!reservation || !reviewContent.trim()) return;
+    setReviewSubmitting(true);
+    setReviewError('');
+    try {
+      await createReview({ reservationId: reservation.id, content: reviewContent.trim() });
+      setReviewDone(true);
+    } catch (err) {
+      if (axios.isAxiosError(err) && (err.response?.data as ApiError | undefined)?.code === 'REVIEW_003') {
+        setReviewDone(true);
+      } else {
+        setReviewError(getErrorMessage(err));
+      }
+    } finally {
+      setReviewSubmitting(false);
     }
   }
 
@@ -138,6 +165,34 @@ export default function ReservationDetailPage() {
                     </span>
                   </Row>
                 </div>
+              </div>
+            )}
+
+            {/* 이용 후기 */}
+            {reservation.status === 'CONFIRMED' && (
+              <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-4">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3">이용 후기</h3>
+                {reviewDone ? (
+                  <p className="text-sm text-gray-400 text-center py-4">리뷰가 등록되었습니다. 감사합니다!</p>
+                ) : (
+                  <form onSubmit={handleSubmitReview}>
+                    <textarea
+                      value={reviewContent}
+                      onChange={(e) => setReviewContent(e.target.value)}
+                      placeholder="이용하신 소감을 남겨주세요."
+                      rows={3}
+                      className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    />
+                    {reviewError && <p className="text-sm text-red-400 mt-2">{reviewError}</p>}
+                    <button
+                      type="submit"
+                      disabled={reviewSubmitting || !reviewContent.trim()}
+                      className="mt-3 w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-200 disabled:text-gray-400 text-white text-sm font-medium rounded-xl py-2.5 transition-colors"
+                    >
+                      {reviewSubmitting ? '등록 중...' : '리뷰 등록'}
+                    </button>
+                  </form>
+                )}
               </div>
             )}
 

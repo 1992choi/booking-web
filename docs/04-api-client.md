@@ -10,6 +10,7 @@ CORS 문제 없이 백엔드 4개 서비스로 자동 프록시된다.
 | `/api/v1/reservations/**` | `localhost:8081` (reservation) |
 | `/api/v1/payments/**` | `localhost:8082` (payment) |
 | `/api/v1/notifications/**` | `localhost:8083` (notification) |
+| `/api/v1/reviews/**` | `localhost:8084` (review) |
 | `/api/v1/**` (나머지) | `localhost:8080` (api) |
 
 ---
@@ -85,6 +86,14 @@ refund(reservationId) → void
 ### notifications.ts
 ```
 getMyNotifications() → Notification[]
+```
+
+### reviews.ts
+```
+getReviewsByMerchant(merchantId) → Review[]
+createReview(body: ReviewCreateRequest) → Review
+updateReview(reviewId, body: ReviewUpdateRequest) → Review
+deleteReview(reviewId) → void
 ```
 
 ---

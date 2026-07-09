@@ -7,12 +7,14 @@ import BackButton from '@/components/ui/BackButton';
 import { getMerchant } from '@/lib/api/merchants';
 import { getAvailableTimes } from '@/lib/api/resources';
 import { createReservation } from '@/lib/api/reservations';
+import { getReviewsByMerchant, updateReview, deleteReview } from '@/lib/api/reviews';
 import { getErrorMessage } from '@/lib/api/axios';
 import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
-import { formatPrice, formatTime, today } from '@/lib/utils/format';
+import { formatDate, formatPrice, formatTime, today } from '@/lib/utils/format';
 import { useAuthStore } from '@/lib/store/auth';
 import { useToastStore } from '@/lib/store/toast';
 import type { AvailableTime, MerchantDetail, Resource } from '@/lib/types/merchant';
+import type { Review } from '@/lib/types/review';
 
 // ─── 예약 가능 시간 모달 ─────────────────────────────────────────────
 function AvailableTimesModal({
@@ -218,13 +220,132 @@ function ResourceCard({
   );
 }
 
+// ─── 리뷰 카드 ─────────────────────────────────────────────────────
+function ReviewCard({
+  review,
+  isMine,
+  onUpdated,
+  onDeleted,
+}: {
+  review: Review;
+  isMine: boolean;
+  onUpdated: (review: Review) => void;
+  onDeleted: (reviewId: number) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [content, setContent] = useState(review.content);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  async function handleSave() {
+    if (!content.trim()) return;
+    setSaving(true);
+    setError('');
+    try {
+      const updated = await updateReview(review.id, { content: content.trim() });
+      onUpdated(updated);
+      setEditing(false);
+    } catch (err) {
+      setError(getErrorMessage(err));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete() {
+    setSaving(true);
+    setError('');
+    try {
+      await deleteReview(review.id);
+      onDeleted(review.id);
+    } catch (err) {
+      setError(getErrorMessage(err));
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="border border-gray-200 rounded-2xl p-4">
+      {editing ? (
+        <>
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            rows={3}
+            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+          />
+          {error && <p className="text-xs text-red-400 mt-2">{error}</p>}
+          <div className="flex gap-2 mt-2">
+            <button
+              onClick={handleSave}
+              disabled={saving || !content.trim()}
+              className="text-xs font-semibold text-blue-500 disabled:text-gray-300"
+            >
+              저장
+            </button>
+            <button
+              onClick={() => {
+                setEditing(false);
+                setContent(review.content);
+                setError('');
+              }}
+              className="text-xs font-medium text-gray-400"
+            >
+              취소
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{review.content}</p>
+          <div className="flex items-center justify-between mt-3">
+            <span className="text-xs text-gray-400">
+              {formatDate(review.createdAt)}
+              {review.updatedAt !== review.createdAt && ' (수정됨)'}
+            </span>
+            {isMine && (
+              <div className="flex items-center gap-2 text-xs">
+                {confirmingDelete ? (
+                  <>
+                    <span className="text-gray-400">삭제할까요?</span>
+                    <button onClick={handleDelete} disabled={saving} className="font-semibold text-red-500">
+                      삭제
+                    </button>
+                    <button onClick={() => setConfirmingDelete(false)} className="font-medium text-gray-400">
+                      취소
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={() => setEditing(true)} className="font-medium text-blue-500">
+                      수정
+                    </button>
+                    <button onClick={() => setConfirmingDelete(true)} className="font-medium text-gray-400">
+                      삭제
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
+          {error && <p className="text-xs text-red-400 mt-2">{error}</p>}
+        </>
+      )}
+    </div>
+  );
+}
+
 // ─── 상세 페이지 ──────────────────────────────────────────────────────
 export default function MerchantPublicDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuthStore();
   const [merchant, setMerchant] = useState<MerchantDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(true);
 
   useEffect(() => {
     if (!id) return;
@@ -232,6 +353,14 @@ export default function MerchantPublicDetailPage() {
       .then(setMerchant)
       .catch(() => setError('업체 정보를 불러오지 못했습니다.'))
       .finally(() => setLoading(false));
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    getReviewsByMerchant(Number(id))
+      .then(setReviews)
+      .catch(() => {})
+      .finally(() => setReviewsLoading(false));
   }, [id]);
 
   return (
@@ -283,6 +412,44 @@ export default function MerchantPublicDetailPage() {
                 ))}
               </div>
             )}
+
+            <div className="border-t border-gray-100 my-6" />
+
+            <div>
+              <h2 className="text-base font-bold text-gray-900 mb-3">
+                이용 후기{reviews.length > 0 && ` (${reviews.length})`}
+              </h2>
+
+              {reviewsLoading && (
+                <div className="space-y-2">
+                  {[1, 2].map((i) => (
+                    <div key={i} className="h-20 rounded-2xl bg-gray-100 animate-pulse" />
+                  ))}
+                </div>
+              )}
+
+              {!reviewsLoading && reviews.length === 0 && (
+                <p className="text-sm text-gray-400 text-center py-8">아직 작성된 후기가 없습니다.</p>
+              )}
+
+              {!reviewsLoading && reviews.length > 0 && (
+                <div className="space-y-3">
+                  {reviews.map((review) => (
+                    <ReviewCard
+                      key={review.id}
+                      review={review}
+                      isMine={!!user && user.id === review.userId}
+                      onUpdated={(updated) =>
+                        setReviews((prev) => prev.map((r) => (r.id === updated.id ? updated : r)))
+                      }
+                      onDeleted={(reviewId) =>
+                        setReviews((prev) => prev.filter((r) => r.id !== reviewId))
+                      }
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </>
         )}
       </main>
