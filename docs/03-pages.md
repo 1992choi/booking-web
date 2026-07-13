@@ -13,12 +13,26 @@
 | GET | `/api/v1/users/me` | 내 정보 조회 |
 | PUT | `/api/v1/users/me` | 내 정보 수정 (name, phone) |
 | DELETE | `/api/v1/users/me` | 회원 탈퇴 |
+| GET | `/api/v1/admin/users?role=` | 회원 목록 조회 (ADMIN) |
+| POST | `/api/v1/admin/users/{id}/message` | 회원에게 메시지 발송 (ADMIN) |
+
+### reservation 서비스 (8081)
+
+업체(Merchant)·예약 대상(Resource)·관리자 예약 도메인이 이관되어 함께 서비스된다.
+
+| 메서드 | 경로 | 설명 |
+|--------|------|------|
+| POST | `/api/v1/reservations` | 예약 생성 |
+| GET | `/api/v1/reservations/{id}` | 예약 상세 |
+| GET | `/api/v1/reservations/me?status=&page=&size=` | 내 예약 목록 |
+| PUT | `/api/v1/reservations/{id}/cancel` | 예약 취소 |
 | POST | `/api/v1/merchants` | 업체 등록 |
 | GET | `/api/v1/merchants` | 전체 업체 목록 |
 | GET | `/api/v1/merchants/me` | 내 업체 목록 |
 | GET | `/api/v1/merchants/{id}` | 업체 상세 |
 | PUT | `/api/v1/merchants/{id}` | 업체 수정 |
 | GET | `/api/v1/merchants/{id}/reservations` | 업체별 예약 목록 |
+| GET | `/api/v1/merchants/{id}/stats/daily?year=&month=` | 업체 일별 매출 통계 |
 | POST | `/api/v1/merchants/{id}/resources` | 예약 대상 등록 |
 | PUT | `/api/v1/resources/{id}` | 예약 대상 수정 |
 | DELETE | `/api/v1/resources/{id}` | 예약 대상 삭제 |
@@ -29,15 +43,6 @@
 | GET | `/api/v1/admin/reservations/calendar?year=&month=` | 예약 현황 캘린더 |
 | PUT | `/api/v1/admin/reservations/{id}/confirm` | 예약 수동 확정 |
 | PUT | `/api/v1/admin/reservations/{id}/cancel` | 예약 수동 취소 |
-
-### reservation 서비스 (8081)
-
-| 메서드 | 경로 | 설명 |
-|--------|------|------|
-| POST | `/api/v1/reservations` | 예약 생성 |
-| GET | `/api/v1/reservations/{id}` | 예약 상세 |
-| GET | `/api/v1/reservations/me?status=&page=&size=` | 내 예약 목록 |
-| PUT | `/api/v1/reservations/{id}/cancel` | 예약 취소 |
 
 ### payment 서비스 (8082)
 
@@ -96,7 +101,15 @@
 | 업체 상세 관리 | `/merchant/{id}` | `GET /merchants/{id}` |
 | 업체·리소스 수정 | `/merchant/{id}/edit` | `PUT /merchants/{id}`, `POST /merchants/{id}/resources`, `PUT /resources/{id}`, `DELETE /resources/{id}`, `GET /resources/{id}/available-times`, `POST /resources/{id}/available-times`, `PUT /available-times/{id}`, `DELETE /available-times/{id}` |
 | 업체별 예약 목록 | `/merchant/{id}/reservations` | `GET /merchants/{id}/reservations` |
+| 일별 매출 통계 | `/merchant/{id}/stats` | `GET /merchants/{id}/stats/daily` |
 | 예약 현황 캘린더 | `/merchant/calendar` | `GET /admin/reservations/calendar`, `PUT /admin/reservations/{id}/confirm`, `PUT /admin/reservations/{id}/cancel` |
+
+### 관리자 (role=ADMIN)
+
+| 페이지 | URL | 사용 API |
+|--------|-----|---------|
+| 회원 관리 | `/admin/users` | `GET /admin/users?role=` |
+| 메시지 보내기 | `/admin/users/{id}/message` | `GET /admin/users?role=`, `POST /admin/users/{id}/message` |
 
 ---
 

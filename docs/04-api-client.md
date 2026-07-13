@@ -3,15 +3,22 @@
 ## 백엔드 연결 구조
 
 로컬 개발 시 `next.config.ts`의 rewrites로 모든 API 요청을 `localhost:3000/api/v1/...`로 통일.
-CORS 문제 없이 백엔드 4개 서비스로 자동 프록시된다.
+CORS 문제 없이 백엔드 5개 서비스로 자동 프록시된다.
 
 | 요청 경로 | 프록시 대상 |
 |----------|-----------|
+| `/api/v1/merchants/**` | `localhost:8081` (reservation) |
+| `/api/v1/resources/**` | `localhost:8081` (reservation) |
+| `/api/v1/available-times/**` | `localhost:8081` (reservation) |
+| `/api/v1/admin/users`, `/api/v1/admin/users/**` | `localhost:8080` (api) |
+| `/api/v1/admin/**` (나머지, 예: reservations) | `localhost:8081` (reservation) |
 | `/api/v1/reservations/**` | `localhost:8081` (reservation) |
 | `/api/v1/payments/**` | `localhost:8082` (payment) |
 | `/api/v1/notifications/**` | `localhost:8083` (notification) |
 | `/api/v1/reviews/**` | `localhost:8084` (review) |
-| `/api/v1/**` (나머지) | `localhost:8080` (api) |
+| `/api/v1/**` (나머지, 예: auth, users) | `localhost:8080` (api) |
+
+라우팅 우선순위는 `next.config.ts`에 정의된 rewrites 순서를 따른다 (더 구체적인 규칙이 먼저 매칭).
 
 ---
 
@@ -28,6 +35,7 @@ CORS 문제 없이 백엔드 4개 서비스로 자동 프록시된다.
 
 ### auth.ts
 ```
+getUsers(params?: { role?: Role }) → UserResponse[]  // ADMIN only
 getMe() → UserResponse
 updateMe(body: UserUpdateRequest) → UserResponse
 deleteMe() → void
@@ -39,12 +47,12 @@ refresh(refreshToken: string) → RefreshResponse
 
 ### merchants.ts
 ```
-getMerchants() → MerchantSummary[]
-getMyMerchants() → MerchantResponse[]
+getMerchants() → MerchantSummary[]        // ADMIN
+getMyMerchants() → MerchantResponse[]     // MERCHANT
 createMerchant(params: MerchantRequest) → MerchantResponse
 getMerchant(id) → MerchantDetail
 updateMerchant(id, params: MerchantRequest) → MerchantResponse
-createReservation(params: CreateReservationRequest) → void
+getMerchantDailyStats(id, year, month) → DailyMerchantStats[]
 ```
 
 ### resources.ts
@@ -60,6 +68,7 @@ deleteAvailableTime(id) → void
 
 ### reservations.ts
 ```
+createReservation(params: CreateReservationRequest) → void
 getReservation(id) → Reservation
 cancelReservation(id) → void
 getMyReservations(status?, page?, size?) → PageResponse<Reservation>
@@ -86,6 +95,7 @@ refund(reservationId) → void
 ### notifications.ts
 ```
 getMyNotifications() → Notification[]
+sendNotificationToUser(userId, message) → void  // ADMIN only
 ```
 
 ### reviews.ts

@@ -11,10 +11,13 @@ Next.js App Router 기반. 테마/레이아웃만 교체해 숙박·강의·시�
 
 | 서비스 | 포트 | 역할 |
 |--------|------|------|
-| api | 8080 | 인증, 회원, 업체(Merchant), 예약 대상(Resource) |
-| reservation | 8081 | 예약 생성/조회/취소 |
+| api | 8080 | 인증, 회원, 관리자(회원 조회·메시지 발송) |
+| reservation | 8081 | 예약 생성/조회/취소, 업체(Merchant), 예약 대상(Resource), 관리자 예약 캘린더 |
 | payment | 8082 | 결제 내역 조회, 환불 |
 | notification | 8083 | 알림 이력 조회 |
+| review | 8084 | 리뷰 조회/작성/수정/삭제 |
+
+업체(Merchant)·예약 대상(Resource)·관리자 예약 도메인은 백엔드 아키텍처 재구성으로 `api` 서비스에서 `reservation` 서비스로 이관되었다.
 
 ---
 

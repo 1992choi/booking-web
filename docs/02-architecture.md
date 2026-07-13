@@ -7,15 +7,16 @@
         ↓
   [Next.js Dev Server]
         ↓ (next.config.ts rewrites 로 프록시)
-  ┌─────────────────────────────────────────┐
-  │  api        :8080  (인증, 업체, 리소스)  │
-  │  reservation:8081  (예약)               │
-  │  payment    :8082  (결제)               │
-  │  notification:8083 (알림)               │
-  └─────────────────────────────────────────┘
+  ┌───────────────────────────────────────────────────┐
+  │  api        :8080  (인증, 회원, 관리자-회원)       │
+  │  reservation:8081  (예약, 업체, 리소스, 관리자-예약)│
+  │  payment    :8082  (결제)                          │
+  │  notification:8083 (알림)                          │
+  │  review     :8084  (리뷰)                          │
+  └───────────────────────────────────────────────────┘
 ```
 
-로컬 개발 시 `next.config.ts`의 rewrites 설정으로 백엔드 4개 서비스에 프록시한다.
+로컬 개발 시 `next.config.ts`의 rewrites 설정으로 백엔드 5개 서비스에 프록시한다.
 CORS 문제 없이 모두 `localhost:3000/api/v1/...`로 호출 가능.
 
 ---
@@ -46,33 +47,48 @@ booking-web/
 │   │   │   └── notifications/
 │   │   │       └── page.tsx          # /my/notifications (내 알림)
 │   │   │
-│   │   └── merchant/                 # 업체 운영자 (role=MERCHANT 이상)
-│   │       ├── register/page.tsx     # /merchant/register (업체 등록)
-│   │       ├── dashboard/page.tsx    # /merchant/dashboard (내 업체 목록)
-│   │       ├── calendar/page.tsx     # /merchant/calendar (예약 현황 캘린더)
-│   │       └── [id]/
-│   │           ├── page.tsx          # /merchant/{id} (업체 상세 관리)
-│   │           ├── edit/page.tsx     # /merchant/{id}/edit (업체·리소스 수정)
-│   │           └── reservations/
-│   │               └── page.tsx      # /merchant/{id}/reservations (업체별 예약 목록)
+│   │   ├── merchant/                 # 업체 운영자 (role=MERCHANT 이상)
+│   │   │   ├── register/page.tsx     # /merchant/register (업체 등록)
+│   │   │   ├── dashboard/page.tsx    # /merchant/dashboard (내 업체 목록)
+│   │   │   ├── calendar/page.tsx     # /merchant/calendar (예약 현황 캘린더)
+│   │   │   └── [id]/
+│   │   │       ├── page.tsx          # /merchant/{id} (업체 상세 관리)
+│   │   │       ├── edit/page.tsx     # /merchant/{id}/edit (업체·리소스 수정)
+│   │   │       ├── stats/page.tsx    # /merchant/{id}/stats (일별 매출 통계)
+│   │   │       └── reservations/
+│   │   │           └── page.tsx      # /merchant/{id}/reservations (업체별 예약 목록)
+│   │   │
+│   │   └── admin/                    # 관리자 (role=ADMIN)
+│   │       └── users/
+│   │           ├── page.tsx          # /admin/users (회원 목록/역할 필터)
+│   │           └── [id]/
+│   │               └── message/page.tsx # /admin/users/{id}/message (회원에게 메시지 발송)
 │   │
 │   ├── components/
-│   │   └── Header.tsx
+│   │   ├── Header.tsx
+│   │   └── ui/
+│   │       ├── BackButton.tsx
+│   │       ├── Row.tsx
+│   │       └── ToastContainer.tsx
 │   │
 │   ├── lib/
 │   │   ├── api/                      # API 호출 함수 (서비스별 분리)
 │   │   │   ├── axios.ts              # Axios 인스턴스 + JWT 인터셉터
-│   │   │   ├── auth.ts               # 회원가입, 로그인, 내 정보 조회
-│   │   │   ├── merchants.ts          # 업체 CRUD, 가능시간 조회, 예약 생성
+│   │   │   ├── auth.ts               # 회원가입, 로그인, 내 정보 조회, 회원 목록(ADMIN)
+│   │   │   ├── merchants.ts          # 업체 CRUD, 예약 생성, 일별 매출 통계
 │   │   │   ├── resources.ts          # 예약 대상 CRUD, 가능시간 CRUD
 │   │   │   ├── reservations.ts       # 내 예약 조회/취소
 │   │   │   ├── merchantReservations.ts # 업체별 예약 조회, 확정/취소
 │   │   │   ├── adminReservations.ts  # 관리자 캘린더 조회
 │   │   │   ├── payments.ts           # 결제 조회, 환불
-│   │   │   └── notifications.ts      # 알림 조회
+│   │   │   ├── notifications.ts      # 알림 조회, 회원에게 메시지 발송(ADMIN)
+│   │   │   └── reviews.ts            # 리뷰 조회/작성/수정/삭제
 │   │   │
 │   │   ├── store/
 │   │   │   └── auth.ts               # Zustand: accessToken, user 정보
+│   │   │
+│   │   ├── utils/
+│   │   │   └── format.ts             # 날짜/가격 포맷 헬퍼
 │   │   │
 │   │   └── types/                    # 백엔드 DTO 기반 TypeScript 타입
 │   │       ├── auth.ts
@@ -81,6 +97,7 @@ booking-web/
 │   │       ├── payment.ts
 │   │       ├── notification.ts
 │   │       ├── admin.ts
+│   │       ├── review.ts
 │   │       └── common.ts
 │   │
 │   └── middleware.ts                  # 라우트 보호 (미인증 → /login 리디렉션)

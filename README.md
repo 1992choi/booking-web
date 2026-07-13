@@ -60,6 +60,7 @@ npm run dev
 > | reservation | 8081 |
 > | payment | 8082 |
 > | notification | 8083 |
+> | review | 8084 |
 
 ### 4. 빌드 (배포용)
 
