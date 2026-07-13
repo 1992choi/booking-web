@@ -78,6 +78,18 @@ npm run start
 npm run lint
 ```
 
+### 6. 테스트 실행
+
+```bash
+# 전체 테스트 1회 실행
+npm test
+
+# watch 모드 (파일 변경 시 자동 재실행)
+npm run test:watch
+```
+
+테스트 러너로 [Vitest](https://vitest.dev)를 사용한다. 테스트 파일은 대상 파일과 같은 위치에 `*.test.ts`로 작성한다 (예: `src/lib/utils/format.ts` → `src/lib/utils/format.test.ts`).
+
 ---
 
 ## shadcn/ui 컴포넌트 추가 방법
