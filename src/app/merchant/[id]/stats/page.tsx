@@ -7,6 +7,7 @@ import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import { getMerchantDailyStats } from '@/lib/api/merchants';
 import { formatPrice } from '@/lib/utils/format';
+import { shiftMonth } from '@/lib/utils/calendar';
 import type { DailyMerchantStats } from '@/lib/types/merchant';
 
 function SummaryCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
@@ -62,13 +63,15 @@ export default function MerchantStatsPage() {
   });
 
   function prevMonth() {
-    if (month === 1) { setYear(y => y - 1); setMonth(12); }
-    else setMonth(m => m - 1);
+    const shifted = shiftMonth(year, month, -1);
+    setYear(shifted.year);
+    setMonth(shifted.month);
   }
 
   function nextMonth() {
-    if (month === 12) { setYear(y => y + 1); setMonth(1); }
-    else setMonth(m => m + 1);
+    const shifted = shiftMonth(year, month, 1);
+    setYear(shifted.year);
+    setMonth(shifted.month);
   }
 
   const totalRevenue = stats.reduce((sum, s) => sum + s.totalRevenue, 0);

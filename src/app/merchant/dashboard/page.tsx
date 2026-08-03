@@ -53,7 +53,7 @@ function MerchantCard({ merchant, isMerchant }: { merchant: MerchantSummary; isM
 }
 
 export default function MerchantDashboardPage() {
-  const { role } = useAuthStore();
+  const role = useAuthStore((s) => s.role);
   const isAdmin = role === 'ADMIN';
   const isMerchant = role === 'MERCHANT';
 

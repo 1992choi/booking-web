@@ -536,7 +536,7 @@ type ResourceFormTarget = Resource | 'new' | null;
 export default function MerchantDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { role } = useAuthStore();
+  const role = useAuthStore((s) => s.role);
   const isMerchant = role === 'MERCHANT';
 
   const [merchant, setMerchant] = useState<MerchantDetail | null>(null);

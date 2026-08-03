@@ -23,6 +23,19 @@ export function formatDate(isoString: string): string {
   return d.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Seoul' });
 }
 
+export function formatDateTime(isoString: string): string {
+  const d = parseDate(isoString);
+  if (isNaN(d.getTime())) return isoString;
+  return d.toLocaleDateString('ko-KR', {
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'Asia/Seoul',
+  });
+}
+
 export function today(): string {
   return new Date().toISOString().slice(0, 10);
 }

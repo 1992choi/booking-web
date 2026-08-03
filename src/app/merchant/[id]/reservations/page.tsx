@@ -8,12 +8,8 @@ import BackButton from '@/components/ui/BackButton';
 import { getMerchantReservations } from '@/lib/api/merchantReservations';
 import { confirmReservation, cancelReservation } from '@/lib/api/adminReservations';
 import { getErrorMessage } from '@/lib/api/axios';
-import {
-  RESERVATION_STATUS_LABELS,
-  RESERVATION_STATUS_STYLES,
-  RESERVATION_STATUS_TABS,
-} from '@/lib/constants/reservation';
-import { formatDate, formatPrice, formatTime } from '@/lib/utils/format';
+import { RESERVATION_STATUS_TABS } from '@/lib/constants/reservation';
+import { ReservationStatusBadge, ReservationSummaryRows } from '@/components/ReservationSummary';
 import type { MerchantReservation, ReservationStatus } from '@/lib/types/reservation';
 
 type Action = 'confirm' | 'cancel';
@@ -34,31 +30,15 @@ function ReservationCard({
           <p className="text-base font-semibold text-gray-900 truncate">{reservation.resourceName}</p>
           <p className="text-xs text-gray-400 mt-0.5">{reservation.userName ?? '—'}</p>
         </div>
-        <span className={`flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${RESERVATION_STATUS_STYLES[reservation.status]}`}>
-          {RESERVATION_STATUS_LABELS[reservation.status]}
-        </span>
+        <ReservationStatusBadge status={reservation.status} />
       </div>
 
-      <div className="border-t border-gray-50 pt-3 space-y-1.5">
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-400">날짜</span>
-          <span className="text-gray-700 font-medium">{formatDate(reservation.startTime)}</span>
-        </div>
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-400">시간</span>
-          <span className="text-gray-700 font-medium">
-            {formatTime(reservation.startTime)} ~ {formatTime(reservation.endTime)}
-          </span>
-        </div>
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-400">인원</span>
-          <span className="text-gray-700 font-medium">{reservation.headCount}명</span>
-        </div>
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-400">금액</span>
-          <span className="text-blue-500 font-bold">{formatPrice(reservation.amount)}</span>
-        </div>
-      </div>
+      <ReservationSummaryRows
+        startTime={reservation.startTime}
+        endTime={reservation.endTime}
+        headCount={reservation.headCount}
+        amount={reservation.amount}
+      />
 
       {(reservation.status === 'PENDING' || reservation.status === 'CONFIRMED') && (
         <div className="flex gap-2 mt-4 pt-3 border-t border-gray-50">
@@ -95,15 +75,7 @@ export default function MerchantReservationsPage() {
   const { data: reservations = [], isLoading, isError } = useQuery({
     queryKey: ['merchant-reservations', merchantId, tab],
     queryFn: async () => {
-      if (tab === 'ALL') {
-        const [pending, confirmed, cancelled] = await Promise.all([
-          getMerchantReservations(merchantId, 'PENDING'),
-          getMerchantReservations(merchantId, 'CONFIRMED'),
-          getMerchantReservations(merchantId, 'CANCELLED'),
-        ]);
-        return [...pending.content, ...confirmed.content, ...cancelled.content];
-      }
-      const res = await getMerchantReservations(merchantId, tab);
+      const res = await getMerchantReservations(merchantId, tab === 'ALL' ? undefined : tab);
       return res.content;
     },
   });

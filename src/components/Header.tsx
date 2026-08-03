@@ -8,7 +8,10 @@ import { logout } from '@/lib/api/auth';
 
 export default function Header() {
   const router = useRouter();
-  const { isAuthenticated, user, role, clearAuth } = useAuthStore();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const user = useAuthStore((s) => s.user);
+  const role = useAuthStore((s) => s.role);
+  const clearAuth = useAuthStore((s) => s.clearAuth);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 

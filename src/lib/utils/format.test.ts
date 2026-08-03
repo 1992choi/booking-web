@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatDate, formatPrice, formatTime, today } from './format';
+import { formatDate, formatDateTime, formatPrice, formatTime, today } from './format';
 
 describe('formatPrice', () => {
   it('천 단위 구분 기호와 "원"을 붙인다', () => {
@@ -35,6 +35,16 @@ describe('formatTime', () => {
 describe('formatDate', () => {
   it('타임존 없는 ISO 문자열을 "년 월 일" 형식으로 변환한다', () => {
     expect(formatDate('2024-01-15T10:30:00')).toBe('2024년 1월 15일');
+  });
+});
+
+describe('formatDateTime', () => {
+  it('타임존 없는 ISO 문자열을 "월 일 시:분" 형식으로 변환한다', () => {
+    expect(formatDateTime('2024-01-15T10:30:00')).toBe('1월 15일 10:30');
+  });
+
+  it('유효하지 않은 날짜 문자열은 그대로 반환한다', () => {
+    expect(formatDateTime('invalid-date')).toBe('invalid-date');
   });
 });
 

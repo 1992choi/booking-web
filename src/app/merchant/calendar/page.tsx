@@ -4,21 +4,15 @@ import { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import { getAdminCalendar, confirmReservation, cancelReservation } from '@/lib/api/adminReservations';
 import { getErrorMessage } from '@/lib/api/axios';
-import { toDateKey, buildCalendarGrid } from '@/lib/utils/calendar';
+import { toDateKey, buildCalendarGrid, shiftMonth } from '@/lib/utils/calendar';
 import type { AdminCalendarEntry, AdminCalendarData } from '@/lib/types/admin';
 import type { ReservationStatus } from '@/lib/types/reservation';
-import { RESERVATION_STATUS_LABELS } from '@/lib/constants/reservation';
+import { RESERVATION_STATUS_LABELS, RESERVATION_STATUS_STYLES } from '@/lib/constants/reservation';
 
 const STATUS_DOT: Record<ReservationStatus, string> = {
   PENDING:   'bg-yellow-400',
   CONFIRMED: 'bg-blue-400',
   CANCELLED: 'bg-gray-300',
-};
-
-const STATUS_BADGE: Record<ReservationStatus, string> = {
-  PENDING:   'bg-yellow-50 text-yellow-600',
-  CONFIRMED: 'bg-blue-50 text-blue-600',
-  CANCELLED: 'bg-gray-100 text-gray-400',
 };
 
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
@@ -39,7 +33,7 @@ function EntryCard({
     <div className="bg-white border border-gray-100 rounded-xl p-4">
       <div className="flex items-center justify-between mb-2">
         <p className="text-sm font-medium text-gray-900 truncate">{entry.resourceName}</p>
-        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ml-2 flex-shrink-0 ${STATUS_BADGE[entry.status]}`}>
+        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ml-2 flex-shrink-0 ${RESERVATION_STATUS_STYLES[entry.status]}`}>
           {RESERVATION_STATUS_LABELS[entry.status]}
         </span>
       </div>
@@ -93,13 +87,15 @@ export default function AdminReservationsPage() {
   }, [year, month]);
 
   function prevMonth() {
-    if (month === 1) { setYear(y => y - 1); setMonth(12); }
-    else setMonth(m => m - 1);
+    const shifted = shiftMonth(year, month, -1);
+    setYear(shifted.year);
+    setMonth(shifted.month);
   }
 
   function nextMonth() {
-    if (month === 12) { setYear(y => y + 1); setMonth(1); }
-    else setMonth(m => m + 1);
+    const shifted = shiftMonth(year, month, 1);
+    setYear(shifted.year);
+    setMonth(shifted.month);
   }
 
   async function handleAction(reservationId: number, action: 'confirm' | 'cancel') {

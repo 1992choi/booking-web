@@ -1,5 +1,20 @@
 import { describe, expect, it } from 'vitest';
-import { buildCalendarGrid, toDateKey } from './calendar';
+import { buildCalendarGrid, shiftMonth, toDateKey } from './calendar';
+
+describe('shiftMonth', () => {
+  it('같은 해 안에서는 월만 이동한다', () => {
+    expect(shiftMonth(2024, 6, 1)).toEqual({ year: 2024, month: 7 });
+    expect(shiftMonth(2024, 6, -1)).toEqual({ year: 2024, month: 5 });
+  });
+
+  it('12월에서 다음 달로 이동하면 해가 넘어간다', () => {
+    expect(shiftMonth(2024, 12, 1)).toEqual({ year: 2025, month: 1 });
+  });
+
+  it('1월에서 이전 달로 이동하면 해가 줄어든다', () => {
+    expect(shiftMonth(2024, 1, -1)).toEqual({ year: 2023, month: 12 });
+  });
+});
 
 describe('toDateKey', () => {
   it('한 자리 월/일을 0으로 패딩한다', () => {

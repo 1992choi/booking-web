@@ -3,19 +3,15 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import type { z } from 'zod';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { login } from '@/lib/api/auth';
 import { useAuthStore } from '@/lib/store/auth';
 import { getErrorMessage } from '@/lib/api/axios';
+import { loginSchema } from '@/lib/validation/auth';
 
-const schema = z.object({
-  email: z.string().email('올바른 이메일 형식이 아닙니다.'),
-  password: z.string().min(1, '비밀번호를 입력해 주세요.'),
-});
-
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
@@ -30,7 +26,7 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<FormValues>({ resolver: zodResolver(schema) });
+  } = useForm<FormValues>({ resolver: zodResolver(loginSchema) });
 
   const onSubmit = async (values: FormValues) => {
     setErrorMsg('');

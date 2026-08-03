@@ -3,29 +3,14 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import type { z } from 'zod';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { signup } from '@/lib/api/auth';
 import { getErrorMessage } from '@/lib/api/axios';
+import { signupSchema } from '@/lib/validation/auth';
 
-export const schema = z
-  .object({
-    name: z.string().min(1, '이름을 입력해 주세요.'),
-    email: z.string().email('올바른 이메일 형식이 아닙니다.'),
-    phone: z
-      .string()
-      .min(1, '전화번호를 입력해 주세요.')
-      .regex(/^01[016-9]-?\d{3,4}-?\d{4}$/, '올바른 전화번호 형식이 아닙니다.'),
-    password: z.string().min(8, '비밀번호는 8자 이상이어야 합니다.'),
-    passwordConfirm: z.string(),
-  })
-  .refine((data) => data.password === data.passwordConfirm, {
-    message: '비밀번호가 일치하지 않습니다.',
-    path: ['passwordConfirm'],
-  });
-
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
   const router = useRouter();
@@ -35,7 +20,7 @@ export default function SignupPage() {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<FormValues>({ resolver: zodResolver(schema) });
+  } = useForm<FormValues>({ resolver: zodResolver(signupSchema) });
 
   const onSubmit = async (values: FormValues) => {
     setErrorMsg('');

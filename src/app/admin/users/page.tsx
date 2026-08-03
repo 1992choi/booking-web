@@ -6,19 +6,8 @@ import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { getUsers } from '@/lib/api/auth';
 import { formatDate } from '@/lib/utils/format';
+import { ROLE_LABELS, ROLE_COLORS } from '@/lib/constants/user';
 import type { Role, UserResponse } from '@/lib/types/auth';
-
-const ROLE_LABELS: Record<Role, string> = {
-  USER: '일반 회원',
-  MERCHANT: '업체 운영자',
-  ADMIN: '관리자',
-};
-
-const ROLE_COLORS: Record<Role, string> = {
-  USER: 'bg-gray-100 text-gray-500',
-  MERCHANT: 'bg-blue-50 text-blue-600',
-  ADMIN: 'bg-purple-50 text-purple-600',
-};
 
 type FilterRole = Role | 'ALL';
 

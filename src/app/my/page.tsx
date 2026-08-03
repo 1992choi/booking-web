@@ -8,23 +8,13 @@ import { getMe, updateMe, deleteMe, logout } from '@/lib/api/auth';
 import { getErrorMessage } from '@/lib/api/axios';
 import { formatDate } from '@/lib/utils/format';
 import { useAuthStore } from '@/lib/store/auth';
+import { ROLE_LABELS, ROLE_COLORS } from '@/lib/constants/user';
 import type { UserResponse } from '@/lib/types/auth';
-
-const ROLE_LABELS = {
-  USER:     '일반 회원',
-  MERCHANT: '업체 운영자',
-  ADMIN:    '관리자',
-} as const;
-
-const ROLE_COLORS = {
-  USER:     'bg-gray-100 text-gray-500',
-  MERCHANT: 'bg-blue-50 text-blue-600',
-  ADMIN:    'bg-purple-50 text-purple-600',
-} as const;
 
 export default function MyPage() {
   const router = useRouter();
-  const { clearAuth, updateUser } = useAuthStore();
+  const clearAuth = useAuthStore((s) => s.clearAuth);
+  const updateUser = useAuthStore((s) => s.updateUser);
   const [user, setUser] = useState<UserResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

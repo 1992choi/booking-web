@@ -17,8 +17,8 @@ export default function SendMessagePage() {
   const [message, setMessage] = useState('');
 
   const { data: users, isLoading: isLoadingUser } = useQuery({
-    queryKey: ['admin-users'],
-    queryFn: () => getUsers(),
+    queryKey: ['admin-users', 'ALL'],
+    queryFn: () => getUsers({ role: undefined }),
   });
 
   const user = users?.find((u) => u.id === userId);

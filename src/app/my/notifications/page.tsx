@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import { getMyNotifications } from '@/lib/api/notifications';
+import { formatDateTime } from '@/lib/utils/format';
 import type { Notification } from '@/lib/types/notification';
 
 const TYPE_LABELS: Record<string, string> = {
@@ -12,12 +13,6 @@ const TYPE_LABELS: Record<string, string> = {
   RESERVATION_REMINDER: '예약 알림',
   ADMIN_MESSAGE: '관리자 메시지',
 };
-
-function formatDate(sentAt: string) {
-  const d = new Date(sentAt);
-  if (isNaN(d.getTime())) return sentAt;
-  return d.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
-}
 
 function NotificationItem({ notification }: { notification: Notification }) {
   const label = TYPE_LABELS[notification.type] ?? notification.type;
@@ -31,7 +26,7 @@ function NotificationItem({ notification }: { notification: Notification }) {
             <span className="font-medium">[{label}]</span>
             {notification.message && <span className="text-gray-600"> {notification.message}</span>}
           </p>
-          <p className="text-xs text-gray-300 mt-1.5">{formatDate(notification.sentAt)}</p>
+          <p className="text-xs text-gray-300 mt-1.5">{formatDateTime(notification.sentAt)}</p>
         </div>
       </div>
     </div>

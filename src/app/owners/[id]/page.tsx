@@ -26,7 +26,7 @@ function AvailableTimesModal({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated } = useAuthStore();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const showToast = useToastStore((s) => s.showToast);
 
   const [date, setDate] = useState(today());
@@ -339,7 +339,7 @@ function ReviewCard({
 // ─── 상세 페이지 ──────────────────────────────────────────────────────
 export default function MerchantPublicDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { user } = useAuthStore();
+  const user = useAuthStore((s) => s.user);
   const [merchant, setMerchant] = useState<MerchantDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
