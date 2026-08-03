@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildCalendarGrid, toDateKey } from './page';
+import { buildCalendarGrid, toDateKey } from './calendar';
 
 describe('toDateKey', () => {
   it('한 자리 월/일을 0으로 패딩한다', () => {
@@ -39,7 +39,6 @@ describe('buildCalendarGrid', () => {
     const lastWeek = weeks[weeks.length - 1];
     const trailingNulls = lastWeek.filter((d) => d === null).length;
     expect(lastWeek).toHaveLength(7);
-    expect(trailingNulls).toBeGreaterThanOrEqual(0);
     // 2024-02-29 is a Thursday (index 4), so trailing 2 nulls (Fri, Sat)
     expect(trailingNulls).toBe(2);
   });

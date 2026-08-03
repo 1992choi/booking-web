@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import Header from './Header';
 import { useAuthStore } from '@/lib/store/auth';
+import { testUser } from '@/lib/test/fixtures';
 import type { UserResponse } from '@/lib/types/auth';
 
 const push = vi.fn();
@@ -16,23 +17,8 @@ vi.mock('@/lib/api/auth', () => ({
   logout: (...args: unknown[]) => logout(...args),
 }));
 
-const user: UserResponse = {
-  id: 1,
-  name: '홍길동',
-  email: 'hong@example.com',
-  phone: '010-1234-5678',
-  role: 'USER',
-  createdAt: '2024-01-15T10:30:00',
-};
-
 function loginAs(role: UserResponse['role']) {
-  useAuthStore.setState({
-    accessToken: 'access-1',
-    refreshToken: 'refresh-1',
-    user: { ...user, role },
-    role,
-    isAuthenticated: true,
-  });
+  useAuthStore.getState().setAuth('access-1', 'refresh-1', { ...testUser, role });
 }
 
 beforeEach(() => {

@@ -2,15 +2,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { useAuthStore } from './auth';
 import type { UserResponse } from '@/lib/types/auth';
-
-const user: UserResponse = {
-  id: 1,
-  name: '홍길동',
-  email: 'hong@example.com',
-  phone: '010-1234-5678',
-  role: 'USER',
-  createdAt: '2024-01-15T10:30:00',
-};
+import { testUser as user } from '@/lib/test/fixtures';
 
 function getCookie(): string {
   return document.cookie;
