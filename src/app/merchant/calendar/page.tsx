@@ -22,11 +22,11 @@ const STATUS_BADGE: Record<ReservationStatus, string> = {
 
 const DAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'];
 
-function toDateKey(year: number, month: number, day: number) {
+export function toDateKey(year: number, month: number, day: number) {
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
-function buildCalendarGrid(year: number, month: number): (number | null)[][] {
+export function buildCalendarGrid(year: number, month: number): (number | null)[][] {
   const firstDay = new Date(year, month - 1, 1).getDay();
   const daysInMonth = new Date(year, month, 0).getDate();
   const cells: (number | null)[] = [

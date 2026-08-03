@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import { signup } from '@/lib/api/auth';
 import { getErrorMessage } from '@/lib/api/axios';
 
-const schema = z
+export const schema = z
   .object({
     name: z.string().min(1, '이름을 입력해 주세요.'),
     email: z.string().email('올바른 이메일 형식이 아닙니다.'),
