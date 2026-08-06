@@ -1,6 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import type { z } from 'zod';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
@@ -15,12 +18,15 @@ import {
   updateAvailableTime,
   deleteAvailableTime,
 } from '@/lib/api/resources';
-import type { ResourceRequest } from '@/lib/api/resources';
 import { getErrorMessage } from '@/lib/api/axios';
 import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
+import { resourceSchema, availableTimeSchema } from '@/lib/validation/merchant';
 import { formatPrice } from '@/lib/utils/format';
 import { useAuthStore } from '@/lib/store/auth';
 import type { MerchantDetail, MerchantType, Resource, AvailableTime } from '@/lib/types/merchant';
+
+type ResourceFormValues = z.infer<typeof resourceSchema>;
+type AvailableTimeFormValues = z.infer<typeof availableTimeSchema>;
 
 const STATUS_LABELS: Record<AvailableTime['status'], string> = {
   OPEN:    '예약 가능',
@@ -63,34 +69,33 @@ function ResourceFormModal({
   onDelete?: () => void;
 }) {
   const isEdit = initial !== null;
-  const [name, setName] = useState(initial?.name ?? '');
-  const [description, setDescription] = useState(initial?.description ?? '');
-  const [price, setPrice] = useState(String(initial?.price ?? ''));
-  const [maxCapacity, setMaxCapacity] = useState(String(initial?.maxCapacity ?? ''));
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-    const params: ResourceRequest = {
-      name: name.trim(),
-      description: description.trim(),
-      price: Number(price),
-      maxCapacity: Number(maxCapacity),
-    };
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<ResourceFormValues>({
+    resolver: zodResolver(resourceSchema),
+    defaultValues: {
+      name: initial?.name ?? '',
+      description: initial?.description ?? '',
+      price: initial?.price ?? 0,
+      maxCapacity: initial?.maxCapacity ?? 1,
+    },
+  });
+
+  const onSubmit = async (values: ResourceFormValues) => {
+    setErrorMsg('');
     try {
       const saved = isEdit
-        ? await updateResource(initial!.id, params)
-        : await createResource(merchantId, params);
+        ? await updateResource(initial!.id, values)
+        : await createResource(merchantId, values);
       onSaved(saved);
     } catch (err) {
-      setError(getErrorMessage(err));
-    } finally {
-      setLoading(false);
+      setErrorMsg(getErrorMessage(err));
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
@@ -103,25 +108,23 @@ function ResourceFormModal({
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1.5">이름</label>
             <input
+              {...register('name')}
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
               placeholder="예: A동, 오전반, 1번 코트"
-              required
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>}
           </div>
 
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1.5">설명 (선택)</label>
             <input
+              {...register('description')}
               type="text"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
               placeholder="간단한 설명을 입력하세요"
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -131,37 +134,37 @@ function ResourceFormModal({
             <div>
               <label className="block text-xs font-medium text-gray-500 mb-1.5">가격 (원)</label>
               <input
+                {...register('price')}
                 type="number"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
                 placeholder="0"
                 min={0}
-                required
                 className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+              {errors.price && <p className="mt-1 text-xs text-red-500">{errors.price.message}</p>}
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-500 mb-1.5">최대 인원</label>
               <input
+                {...register('maxCapacity')}
                 type="number"
-                value={maxCapacity}
-                onChange={(e) => setMaxCapacity(e.target.value)}
                 placeholder="1"
                 min={1}
-                required
                 className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+              {errors.maxCapacity && (
+                <p className="mt-1 text-xs text-red-500">{errors.maxCapacity.message}</p>
+              )}
             </div>
           </div>
 
-          {error && <p className="text-sm text-red-400 text-center">{error}</p>}
+          {errorMsg && <p className="text-sm text-red-400 text-center">{errorMsg}</p>}
 
           <button
             type="submit"
-            disabled={loading || !name.trim() || !price || !maxCapacity}
+            disabled={isSubmitting}
             className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-200 disabled:text-gray-400 text-white text-sm font-medium rounded-xl py-3 transition-colors"
           >
-            {loading ? '저장 중...' : isEdit ? '수정 완료' : '추가'}
+            {isSubmitting ? '저장 중...' : isEdit ? '수정 완료' : '추가'}
           </button>
 
           {isEdit && onDelete && (
@@ -234,32 +237,33 @@ function AvailableTimeFormModal({
   onSaved: () => void;
 }) {
   const isEdit = initial !== null;
-  const [startTime, setStartTime] = useState(
-    initial ? toDatetimeLocal(initial.startTime) : `${defaultDate}T09:00`
-  );
-  const [endTime, setEndTime] = useState(
-    initial ? toDatetimeLocal(initial.endTime) : `${defaultDate}T10:00`
-  );
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<AvailableTimeFormValues>({
+    resolver: zodResolver(availableTimeSchema),
+    defaultValues: {
+      startTime: initial ? toDatetimeLocal(initial.startTime) : `${defaultDate}T09:00`,
+      endTime: initial ? toDatetimeLocal(initial.endTime) : `${defaultDate}T10:00`,
+    },
+  });
+
+  const onSubmit = async (values: AvailableTimeFormValues) => {
+    setErrorMsg('');
     try {
       if (isEdit) {
-        await updateAvailableTime(initial!.id, toBackendTime(startTime), toBackendTime(endTime));
+        await updateAvailableTime(initial!.id, toBackendTime(values.startTime), toBackendTime(values.endTime));
       } else {
-        await createAvailableTime(resourceId, toBackendTime(startTime), toBackendTime(endTime));
+        await createAvailableTime(resourceId, toBackendTime(values.startTime), toBackendTime(values.endTime));
       }
       onSaved();
     } catch (err) {
-      setError(getErrorMessage(err));
-    } finally {
-      setLoading(false);
+      setErrorMsg(getErrorMessage(err));
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center">
@@ -272,36 +276,34 @@ function AvailableTimeFormModal({
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1.5">시작 시간</label>
             <input
+              {...register('startTime')}
               type="datetime-local"
-              value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
-              required
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {errors.startTime && <p className="mt-1 text-xs text-red-500">{errors.startTime.message}</p>}
           </div>
           <div>
             <label className="block text-xs font-medium text-gray-500 mb-1.5">종료 시간</label>
             <input
+              {...register('endTime')}
               type="datetime-local"
-              value={endTime}
-              onChange={(e) => setEndTime(e.target.value)}
-              required
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {errors.endTime && <p className="mt-1 text-xs text-red-500">{errors.endTime.message}</p>}
           </div>
 
-          {error && <p className="text-sm text-red-400 text-center">{error}</p>}
+          {errorMsg && <p className="text-sm text-red-400 text-center">{errorMsg}</p>}
 
           <button
             type="submit"
-            disabled={loading || !startTime || !endTime}
+            disabled={isSubmitting}
             className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-200 disabled:text-gray-400 text-white text-sm font-medium rounded-xl py-3 transition-colors"
           >
-            {loading ? '저장 중...' : isEdit ? '수정 완료' : '추가'}
+            {isSubmitting ? '저장 중...' : isEdit ? '수정 완료' : '추가'}
           </button>
         </form>
       </div>
