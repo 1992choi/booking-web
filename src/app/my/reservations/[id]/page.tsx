@@ -176,7 +176,11 @@ export default function ReservationDetailPage() {
                   <p className="text-sm text-gray-400 text-center py-4">리뷰가 등록되었습니다. 감사합니다!</p>
                 ) : (
                   <form onSubmit={handleSubmitReview}>
+                    <label htmlFor="review-content" className="sr-only">
+                      이용 후기
+                    </label>
                     <textarea
+                      id="review-content"
                       value={reviewContent}
                       onChange={(e) => setReviewContent(e.target.value)}
                       placeholder="이용하신 소감을 남겨주세요."

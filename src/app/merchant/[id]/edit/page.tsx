@@ -76,34 +76,55 @@ export default function MerchantEditPage() {
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1.5">업체명</label>
+              <label htmlFor="merchant-name" className="block text-xs font-medium text-gray-500 mb-1.5">
+                업체명
+              </label>
               <input
                 {...register('name')}
+                id="merchant-name"
                 type="text"
                 placeholder="업체명을 입력하세요"
+                aria-invalid={!!errors.name}
+                aria-describedby={errors.name ? 'merchant-name-error' : undefined}
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>}
+              {errors.name && (
+                <p id="merchant-name-error" className="mt-1 text-xs text-red-500">
+                  {errors.name.message}
+                </p>
+              )}
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1.5">전화번호</label>
+              <label htmlFor="merchant-phone" className="block text-xs font-medium text-gray-500 mb-1.5">
+                전화번호
+              </label>
               <input
                 {...register('phone')}
+                id="merchant-phone"
                 type="tel"
                 placeholder="010-0000-0000"
+                aria-invalid={!!errors.phone}
+                aria-describedby={errors.phone ? 'merchant-phone-error' : undefined}
                 className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone.message}</p>}
+              {errors.phone && (
+                <p id="merchant-phone-error" className="mt-1 text-xs text-red-500">
+                  {errors.phone.message}
+                </p>
+              )}
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1.5">업체 유형</label>
+            <div role="group" aria-labelledby="merchant-type-label">
+              <label id="merchant-type-label" className="block text-xs font-medium text-gray-500 mb-1.5">
+                업체 유형
+              </label>
               <div className="grid grid-cols-2 gap-2">
                 {MERCHANT_TYPE_OPTIONS.map((opt) => (
                   <button
                     key={opt.value}
                     type="button"
+                    aria-pressed={type === opt.value}
                     onClick={() => setValue('type', opt.value, { shouldValidate: true })}
                     className={`py-3 rounded-xl text-sm font-medium border transition-colors ${
                       type === opt.value

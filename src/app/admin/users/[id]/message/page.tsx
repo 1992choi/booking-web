@@ -61,10 +61,11 @@ export default function SendMessagePage() {
         {user && (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="message-content" className="block text-sm font-medium text-gray-700 mb-2">
                 메시지 내용
               </label>
               <textarea
+                id="message-content"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="보낼 메시지를 입력하세요."

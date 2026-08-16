@@ -132,8 +132,11 @@ export default function MyPage() {
               {editing ? (
                 <form onSubmit={handleUpdate} className="space-y-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1.5">이름</label>
+                    <label htmlFor="edit-name" className="block text-xs font-medium text-gray-500 mb-1.5">
+                      이름
+                    </label>
                     <input
+                      id="edit-name"
                       type="text"
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
@@ -142,8 +145,11 @@ export default function MyPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1.5">전화번호</label>
+                    <label htmlFor="edit-phone" className="block text-xs font-medium text-gray-500 mb-1.5">
+                      전화번호
+                    </label>
                     <input
+                      id="edit-phone"
                       type="tel"
                       value={editPhone}
                       onChange={(e) => setEditPhone(e.target.value)}

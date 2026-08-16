@@ -9,6 +9,7 @@ import { getAvailableTimes } from '@/lib/api/resources';
 import { createReservation } from '@/lib/api/reservations';
 import { getReviewsByMerchant, updateReview, deleteReview } from '@/lib/api/reviews';
 import { getErrorMessage } from '@/lib/api/axios';
+import { useEscapeKey } from '@/lib/hooks/useEscapeKey';
 import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
 import { formatDate, formatPrice, formatTime, today } from '@/lib/utils/format';
 import { useAuthStore } from '@/lib/store/auth';
@@ -82,8 +83,15 @@ function AvailableTimesModal({
 
   const totalPrice = resource.price * selectedIds.size;
 
+  useEscapeKey(onClose);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="available-times-title"
+    >
       {/* 오버레이 */}
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
@@ -92,16 +100,19 @@ function AvailableTimesModal({
         {/* 헤더 */}
         <div className="flex items-start justify-between mb-5">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">{resource.name}</h2>
+            <h2 id="available-times-title" className="text-lg font-bold text-gray-900">{resource.name}</h2>
             <p className="text-sm text-blue-500 font-medium mt-0.5">{formatPrice(resource.price)}</p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
+          <button onClick={onClose} aria-label="닫기" className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
         </div>
 
         {/* 날짜 선택 */}
         <div className="mb-5">
-          <label className="block text-xs font-medium text-gray-500 mb-1.5">날짜 선택</label>
+          <label htmlFor="available-times-date" className="block text-xs font-medium text-gray-500 mb-1.5">
+            날짜 선택
+          </label>
           <input
+            id="available-times-date"
             type="date"
             value={date}
             min={today()}
@@ -138,6 +149,7 @@ function AvailableTimesModal({
                   <button
                     key={t.id}
                     onClick={() => toggleSlot(t.id)}
+                    aria-pressed={isSelected}
                     className={`w-full flex items-center justify-between rounded-xl px-4 py-3 transition-colors border ${
                       isSelected
                         ? 'border-blue-500 bg-blue-50'
@@ -269,7 +281,11 @@ function ReviewCard({
     <div className="border border-gray-200 rounded-2xl p-4">
       {editing ? (
         <>
+          <label htmlFor={`review-content-${review.id}`} className="sr-only">
+            후기 내용
+          </label>
           <textarea
+            id={`review-content-${review.id}`}
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={3}

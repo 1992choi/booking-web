@@ -128,6 +128,7 @@ export default function AdminReservationsPage() {
         <div className="flex items-center justify-between mb-4">
           <button
             onClick={prevMonth}
+            aria-label="이전 달"
             className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
           >
             ‹
@@ -137,6 +138,7 @@ export default function AdminReservationsPage() {
           </span>
           <button
             onClick={nextMonth}
+            aria-label="다음 달"
             className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
           >
             ›
@@ -183,10 +185,17 @@ export default function AdminReservationsPage() {
                         const pending = entries.filter(e => e.status === 'PENDING').length;
                         const confirmed = entries.filter(e => e.status === 'CONFIRMED').length;
 
+                        const summary = [
+                          pending > 0 ? `대기 ${pending}건` : null,
+                          confirmed > 0 ? `확정 ${confirmed}건` : null,
+                        ].filter(Boolean).join(', ');
+
                         return (
                           <button
                             key={di}
                             onClick={() => setSelectedDate(isSelected ? null : dateKey)}
+                            aria-pressed={isSelected}
+                            aria-label={`${month}월 ${day}일${summary ? `, ${summary}` : ''}`}
                             className={`min-h-[72px] p-2 text-left border-l border-gray-50 first:border-0 transition-colors ${
                               isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'
                             }`}

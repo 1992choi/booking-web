@@ -44,65 +44,106 @@ export default function SignupPage() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
         {/* 이름 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            이름
+          </label>
           <input
             {...register('name')}
+            id="name"
             type="text"
             placeholder="홍길동"
+            aria-invalid={!!errors.name}
+            aria-describedby={errors.name ? 'name-error' : undefined}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>}
+          {errors.name && (
+            <p id="name-error" className="mt-1 text-xs text-red-500">
+              {errors.name.message}
+            </p>
+          )}
         </div>
 
         {/* 이메일 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">이메일</label>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            이메일
+          </label>
           <input
             {...register('email')}
+            id="email"
             type="email"
             placeholder="example@email.com"
+            aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? 'email-error' : undefined}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>}
+          {errors.email && (
+            <p id="email-error" className="mt-1 text-xs text-red-500">
+              {errors.email.message}
+            </p>
+          )}
         </div>
 
         {/* 전화번호 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">전화번호</label>
+          <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+            전화번호
+          </label>
           <input
             {...register('phone')}
+            id="phone"
             type="tel"
             placeholder="010-1234-5678"
+            aria-invalid={!!errors.phone}
+            aria-describedby={errors.phone ? 'phone-error' : undefined}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone.message}</p>}
+          {errors.phone && (
+            <p id="phone-error" className="mt-1 text-xs text-red-500">
+              {errors.phone.message}
+            </p>
+          )}
         </div>
 
         {/* 비밀번호 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호</label>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            비밀번호
+          </label>
           <input
             {...register('password')}
+            id="password"
             type="password"
             placeholder="8자 이상 입력해 주세요."
+            aria-invalid={!!errors.password}
+            aria-describedby={errors.password ? 'password-error' : undefined}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {errors.password && (
-            <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>
+            <p id="password-error" className="mt-1 text-xs text-red-500">
+              {errors.password.message}
+            </p>
           )}
         </div>
 
         {/* 비밀번호 확인 */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호 확인</label>
+          <label htmlFor="passwordConfirm" className="block text-sm font-medium text-gray-700 mb-1">
+            비밀번호 확인
+          </label>
           <input
             {...register('passwordConfirm')}
+            id="passwordConfirm"
             type="password"
             placeholder="비밀번호를 한 번 더 입력해 주세요."
+            aria-invalid={!!errors.passwordConfirm}
+            aria-describedby={errors.passwordConfirm ? 'passwordConfirm-error' : undefined}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {errors.passwordConfirm && (
-            <p className="mt-1 text-xs text-red-500">{errors.passwordConfirm.message}</p>
+            <p id="passwordConfirm-error" className="mt-1 text-xs text-red-500">
+              {errors.passwordConfirm.message}
+            </p>
           )}
         </div>
 
