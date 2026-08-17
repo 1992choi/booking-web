@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios';
 import type { InternalAxiosRequestConfig } from 'axios';
 import type { ApiError } from '@/lib/types/common';
+import { useAuthStore } from '@/lib/store/auth';
 
 /** Korean error messages keyed by backend error code */
 const ERROR_MESSAGES: Record<string, string> = {
@@ -41,9 +42,7 @@ const apiClient = axios.create({
 
 /** Attach access token from Zustand store if available */
 apiClient.interceptors.request.use((config) => {
-  // Import lazily to avoid circular deps and SSR issues
   if (typeof window !== 'undefined') {
-    const { useAuthStore } = require('@/lib/store/auth');
     const token = useAuthStore.getState().accessToken;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -79,7 +78,6 @@ apiClient.interceptors.response.use(
 
     // Refresh endpoint itself returned 401 — token is invalid, force logout
     if (original?.url?.includes('/auth/refresh')) {
-      const { useAuthStore } = require('@/lib/store/auth');
       useAuthStore.getState().clearAuth();
       window.location.href = '/login';
       return Promise.reject(error);
@@ -98,7 +96,6 @@ apiClient.interceptors.response.use(
     original._retry = true;
     isRefreshing = true;
 
-    const { useAuthStore } = require('@/lib/store/auth');
     const { refreshToken, clearAuth, setAccessToken } = useAuthStore.getState();
 
     if (!refreshToken) {
@@ -108,7 +105,8 @@ apiClient.interceptors.response.use(
     }
 
     try {
-      const { refresh } = require('@/lib/api/auth');
+      // 동적 import: api/auth.ts가 이 파일의 apiClient를 가져오는 순환 참조라 정적 import 불가
+      const { refresh } = await import('@/lib/api/auth');
       const { accessToken } = await refresh(refreshToken);
       setAccessToken(accessToken);
       flushQueue(null, accessToken);
