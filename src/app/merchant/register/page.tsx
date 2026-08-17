@@ -11,10 +11,12 @@ import { createMerchant } from '@/lib/api/merchants';
 import { getErrorMessage } from '@/lib/api/axios';
 import { MERCHANT_TYPE_OPTIONS } from '@/lib/constants/merchant';
 import { merchantSchema } from '@/lib/validation/merchant';
+import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 
 type FormValues = z.infer<typeof merchantSchema>;
 
 export default function MerchantRegisterPage() {
+  useDocumentTitle('업체 등록');
   const router = useRouter();
   const [errorMsg, setErrorMsg] = useState('');
 

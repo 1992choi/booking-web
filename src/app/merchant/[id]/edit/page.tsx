@@ -11,10 +11,12 @@ import { getMerchant, updateMerchant } from '@/lib/api/merchants';
 import { getErrorMessage } from '@/lib/api/axios';
 import { MERCHANT_TYPE_OPTIONS } from '@/lib/constants/merchant';
 import { merchantSchema } from '@/lib/validation/merchant';
+import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 
 type FormValues = z.infer<typeof merchantSchema>;
 
 export default function MerchantEditPage() {
+  useDocumentTitle('업체 수정');
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
 

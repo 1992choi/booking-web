@@ -18,6 +18,7 @@ import { formatDate, formatPrice, formatTime } from '@/lib/utils/format';
 import type { Reservation } from '@/lib/types/reservation';
 import type { Payment, PaymentStatus } from '@/lib/types/payment';
 import type { ApiError } from '@/lib/types/common';
+import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 
 const PAYMENT_STATUS_STYLES: Record<PaymentStatus, string> = {
   PENDING:   'bg-yellow-50 text-yellow-600',
@@ -38,6 +39,7 @@ export default function ReservationDetailPage() {
   const router = useRouter();
 
   const [reservation, setReservation] = useState<Reservation | null>(null);
+  useDocumentTitle(reservation ? reservation.resourceName : '예약 상세');
   const [payment, setPayment] = useState<Payment | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

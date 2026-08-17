@@ -8,6 +8,7 @@ import { getUsers } from '@/lib/api/auth';
 import { formatDate } from '@/lib/utils/format';
 import { ROLE_LABELS, ROLE_COLORS } from '@/lib/constants/user';
 import type { Role, UserResponse } from '@/lib/types/auth';
+import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 
 type FilterRole = Role | 'ALL';
 
@@ -53,6 +54,7 @@ function UserCard({ user }: { user: UserResponse }) {
 }
 
 export default function AdminUsersPage() {
+  useDocumentTitle('회원 관리');
   const [tab, setTab] = useState<FilterRole>('ALL');
 
   const { data, isLoading, isError } = useQuery({

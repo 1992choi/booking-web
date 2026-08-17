@@ -8,6 +8,7 @@ import { toDateKey, buildCalendarGrid, shiftMonth } from '@/lib/utils/calendar';
 import type { AdminCalendarEntry, AdminCalendarData } from '@/lib/types/admin';
 import type { ReservationStatus } from '@/lib/types/reservation';
 import { RESERVATION_STATUS_LABELS, RESERVATION_STATUS_STYLES } from '@/lib/constants/reservation';
+import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 
 const STATUS_DOT: Record<ReservationStatus, string> = {
   PENDING:   'bg-yellow-400',
@@ -66,6 +67,7 @@ function EntryCard({
 
 // ─── 메인 페이지 ──────────────────────────────────────────────────────
 export default function AdminReservationsPage() {
+  useDocumentTitle('예약 현황');
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth() + 1);

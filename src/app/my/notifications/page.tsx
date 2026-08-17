@@ -6,6 +6,7 @@ import BackButton from '@/components/ui/BackButton';
 import { getMyNotifications } from '@/lib/api/notifications';
 import { formatDateTime } from '@/lib/utils/format';
 import type { Notification } from '@/lib/types/notification';
+import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 
 const TYPE_LABELS: Record<string, string> = {
   RESERVATION_CONFIRMED: '예약 확정',
@@ -34,6 +35,7 @@ function NotificationItem({ notification }: { notification: Notification }) {
 }
 
 export default function NotificationsPage() {
+  useDocumentTitle('알림');
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

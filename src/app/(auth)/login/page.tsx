@@ -10,10 +10,12 @@ import { login } from '@/lib/api/auth';
 import { useAuthStore } from '@/lib/store/auth';
 import { getErrorMessage } from '@/lib/api/axios';
 import { loginSchema } from '@/lib/validation/auth';
+import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 
 type FormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
+  useDocumentTitle('로그인');
   const router = useRouter();
   const searchParams = useSearchParams();
   const setAuth = useAuthStore((s) => s.setAuth);

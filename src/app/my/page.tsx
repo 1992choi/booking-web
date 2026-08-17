@@ -10,8 +10,10 @@ import { formatDate } from '@/lib/utils/format';
 import { useAuthStore } from '@/lib/store/auth';
 import { ROLE_LABELS, ROLE_COLORS } from '@/lib/constants/user';
 import type { UserResponse } from '@/lib/types/auth';
+import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 
 export default function MyPage() {
+  useDocumentTitle('내 정보');
   const router = useRouter();
   const clearAuth = useAuthStore((s) => s.clearAuth);
   const updateUser = useAuthStore((s) => s.updateUser);

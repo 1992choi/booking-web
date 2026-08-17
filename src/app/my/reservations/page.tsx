@@ -8,6 +8,7 @@ import { getMyReservations } from '@/lib/api/reservations';
 import { RESERVATION_STATUS_TABS } from '@/lib/constants/reservation';
 import { ReservationStatusBadge, ReservationSummaryRows } from '@/components/ReservationSummary';
 import type { Reservation, ReservationStatus } from '@/lib/types/reservation';
+import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 
 function ReservationCard({ reservation }: { reservation: Reservation }) {
   return (
@@ -30,6 +31,7 @@ function ReservationCard({ reservation }: { reservation: Reservation }) {
 }
 
 export default function MyReservationsPage() {
+  useDocumentTitle('내 예약');
   const [tab, setTab] = useState<ReservationStatus | 'ALL'>('ALL');
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);

@@ -8,8 +8,10 @@ import BackButton from '@/components/ui/BackButton';
 import { getUsers } from '@/lib/api/auth';
 import { sendNotificationToUser } from '@/lib/api/notifications';
 import { getErrorMessage } from '@/lib/api/axios';
+import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 
 export default function SendMessagePage() {
+  useDocumentTitle('메시지 보내기');
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const userId = Number(id);

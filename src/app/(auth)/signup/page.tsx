@@ -9,10 +9,12 @@ import { useRouter } from 'next/navigation';
 import { signup } from '@/lib/api/auth';
 import { getErrorMessage } from '@/lib/api/axios';
 import { signupSchema } from '@/lib/validation/auth';
+import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 
 type FormValues = z.infer<typeof signupSchema>;
 
 export default function SignupPage() {
+  useDocumentTitle('회원가입');
   const router = useRouter();
   const [errorMsg, setErrorMsg] = useState('');
 

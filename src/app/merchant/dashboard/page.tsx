@@ -8,6 +8,7 @@ import { getMerchants, getMyMerchants } from '@/lib/api/merchants';
 import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
 import { useAuthStore } from '@/lib/store/auth';
 import type { MerchantSummary } from '@/lib/types/merchant';
+import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 
 function MerchantCard({ merchant, isMerchant }: { merchant: MerchantSummary; isMerchant: boolean }) {
   const router = useRouter();
@@ -53,6 +54,7 @@ function MerchantCard({ merchant, isMerchant }: { merchant: MerchantSummary; isM
 }
 
 export default function MerchantDashboardPage() {
+  useDocumentTitle('업체 관리');
   const role = useAuthStore((s) => s.role);
   const isAdmin = role === 'ADMIN';
   const isMerchant = role === 'MERCHANT';

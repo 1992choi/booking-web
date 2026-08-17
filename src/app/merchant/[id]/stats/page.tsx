@@ -9,6 +9,7 @@ import { getMerchantDailyStats } from '@/lib/api/merchants';
 import { formatPrice } from '@/lib/utils/format';
 import { shiftMonth } from '@/lib/utils/calendar';
 import type { DailyMerchantStats } from '@/lib/types/merchant';
+import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 
 function SummaryCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
@@ -51,6 +52,7 @@ function DayRow({ stat }: { stat: DailyMerchantStats }) {
 }
 
 export default function MerchantStatsPage() {
+  useDocumentTitle('일별 매출');
   const { id } = useParams<{ id: string }>();
   const merchantId = Number(id);
   const now = new Date();

@@ -20,6 +20,7 @@ import {
 } from '@/lib/api/resources';
 import { getErrorMessage } from '@/lib/api/axios';
 import { useEscapeKey } from '@/lib/hooks/useEscapeKey';
+import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
 import { resourceSchema, availableTimeSchema } from '@/lib/validation/merchant';
 import { formatPrice } from '@/lib/utils/format';
@@ -632,6 +633,7 @@ export default function MerchantDetailPage() {
   const isMerchant = role === 'MERCHANT';
 
   const [merchant, setMerchant] = useState<MerchantDetail | null>(null);
+  useDocumentTitle(merchant ? merchant.name : '업체 상세');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 

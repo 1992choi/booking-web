@@ -11,6 +11,7 @@ import { getErrorMessage } from '@/lib/api/axios';
 import { RESERVATION_STATUS_TABS } from '@/lib/constants/reservation';
 import { ReservationStatusBadge, ReservationSummaryRows } from '@/components/ReservationSummary';
 import type { MerchantReservation, ReservationStatus } from '@/lib/types/reservation';
+import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 
 type Action = 'confirm' | 'cancel';
 
@@ -65,6 +66,7 @@ function ReservationCard({
 }
 
 export default function MerchantReservationsPage() {
+  useDocumentTitle('예약 관리');
   const { id } = useParams<{ id: string }>();
   const merchantId = Number(id);
   const router = useRouter();

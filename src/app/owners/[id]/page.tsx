@@ -10,6 +10,7 @@ import { createReservation } from '@/lib/api/reservations';
 import { getReviewsByMerchant, updateReview, deleteReview } from '@/lib/api/reviews';
 import { getErrorMessage } from '@/lib/api/axios';
 import { useEscapeKey } from '@/lib/hooks/useEscapeKey';
+import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
 import { formatDate, formatPrice, formatTime, today } from '@/lib/utils/format';
 import { useAuthStore } from '@/lib/store/auth';
@@ -357,6 +358,7 @@ export default function MerchantPublicDetailPage() {
   const { id } = useParams<{ id: string }>();
   const user = useAuthStore((s) => s.user);
   const [merchant, setMerchant] = useState<MerchantDetail | null>(null);
+  useDocumentTitle(merchant ? merchant.name : '업체 상세');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
