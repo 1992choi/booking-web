@@ -9,7 +9,7 @@ import { getAvailableTimes } from '@/lib/api/resources';
 import { createReservation } from '@/lib/api/reservations';
 import { getReviewsByMerchant, updateReview, deleteReview } from '@/lib/api/reviews';
 import { getErrorMessage } from '@/lib/api/axios';
-import { useEscapeKey } from '@/lib/hooks/useEscapeKey';
+import Modal from '@/components/ui/Modal';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
 import { formatDate, formatPrice, formatTime, today } from '@/lib/utils/format';
@@ -84,116 +84,103 @@ function AvailableTimesModal({
 
   const totalPrice = resource.price * selectedIds.size;
 
-  useEscapeKey(onClose);
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="available-times-title"
-    >
-      {/* 오버레이 */}
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-
-      {/* 모달 본체 */}
-      <div className="relative w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl shadow-xl p-6 max-h-[80vh] overflow-y-auto">
-        {/* 헤더 */}
-        <div className="flex items-start justify-between mb-5">
-          <div>
-            <h2 id="available-times-title" className="text-lg font-bold text-gray-900">{resource.name}</h2>
-            <p className="text-sm text-blue-500 font-medium mt-0.5">{formatPrice(resource.price)}</p>
-          </div>
-          <button onClick={onClose} aria-label="닫기" className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
-        </div>
-
-        {/* 날짜 선택 */}
-        <div className="mb-5">
-          <label htmlFor="available-times-date" className="block text-xs font-medium text-gray-500 mb-1.5">
-            날짜 선택
-          </label>
-          <input
-            id="available-times-date"
-            type="date"
-            value={date}
-            min={today()}
-            onChange={(e) => setDate(e.target.value)}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-
-        {/* 가능 시간 목록 */}
+    <Modal onClose={onClose} labelId="available-times-title" panelClassName="max-h-[80vh] overflow-y-auto">
+      {/* 헤더 */}
+      <div className="flex items-start justify-between mb-5">
         <div>
-          <p className="text-xs font-medium text-gray-500 mb-2">예약 가능 시간</p>
-
-          {loading && (
-            <div className="space-y-2">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-12 rounded-xl bg-gray-100 animate-pulse" />
-              ))}
-            </div>
-          )}
-
-          {!loading && error && (
-            <p className="text-sm text-red-400 text-center py-6">{error}</p>
-          )}
-
-          {!loading && !error && openTimes.length === 0 && (
-            <p className="text-sm text-gray-400 text-center py-6">선택한 날짜에 예약 가능한 시간이 없습니다.</p>
-          )}
-
-          {!loading && !error && openTimes.length > 0 && (
-            <div className="space-y-2">
-              {openTimes.map((t) => {
-                const isSelected = selectedIds.has(t.id);
-                return (
-                  <button
-                    key={t.id}
-                    onClick={() => toggleSlot(t.id)}
-                    aria-pressed={isSelected}
-                    className={`w-full flex items-center justify-between rounded-xl px-4 py-3 transition-colors border ${
-                      isSelected
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-blue-400 hover:bg-blue-50'
-                    }`}
-                  >
-                    <span className={`text-sm font-medium ${isSelected ? 'text-blue-600' : 'text-gray-800'}`}>
-                      {formatTime(t.startTime)} ~ {formatTime(t.endTime)}
-                    </span>
-                    <span className={`text-xs font-semibold px-2 py-1 rounded-lg transition-colors ${
-                      isSelected ? 'bg-blue-500 text-white' : 'bg-blue-50 text-blue-500'
-                    }`}>
-                      {isSelected ? '선택됨' : '선택'}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          )}
+          <h2 id="available-times-title" className="text-lg font-bold text-gray-900">{resource.name}</h2>
+          <p className="text-sm text-blue-500 font-medium mt-0.5">{formatPrice(resource.price)}</p>
         </div>
+        <button onClick={onClose} aria-label="닫기" className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
+      </div>
 
-        {/* 예약 버튼 영역 */}
+      {/* 날짜 선택 */}
+      <div className="mb-5">
+        <label htmlFor="available-times-date" className="block text-xs font-medium text-gray-500 mb-1.5">
+          날짜 선택
+        </label>
+        <input
+          id="available-times-date"
+          type="date"
+          value={date}
+          min={today()}
+          onChange={(e) => setDate(e.target.value)}
+          className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* 가능 시간 목록 */}
+      <div>
+        <p className="text-xs font-medium text-gray-500 mb-2">예약 가능 시간</p>
+
+        {loading && (
+          <div className="space-y-2">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-12 rounded-xl bg-gray-100 animate-pulse" />
+            ))}
+          </div>
+        )}
+
+        {!loading && error && (
+          <p className="text-sm text-red-400 text-center py-6">{error}</p>
+        )}
+
+        {!loading && !error && openTimes.length === 0 && (
+          <p className="text-sm text-gray-400 text-center py-6">선택한 날짜에 예약 가능한 시간이 없습니다.</p>
+        )}
+
         {!loading && !error && openTimes.length > 0 && (
-          <div className="mt-5 pt-4 border-t border-gray-100">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm text-gray-500">
-                {selectedIds.size > 0 ? `${selectedIds.size}개 선택` : '시간대를 선택하세요'}
-              </span>
-              {selectedIds.size > 0 && (
-                <span className="text-sm font-bold text-blue-500">{formatPrice(totalPrice)}</span>
-              )}
-            </div>
-            <button
-              onClick={handleReserve}
-              disabled={selectedIds.size === 0 || booking}
-              className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-xl py-3 transition-colors"
-            >
-              {booking ? '예약 중...' : '예약하기'}
-            </button>
+          <div className="space-y-2">
+            {openTimes.map((t) => {
+              const isSelected = selectedIds.has(t.id);
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => toggleSlot(t.id)}
+                  aria-pressed={isSelected}
+                  className={`w-full flex items-center justify-between rounded-xl px-4 py-3 transition-colors border ${
+                    isSelected
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-blue-400 hover:bg-blue-50'
+                  }`}
+                >
+                  <span className={`text-sm font-medium ${isSelected ? 'text-blue-600' : 'text-gray-800'}`}>
+                    {formatTime(t.startTime)} ~ {formatTime(t.endTime)}
+                  </span>
+                  <span className={`text-xs font-semibold px-2 py-1 rounded-lg transition-colors ${
+                    isSelected ? 'bg-blue-500 text-white' : 'bg-blue-50 text-blue-500'
+                  }`}>
+                    {isSelected ? '선택됨' : '선택'}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
-    </div>
+
+      {/* 예약 버튼 영역 */}
+      {!loading && !error && openTimes.length > 0 && (
+        <div className="mt-5 pt-4 border-t border-gray-100">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm text-gray-500">
+              {selectedIds.size > 0 ? `${selectedIds.size}개 선택` : '시간대를 선택하세요'}
+            </span>
+            {selectedIds.size > 0 && (
+              <span className="text-sm font-bold text-blue-500">{formatPrice(totalPrice)}</span>
+            )}
+          </div>
+          <button
+            onClick={handleReserve}
+            disabled={selectedIds.size === 0 || booking}
+            className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white text-sm font-medium rounded-xl py-3 transition-colors"
+          >
+            {booking ? '예약 중...' : '예약하기'}
+          </button>
+        </div>
+      )}
+    </Modal>
   );
 }
 

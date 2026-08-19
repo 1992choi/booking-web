@@ -19,7 +19,7 @@ import {
   deleteAvailableTime,
 } from '@/lib/api/resources';
 import { getErrorMessage } from '@/lib/api/axios';
-import { useEscapeKey } from '@/lib/hooks/useEscapeKey';
+import Modal, { ModalHeader } from '@/components/ui/Modal';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
 import { resourceSchema, availableTimeSchema } from '@/lib/validation/merchant';
@@ -73,8 +73,6 @@ function ResourceFormModal({
   const isEdit = initial !== null;
   const [errorMsg, setErrorMsg] = useState('');
 
-  useEscapeKey(onClose);
-
   const {
     register,
     handleSubmit,
@@ -102,120 +100,111 @@ function ResourceFormModal({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="resource-form-title"
-    >
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl shadow-xl p-6">
-        <div className="flex items-center justify-between mb-5">
-          <h2 id="resource-form-title" className="text-base font-bold text-gray-900">
-            {isEdit ? '예약 대상 수정' : '예약 대상 추가'}
-          </h2>
-          <button onClick={onClose} aria-label="닫기" className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
+    <Modal onClose={onClose} labelId="resource-form-title">
+      <ModalHeader
+        id="resource-form-title"
+        title={isEdit ? '예약 대상 수정' : '예약 대상 추가'}
+        onClose={onClose}
+      />
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+        <div>
+          <label htmlFor="resource-name" className="block text-xs font-medium text-gray-500 mb-1.5">
+            이름
+          </label>
+          <input
+            {...register('name')}
+            id="resource-name"
+            type="text"
+            placeholder="예: A동, 오전반, 1번 코트"
+            aria-invalid={!!errors.name}
+            aria-describedby={errors.name ? 'resource-name-error' : undefined}
+            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.name && (
+            <p id="resource-name-error" className="mt-1 text-xs text-red-500">
+              {errors.name.message}
+            </p>
+          )}
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+        <div>
+          <label htmlFor="resource-description" className="block text-xs font-medium text-gray-500 mb-1.5">
+            설명 (선택)
+          </label>
+          <input
+            {...register('description')}
+            id="resource-description"
+            type="text"
+            placeholder="간단한 설명을 입력하세요"
+            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
           <div>
-            <label htmlFor="resource-name" className="block text-xs font-medium text-gray-500 mb-1.5">
-              이름
+            <label htmlFor="resource-price" className="block text-xs font-medium text-gray-500 mb-1.5">
+              가격 (원)
             </label>
             <input
-              {...register('name')}
-              id="resource-name"
-              type="text"
-              placeholder="예: A동, 오전반, 1번 코트"
-              aria-invalid={!!errors.name}
-              aria-describedby={errors.name ? 'resource-name-error' : undefined}
+              {...register('price')}
+              id="resource-price"
+              type="number"
+              placeholder="0"
+              min={0}
+              aria-invalid={!!errors.price}
+              aria-describedby={errors.price ? 'resource-price-error' : undefined}
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            {errors.name && (
-              <p id="resource-name-error" className="mt-1 text-xs text-red-500">
-                {errors.name.message}
+            {errors.price && (
+              <p id="resource-price-error" className="mt-1 text-xs text-red-500">
+                {errors.price.message}
               </p>
             )}
           </div>
-
           <div>
-            <label htmlFor="resource-description" className="block text-xs font-medium text-gray-500 mb-1.5">
-              설명 (선택)
+            <label htmlFor="resource-maxCapacity" className="block text-xs font-medium text-gray-500 mb-1.5">
+              최대 인원
             </label>
             <input
-              {...register('description')}
-              id="resource-description"
-              type="text"
-              placeholder="간단한 설명을 입력하세요"
+              {...register('maxCapacity')}
+              id="resource-maxCapacity"
+              type="number"
+              placeholder="1"
+              min={1}
+              aria-invalid={!!errors.maxCapacity}
+              aria-describedby={errors.maxCapacity ? 'resource-maxCapacity-error' : undefined}
               className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {errors.maxCapacity && (
+              <p id="resource-maxCapacity-error" className="mt-1 text-xs text-red-500">
+                {errors.maxCapacity.message}
+              </p>
+            )}
           </div>
+        </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label htmlFor="resource-price" className="block text-xs font-medium text-gray-500 mb-1.5">
-                가격 (원)
-              </label>
-              <input
-                {...register('price')}
-                id="resource-price"
-                type="number"
-                placeholder="0"
-                min={0}
-                aria-invalid={!!errors.price}
-                aria-describedby={errors.price ? 'resource-price-error' : undefined}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.price && (
-                <p id="resource-price-error" className="mt-1 text-xs text-red-500">
-                  {errors.price.message}
-                </p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="resource-maxCapacity" className="block text-xs font-medium text-gray-500 mb-1.5">
-                최대 인원
-              </label>
-              <input
-                {...register('maxCapacity')}
-                id="resource-maxCapacity"
-                type="number"
-                placeholder="1"
-                min={1}
-                aria-invalid={!!errors.maxCapacity}
-                aria-describedby={errors.maxCapacity ? 'resource-maxCapacity-error' : undefined}
-                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              {errors.maxCapacity && (
-                <p id="resource-maxCapacity-error" className="mt-1 text-xs text-red-500">
-                  {errors.maxCapacity.message}
-                </p>
-              )}
-            </div>
-          </div>
+        {errorMsg && <p className="text-sm text-red-400 text-center">{errorMsg}</p>}
 
-          {errorMsg && <p className="text-sm text-red-400 text-center">{errorMsg}</p>}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-200 disabled:text-gray-400 text-white text-sm font-medium rounded-xl py-3 transition-colors"
+        >
+          {isSubmitting ? '저장 중...' : isEdit ? '수정 완료' : '추가'}
+        </button>
 
+        {isEdit && onDelete && (
           <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-200 disabled:text-gray-400 text-white text-sm font-medium rounded-xl py-3 transition-colors"
+            type="button"
+            onClick={onDelete}
+            className="w-full border border-red-200 text-red-400 hover:bg-red-50 hover:text-red-500 text-sm font-medium rounded-xl py-3 transition-colors"
           >
-            {isSubmitting ? '저장 중...' : isEdit ? '수정 완료' : '추가'}
+            삭제
           </button>
-
-          {isEdit && onDelete && (
-            <button
-              type="button"
-              onClick={onDelete}
-              className="w-full border border-red-200 text-red-400 hover:bg-red-50 hover:text-red-500 text-sm font-medium rounded-xl py-3 transition-colors"
-            >
-              삭제
-            </button>
-          )}
-        </form>
-      </div>
-    </div>
+        )}
+      </form>
+    </Modal>
   );
 }
 
@@ -231,40 +220,30 @@ function DeleteConfirmModal({
   onConfirm: () => void;
   loading: boolean;
 }) {
-  useEscapeKey(onClose);
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="resource-delete-title"
-    >
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-xl p-6 mx-4">
-        <h2 id="resource-delete-title" className="text-base font-bold text-gray-900 mb-2">
-          예약 대상 삭제
-        </h2>
-        <p className="text-sm text-gray-500 mb-6">
-          <span className="font-medium text-gray-800">"{resource.name}"</span>을(를) 삭제하시겠습니까?
-        </p>
-        <div className="flex gap-2">
-          <button
-            onClick={onClose}
-            className="flex-1 text-sm font-medium py-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
-          >
-            취소
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={loading}
-            className="flex-1 text-sm font-medium py-2.5 rounded-xl bg-red-500 hover:bg-red-600 disabled:bg-gray-200 text-white transition-colors"
-          >
-            {loading ? '삭제 중...' : '삭제'}
-          </button>
-        </div>
+    <Modal onClose={onClose} labelId="resource-delete-title" position="center" maxWidthClassName="max-w-sm mx-4">
+      <h2 id="resource-delete-title" className="text-base font-bold text-gray-900 mb-2">
+        예약 대상 삭제
+      </h2>
+      <p className="text-sm text-gray-500 mb-6">
+        <span className="font-medium text-gray-800">"{resource.name}"</span>을(를) 삭제하시겠습니까?
+      </p>
+      <div className="flex gap-2">
+        <button
+          onClick={onClose}
+          className="flex-1 text-sm font-medium py-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
+        >
+          취소
+        </button>
+        <button
+          onClick={onConfirm}
+          disabled={loading}
+          className="flex-1 text-sm font-medium py-2.5 rounded-xl bg-red-500 hover:bg-red-600 disabled:bg-gray-200 text-white transition-colors"
+        >
+          {loading ? '삭제 중...' : '삭제'}
+        </button>
       </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -284,8 +263,6 @@ function AvailableTimeFormModal({
 }) {
   const isEdit = initial !== null;
   const [errorMsg, setErrorMsg] = useState('');
-
-  useEscapeKey(onClose);
 
   const {
     register,
@@ -314,71 +291,62 @@ function AvailableTimeFormModal({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="available-time-form-title"
-    >
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl shadow-xl p-6">
-        <div className="flex items-center justify-between mb-5">
-          <h2 id="available-time-form-title" className="text-base font-bold text-gray-900">
-            {isEdit ? '이용 시간 수정' : '이용 시간 추가'}
-          </h2>
-          <button onClick={onClose} aria-label="닫기" className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
+    <Modal onClose={onClose} labelId="available-time-form-title" zIndexClassName="z-[60]">
+      <ModalHeader
+        id="available-time-form-title"
+        title={isEdit ? '이용 시간 수정' : '이용 시간 추가'}
+        onClose={onClose}
+      />
+
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+        <div>
+          <label htmlFor="available-time-start" className="block text-xs font-medium text-gray-500 mb-1.5">
+            시작 시간
+          </label>
+          <input
+            {...register('startTime')}
+            id="available-time-start"
+            type="datetime-local"
+            aria-invalid={!!errors.startTime}
+            aria-describedby={errors.startTime ? 'available-time-start-error' : undefined}
+            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.startTime && (
+            <p id="available-time-start-error" className="mt-1 text-xs text-red-500">
+              {errors.startTime.message}
+            </p>
+          )}
+        </div>
+        <div>
+          <label htmlFor="available-time-end" className="block text-xs font-medium text-gray-500 mb-1.5">
+            종료 시간
+          </label>
+          <input
+            {...register('endTime')}
+            id="available-time-end"
+            type="datetime-local"
+            aria-invalid={!!errors.endTime}
+            aria-describedby={errors.endTime ? 'available-time-end-error' : undefined}
+            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {errors.endTime && (
+            <p id="available-time-end-error" className="mt-1 text-xs text-red-500">
+              {errors.endTime.message}
+            </p>
+          )}
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-          <div>
-            <label htmlFor="available-time-start" className="block text-xs font-medium text-gray-500 mb-1.5">
-              시작 시간
-            </label>
-            <input
-              {...register('startTime')}
-              id="available-time-start"
-              type="datetime-local"
-              aria-invalid={!!errors.startTime}
-              aria-describedby={errors.startTime ? 'available-time-start-error' : undefined}
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.startTime && (
-              <p id="available-time-start-error" className="mt-1 text-xs text-red-500">
-                {errors.startTime.message}
-              </p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="available-time-end" className="block text-xs font-medium text-gray-500 mb-1.5">
-              종료 시간
-            </label>
-            <input
-              {...register('endTime')}
-              id="available-time-end"
-              type="datetime-local"
-              aria-invalid={!!errors.endTime}
-              aria-describedby={errors.endTime ? 'available-time-end-error' : undefined}
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            {errors.endTime && (
-              <p id="available-time-end-error" className="mt-1 text-xs text-red-500">
-                {errors.endTime.message}
-              </p>
-            )}
-          </div>
+        {errorMsg && <p className="text-sm text-red-400 text-center">{errorMsg}</p>}
 
-          {errorMsg && <p className="text-sm text-red-400 text-center">{errorMsg}</p>}
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-200 disabled:text-gray-400 text-white text-sm font-medium rounded-xl py-3 transition-colors"
-          >
-            {isSubmitting ? '저장 중...' : isEdit ? '수정 완료' : '추가'}
-          </button>
-        </form>
-      </div>
-    </div>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full bg-blue-500 hover:bg-blue-600 disabled:bg-gray-200 disabled:text-gray-400 text-white text-sm font-medium rounded-xl py-3 transition-colors"
+        >
+          {isSubmitting ? '저장 중...' : isEdit ? '수정 완료' : '추가'}
+        </button>
+      </form>
+    </Modal>
   );
 }
 
@@ -394,42 +362,38 @@ function AvailableTimeDeleteModal({
   onConfirm: () => void;
   loading: boolean;
 }) {
-  useEscapeKey(onClose);
-
   return (
-    <div
-      className="fixed inset-0 z-[70] flex items-center justify-center"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="available-time-delete-title"
+    <Modal
+      onClose={onClose}
+      labelId="available-time-delete-title"
+      position="center"
+      maxWidthClassName="max-w-sm mx-4"
+      zIndexClassName="z-[70]"
     >
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative w-full max-w-sm bg-white rounded-2xl shadow-xl p-6 mx-4">
-        <h2 id="available-time-delete-title" className="text-base font-bold text-gray-900 mb-2">
-          이용 시간 삭제
-        </h2>
-        <p className="text-sm text-gray-500 mb-6">
-          <span className="font-medium text-gray-800">
-            {formatTime(time.startTime)} ~ {formatTime(time.endTime)}
-          </span> 시간대를 삭제하시겠습니까?
-        </p>
-        <div className="flex gap-2">
-          <button
-            onClick={onClose}
-            className="flex-1 text-sm font-medium py-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
-          >
-            취소
-          </button>
-          <button
-            onClick={onConfirm}
-            disabled={loading}
-            className="flex-1 text-sm font-medium py-2.5 rounded-xl bg-red-500 hover:bg-red-600 disabled:bg-gray-200 text-white transition-colors"
-          >
-            {loading ? '삭제 중...' : '삭제'}
-          </button>
-        </div>
+      <h2 id="available-time-delete-title" className="text-base font-bold text-gray-900 mb-2">
+        이용 시간 삭제
+      </h2>
+      <p className="text-sm text-gray-500 mb-6">
+        <span className="font-medium text-gray-800">
+          {formatTime(time.startTime)} ~ {formatTime(time.endTime)}
+        </span> 시간대를 삭제하시겠습니까?
+      </p>
+      <div className="flex gap-2">
+        <button
+          onClick={onClose}
+          className="flex-1 text-sm font-medium py-2.5 rounded-xl border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
+        >
+          취소
+        </button>
+        <button
+          onClick={onConfirm}
+          disabled={loading}
+          className="flex-1 text-sm font-medium py-2.5 rounded-xl bg-red-500 hover:bg-red-600 disabled:bg-gray-200 text-white transition-colors"
+        >
+          {loading ? '삭제 중...' : '삭제'}
+        </button>
       </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -451,8 +415,6 @@ function AvailableTimeManagerModal({
   const [formTarget, setFormTarget] = useState<TimeFormTarget>(null);
   const [deleteTarget, setDeleteTarget] = useState<AvailableTime | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-
-  useEscapeKey(onClose);
 
   async function fetchTimes(d: string) {
     setTimesLoading(true);
@@ -486,78 +448,69 @@ function AvailableTimeManagerModal({
 
   return (
     <>
-      <div
-        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="available-time-manager-title"
-      >
-        <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-        <div className="relative w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl shadow-xl p-6">
-          <div className="flex items-center justify-between mb-5">
-            <h2 id="available-time-manager-title" className="text-base font-bold text-gray-900 truncate pr-2">
-              {resource.name} — 이용 시간 관리
-            </h2>
-            <button onClick={onClose} aria-label="닫기" className="text-gray-400 hover:text-gray-600 text-xl leading-none flex-shrink-0">✕</button>
+      <Modal onClose={onClose} labelId="available-time-manager-title">
+        <ModalHeader
+          id="available-time-manager-title"
+          title={`${resource.name} — 이용 시간 관리`}
+          onClose={onClose}
+        />
+
+        <label htmlFor="available-time-manager-date" className="sr-only">
+          조회 날짜
+        </label>
+        <input
+          id="available-time-manager-date"
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+        />
+
+        {timesLoading ? (
+          <div className="space-y-2 mb-4">
+            <div className="h-10 bg-gray-100 rounded-xl animate-pulse" />
+            <div className="h-10 bg-gray-100 rounded-xl animate-pulse" />
           </div>
-
-          <label htmlFor="available-time-manager-date" className="sr-only">
-            조회 날짜
-          </label>
-          <input
-            id="available-time-manager-date"
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
-          />
-
-          {timesLoading ? (
-            <div className="space-y-2 mb-4">
-              <div className="h-10 bg-gray-100 rounded-xl animate-pulse" />
-              <div className="h-10 bg-gray-100 rounded-xl animate-pulse" />
-            </div>
-          ) : timesError ? (
-            <p className="text-sm text-red-400 text-center py-4 mb-4">{timesError}</p>
-          ) : times.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-6 mb-4">해당 날짜에 등록된 이용 시간이 없습니다.</p>
-          ) : (
-            <div className="divide-y divide-gray-50 mb-4 max-h-60 overflow-y-auto">
-              {times.map((t) => (
-                <div key={t.id} className="py-3 flex items-center justify-between gap-2">
-                  <p className="text-sm text-gray-800 min-w-0 truncate">
-                    {formatTime(t.startTime)} ~ {formatTime(t.endTime)}
-                  </p>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[t.status]}`}>
-                      {STATUS_LABELS[t.status]}
-                    </span>
-                    <button
-                      onClick={() => setFormTarget(t)}
-                      className="text-xs text-gray-400 hover:text-blue-500 transition-colors"
-                    >
-                      수정
-                    </button>
-                    <button
-                      onClick={() => setDeleteTarget(t)}
-                      className="text-xs text-gray-400 hover:text-red-500 transition-colors"
-                    >
-                      삭제
-                    </button>
-                  </div>
+        ) : timesError ? (
+          <p className="text-sm text-red-400 text-center py-4 mb-4">{timesError}</p>
+        ) : times.length === 0 ? (
+          <p className="text-sm text-gray-400 text-center py-6 mb-4">해당 날짜에 등록된 이용 시간이 없습니다.</p>
+        ) : (
+          <div className="divide-y divide-gray-50 mb-4 max-h-60 overflow-y-auto">
+            {times.map((t) => (
+              <div key={t.id} className="py-3 flex items-center justify-between gap-2">
+                <p className="text-sm text-gray-800 min-w-0 truncate">
+                  {formatTime(t.startTime)} ~ {formatTime(t.endTime)}
+                </p>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[t.status]}`}>
+                    {STATUS_LABELS[t.status]}
+                  </span>
+                  <button
+                    onClick={() => setFormTarget(t)}
+                    className="text-xs text-gray-400 hover:text-blue-500 transition-colors"
+                  >
+                    수정
+                  </button>
+                  <button
+                    onClick={() => setDeleteTarget(t)}
+                    className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+                  >
+                    삭제
+                  </button>
                 </div>
-              ))}
-            </div>
-          )}
+              </div>
+            ))}
+          </div>
+        )}
 
-          <button
-            onClick={() => setFormTarget('new')}
-            className="w-full border border-dashed border-blue-300 text-blue-500 hover:bg-blue-50 text-sm font-medium rounded-xl py-2.5 transition-colors"
-          >
-            + 시간 추가
-          </button>
-        </div>
-      </div>
+        <button
+          onClick={() => setFormTarget('new')}
+          className="w-full border border-dashed border-blue-300 text-blue-500 hover:bg-blue-50 text-sm font-medium rounded-xl py-2.5 transition-colors"
+        >
+          + 시간 추가
+        </button>
+      </Modal>
 
       {formTarget !== null && (
         <AvailableTimeFormModal
