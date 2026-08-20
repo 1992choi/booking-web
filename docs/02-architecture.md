@@ -3,7 +3,7 @@
 ## 전체 구성
 
 ```
-[브라우저 — localhost:3000]
+[브라우저 — localhost:3333]
         ↓
   [Next.js Dev Server]
         ↓ (next.config.ts rewrites 로 프록시)
@@ -17,7 +17,7 @@
 ```
 
 로컬 개발 시 `next.config.ts`의 rewrites 설정으로 백엔드 5개 서비스에 프록시한다.
-CORS 문제 없이 모두 `localhost:3000/api/v1/...`로 호출 가능.
+CORS 문제 없이 모두 `localhost:3333/api/v1/...`로 호출 가능.
 
 ---
 

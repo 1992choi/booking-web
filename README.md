@@ -38,7 +38,7 @@ npm install
 
 ```bash
 # .env.local (기본값과 다를 때만 작성)
-NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+NEXT_PUBLIC_API_BASE_URL=http://localhost:3333
 ```
 
 기본값 그대로 사용한다면 이 파일은 없어도 된다.
@@ -49,7 +49,7 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
 npm run dev
 ```
 
-브라우저에서 http://localhost:3000 접속.
+브라우저에서 http://localhost:3333 접속.
 
 > **백엔드 서버가 먼저 실행되어 있어야 API 호출이 가능합니다.**
 > 백엔드 실행 방법은 [`../booking/README.md`](../booking/README.md) 참고.

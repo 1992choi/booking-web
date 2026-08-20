@@ -2,7 +2,7 @@
 
 ## 백엔드 연결 구조
 
-로컬 개발 시 `next.config.ts`의 rewrites로 모든 API 요청을 `localhost:3000/api/v1/...`로 통일.
+로컬 개발 시 `next.config.ts`의 rewrites로 모든 API 요청을 `localhost:3333/api/v1/...`로 통일.
 CORS 문제 없이 백엔드 5개 서비스로 자동 프록시된다.
 
 | 요청 경로 | 프록시 대상 |
