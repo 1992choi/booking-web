@@ -31,9 +31,3 @@
 `next lint` 실행 시 에러 3건 + 경고 1건이 남아있다: `merchant/[id]/reservations/page.tsx`와 `my/reservations/[id]/page.tsx`에서 쓰지 않는 `router` 변수, `merchant/[id]/page.tsx`의 미사용 `MerchantType` import와 이스케이프하지 않은 `"` 2곳, `AvailableTimeManagerModal`의 `useEffect` 의존성 누락 경고.
 
 **방향**: 각 항목을 개별로 정리해 `next lint`를 에러 0건으로 만들면, 이후 CI에 lint 게이트를 걸어도 바로 걸리지 않는다.
-
-## 6. 홈 카테고리 아이콘 next/image 전환
-
-`src/app/page.tsx`의 카테고리 탭 아이콘이 `eslint-disable-next-line @next/next/no-img-element`로 규칙을 끄고 `<img>` 태그를 직접 쓰고 있다. 고정 크기 아이콘 4개뿐이라 `next/image`로 바꾸면 자동 포맷 변환·lazy loading 같은 최적화를 별다른 비용 없이 얻을 수 있다.
-
-**방향**: `<img>`를 `next/image`의 `<Image width height>`로 교체하고 eslint-disable 주석 제거.

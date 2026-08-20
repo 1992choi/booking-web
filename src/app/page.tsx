@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import { getMerchants } from '@/lib/api/merchants';
@@ -62,8 +63,13 @@ export default function HomePage() {
                       : 'border-transparent text-gray-400 hover:text-gray-600'
                   }`}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={tab.img} alt={tab.label} className="w-13 h-14 object-contain" />
+                  <Image
+                    src={tab.img}
+                    alt={tab.label}
+                    width={52}
+                    height={56}
+                    className="w-13 h-14 object-contain"
+                  />
                   <span className="text-xs font-medium">{tab.label}</span>
                 </button>
               );
