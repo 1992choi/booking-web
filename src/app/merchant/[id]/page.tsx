@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { z } from 'zod';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
@@ -25,7 +25,7 @@ import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merc
 import { resourceSchema, availableTimeSchema } from '@/lib/validation/merchant';
 import { formatPrice } from '@/lib/utils/format';
 import { useAuthStore } from '@/lib/store/auth';
-import type { MerchantDetail, MerchantType, Resource, AvailableTime } from '@/lib/types/merchant';
+import type { MerchantDetail, Resource, AvailableTime } from '@/lib/types/merchant';
 
 type ResourceFormValues = z.infer<typeof resourceSchema>;
 type AvailableTimeFormValues = z.infer<typeof availableTimeSchema>;
@@ -226,7 +226,7 @@ function DeleteConfirmModal({
         예약 대상 삭제
       </h2>
       <p className="text-sm text-gray-500 mb-6">
-        <span className="font-medium text-gray-800">"{resource.name}"</span>을(를) 삭제하시겠습니까?
+        <span className="font-medium text-gray-800">&quot;{resource.name}&quot;</span>을(를) 삭제하시겠습니까?
       </p>
       <div className="flex gap-2">
         <button
@@ -416,7 +416,7 @@ function AvailableTimeManagerModal({
   const [deleteTarget, setDeleteTarget] = useState<AvailableTime | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  async function fetchTimes(d: string) {
+  const fetchTimes = useCallback(async (d: string) => {
     setTimesLoading(true);
     setTimesError('');
     try {
@@ -426,11 +426,11 @@ function AvailableTimeManagerModal({
     } finally {
       setTimesLoading(false);
     }
-  }
+  }, [resource.id]);
 
   useEffect(() => {
     fetchTimes(date);
-  }, [date]);
+  }, [date, fetchTimes]);
 
   async function handleDelete() {
     if (!deleteTarget) return;
@@ -581,7 +581,6 @@ type ResourceFormTarget = Resource | 'new' | null;
 
 export default function MerchantDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const router = useRouter();
   const role = useAuthStore((s) => s.role);
   const isMerchant = role === 'MERCHANT';
 

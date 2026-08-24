@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
@@ -69,7 +69,6 @@ export default function MerchantReservationsPage() {
   useDocumentTitle('예약 관리');
   const { id } = useParams<{ id: string }>();
   const merchantId = Number(id);
-  const router = useRouter();
   const [tab, setTab] = useState<ReservationStatus | 'ALL'>('ALL');
   const [actionError, setActionError] = useState('');
   const queryClient = useQueryClient();

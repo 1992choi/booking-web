@@ -19,9 +19,3 @@
 `merchant/[id]/page.tsx`가 741줄로, 리소스/이용시간 관련 모달 5개(`ResourceFormModal`, `DeleteConfirmModal`, `AvailableTimeFormModal`, `AvailableTimeDeleteModal`, `AvailableTimeManagerModal`)가 전부 한 파일에 인라인으로 정의돼 있다. 공용 `Modal` 셸을 뽑아낸 지금은 각 모달에 폼/리스트 콘텐츠만 남아 있어 분리하기 쉬워졌다.
 
 **방향**: `merchant/[id]/_components/` 아래로 모달들을 파일별로 옮기고, 페이지 컴포넌트는 상태 관리와 조합만 담당하도록 정리.
-
-## 4. 미사용 변수·lint 경고 정리
-
-`next lint` 실행 시 에러 3건 + 경고 1건이 남아있다: `merchant/[id]/reservations/page.tsx`와 `my/reservations/[id]/page.tsx`에서 쓰지 않는 `router` 변수, `merchant/[id]/page.tsx`의 미사용 `MerchantType` import와 이스케이프하지 않은 `"` 2곳, `AvailableTimeManagerModal`의 `useEffect` 의존성 누락 경고.
-
-**방향**: 각 항목을 개별로 정리해 `next lint`를 에러 0건으로 만들면, 이후 CI에 lint 게이트를 걸어도 바로 걸리지 않는다.

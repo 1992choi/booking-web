@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import Row from '@/components/ui/Row';
@@ -36,7 +36,6 @@ const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
 
 export default function ReservationDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const router = useRouter();
 
   const [reservation, setReservation] = useState<Reservation | null>(null);
   useDocumentTitle(reservation ? reservation.resourceName : '예약 상세');
