@@ -29,6 +29,13 @@ export function middleware(request: NextRequest) {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       const role: string = payload.role ?? '';
+      const exp: number | undefined = payload.exp;
+
+      if (exp !== undefined && exp * 1000 < Date.now()) {
+        const loginUrl = new URL('/login', request.url);
+        loginUrl.searchParams.set('redirect', pathname);
+        return NextResponse.redirect(loginUrl);
+      }
 
       const needsMerchant = MERCHANT_PREFIXES.some((p) => pathname.startsWith(p));
       const needsAdmin = ADMIN_ONLY_PREFIXES.some((p) => pathname.startsWith(p));

@@ -20,13 +20,7 @@
 
 **방향**: `merchant/[id]/_components/` 아래로 모달들을 파일별로 옮기고, 페이지 컴포넌트는 상태 관리와 조합만 담당하도록 정리.
 
-## 4. 미들웨어에서 JWT 만료(exp) 검증 추가
-
-`middleware.ts`가 쿠키의 JWT를 `atob`로 디코드해 role만 확인하고 `exp` 클레임은 보지 않는다. `access-token` 쿠키는 만료 시각이 없는 세션 쿠키라 액세스 토큰 자체가 만료된 뒤에도 브라우저 탭을 닫기 전까진 남아있고, 그동안 미들웨어는 protected 라우트를 그대로 통과시킨다. 실제 만료 처리는 이후 API 호출에서 axios 인터셉터가 401을 받아야 시작돼, 그 사이 잠깐 만료된 상태로 화면이 그려질 수 있다.
-
-**방향**: 디코드한 payload의 `exp`가 현재 시각보다 지났으면 다른 만료 케이스와 동일하게 `/login`으로 리다이렉트.
-
-## 5. 미사용 변수·lint 경고 정리
+## 4. 미사용 변수·lint 경고 정리
 
 `next lint` 실행 시 에러 3건 + 경고 1건이 남아있다: `merchant/[id]/reservations/page.tsx`와 `my/reservations/[id]/page.tsx`에서 쓰지 않는 `router` 변수, `merchant/[id]/page.tsx`의 미사용 `MerchantType` import와 이스케이프하지 않은 `"` 2곳, `AvailableTimeManagerModal`의 `useEffect` 의존성 누락 경고.
 
