@@ -4,6 +4,7 @@
 
 로컬 개발 시 `next.config.ts`의 rewrites로 모든 API 요청을 `localhost:3333/api/v1/...`로 통일.
 CORS 문제 없이 백엔드 5개 서비스로 자동 프록시된다.
+각 서비스 주소는 `API_SERVICE_URL`/`RESERVATION_SERVICE_URL`/`PAYMENT_SERVICE_URL`/`NOTIFICATION_SERVICE_URL`/`REVIEW_SERVICE_URL` 환경변수로 오버라이드할 수 있으며, 미설정 시 아래 로컬 기본값을 사용한다 (`.env.example` 참고).
 
 | 요청 경로 | 프록시 대상 |
 |----------|-----------|

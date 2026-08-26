@@ -33,15 +33,14 @@ npm install
 
 ### 2. 환경 변수 설정 (선택)
 
-백엔드 주소가 기본값(`localhost`)과 다를 경우에만 설정한다.
-프로젝트 루트에 `.env.local` 파일을 생성한다.
+`next.config.ts`의 rewrites가 프록시할 백엔드 마이크로서비스 주소가 기본값(`localhost:PORT`)과 다를 경우에만 설정한다.
+`.env.example`을 복사해 프로젝트 루트에 `.env.local` 파일을 생성한다.
 
 ```bash
-# .env.local (기본값과 다를 때만 작성)
-NEXT_PUBLIC_API_BASE_URL=http://localhost:3333
+cp .env.example .env.local
 ```
 
-기본값 그대로 사용한다면 이 파일은 없어도 된다.
+기본값(로컬 개발 포트) 그대로 사용한다면 이 파일은 없어도 된다.
 
 ### 3. 개발 서버 실행
 
