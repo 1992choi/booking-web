@@ -97,10 +97,10 @@
 | 페이지 | URL | 사용 API |
 |--------|-----|---------|
 | 업체 등록 | `/merchant/register` | `POST /merchants` |
-| 내 업체 목록 | `/merchant/dashboard` | `GET /merchants/me` |
-| 업체 상세 관리 | `/merchant/{id}` | `GET /merchants/{id}` |
-| 업체·리소스 수정 | `/merchant/{id}/edit` | `PUT /merchants/{id}`, `POST /merchants/{id}/resources`, `PUT /resources/{id}`, `DELETE /resources/{id}`, `GET /resources/{id}/available-times`, `POST /resources/{id}/available-times`, `PUT /available-times/{id}`, `DELETE /available-times/{id}` |
-| 업체별 예약 목록 | `/merchant/{id}/reservations` | `GET /merchants/{id}/reservations` |
+| 내 업체 목록 | `/merchant/dashboard` | `GET /merchants/me` (MERCHANT), `GET /merchants` (ADMIN) |
+| 업체 상세 관리 (리소스·이용시간 CRUD) | `/merchant/{id}` | `GET /merchants/{id}`, `POST /merchants/{id}/resources`, `PUT /resources/{id}`, `DELETE /resources/{id}`, `GET /resources/{id}/available-times`, `POST /resources/{id}/available-times`, `PUT /available-times/{id}`, `DELETE /available-times/{id}` |
+| 업체 정보 수정 | `/merchant/{id}/edit` | `GET /merchants/{id}`, `PUT /merchants/{id}` |
+| 업체별 예약 목록 | `/merchant/{id}/reservations` | `GET /merchants/{id}/reservations`, `PUT /admin/reservations/{id}/confirm`, `PUT /admin/reservations/{id}/cancel` |
 | 일별 매출 통계 | `/merchant/{id}/stats` | `GET /merchants/{id}/stats/daily` |
 | 예약 현황 캘린더 | `/merchant/calendar` | `GET /admin/reservations/calendar`, `PUT /admin/reservations/{id}/confirm`, `PUT /admin/reservations/{id}/cancel` |
 
@@ -120,13 +120,19 @@
 | RSV_001 | 409 | 이미 예약된 시간대입니다. 다른 시간을 선택해 주세요. |
 | RSV_002 | 409 | 동시 요청이 많습니다. 잠시 후 다시 시도해 주세요. |
 | RSV_003 | 422 | 최대 인원을 초과했습니다. |
+| RSV_004 | 404 | 예약을 찾을 수 없습니다. |
+| RSV_005 | 403 | 본인 예약만 취소할 수 있습니다. |
 | RSV_006 | 404 | 업체를 찾을 수 없습니다. |
 | RSV_007 | 404 | 예약 대상을 찾을 수 없습니다. |
 | RSV_008 | 404 | 이용 가능 시간을 찾을 수 없습니다. |
 | API_001 | 409 | 이미 사용 중인 이메일입니다. |
 | API_002 | 401 | 이메일 또는 비밀번호가 올바르지 않습니다. |
+| API_003 | 429 | 요청이 너무 많습니다. 잠시 후 다시 시도해 주세요. |
+| API_004 | 503 | 알림 서비스를 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도해 주세요. (서킷브레이커 OPEN) |
 | PAY_001 | 422 | 결제가 실패했습니다. 다시 시도해 주세요. |
 | PAY_002 | 409 | 환불 가능한 상태가 아닙니다. |
+| PAY_003 | 404 | 결제 내역을 찾을 수 없습니다. |
+| PAY_004 | 422 | 환불 처리에 실패했습니다. 다시 시도해 주세요. |
 | AUTH_001 | 401 | 로그인이 필요합니다. |
 | AUTH_002 | 403 | 접근 권한이 없습니다. |
 | REVIEW_001 | 404 | 리뷰를 찾을 수 없습니다. |

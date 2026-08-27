@@ -52,8 +52,16 @@ booking-web/
 │   │   │   ├── dashboard/page.tsx    # /merchant/dashboard (내 업체 목록)
 │   │   │   ├── calendar/page.tsx     # /merchant/calendar (예약 현황 캘린더)
 │   │   │   └── [id]/
-│   │   │       ├── page.tsx          # /merchant/{id} (업체 상세 관리)
-│   │   │       ├── edit/page.tsx     # /merchant/{id}/edit (업체·리소스 수정)
+│   │   │       ├── page.tsx          # /merchant/{id} (업체 상세 + 리소스·이용시간 관리)
+│   │   │       ├── _components/      # page.tsx에서 분리한 모달/행 컴포넌트
+│   │   │       │   ├── ResourceFormModal.tsx
+│   │   │       │   ├── DeleteConfirmModal.tsx
+│   │   │       │   ├── AvailableTimeFormModal.tsx
+│   │   │       │   ├── AvailableTimeDeleteModal.tsx
+│   │   │       │   ├── AvailableTimeManagerModal.tsx
+│   │   │       │   ├── ResourceRow.tsx
+│   │   │       │   └── helpers.ts
+│   │   │       ├── edit/page.tsx     # /merchant/{id}/edit (업체 정보 수정)
 │   │   │       ├── stats/page.tsx    # /merchant/{id}/stats (일별 매출 통계)
 │   │   │       └── reservations/
 │   │   │           └── page.tsx      # /merchant/{id}/reservations (업체별 예약 목록)
@@ -66,29 +74,52 @@ booking-web/
 │   │
 │   ├── components/
 │   │   ├── Header.tsx
+│   │   ├── ReservationSummary.tsx     # 예약 상태 배지·요약 행 (여러 페이지 공용)
 │   │   └── ui/
 │   │       ├── BackButton.tsx
+│   │       ├── Modal.tsx              # 오버레이+접근성을 갖춘 공용 모달 셸
 │   │       ├── Row.tsx
 │   │       └── ToastContainer.tsx
 │   │
 │   ├── lib/
 │   │   ├── api/                      # API 호출 함수 (서비스별 분리)
-│   │   │   ├── axios.ts              # Axios 인스턴스 + JWT 인터셉터
+│   │   │   ├── axios.ts              # Axios 인스턴스 + JWT 인터셉터 + 에러 코드→메시지 변환
 │   │   │   ├── auth.ts               # 회원가입, 로그인, 내 정보 조회, 회원 목록(ADMIN)
-│   │   │   ├── merchants.ts          # 업체 CRUD, 예약 생성, 일별 매출 통계
+│   │   │   ├── merchants.ts          # 업체 CRUD, 일별 매출 통계
 │   │   │   ├── resources.ts          # 예약 대상 CRUD, 가능시간 CRUD
-│   │   │   ├── reservations.ts       # 내 예약 조회/취소
-│   │   │   ├── merchantReservations.ts # 업체별 예약 조회, 확정/취소
-│   │   │   ├── adminReservations.ts  # 관리자 캘린더 조회
+│   │   │   ├── reservations.ts       # 예약 생성, 내 예약 조회/취소
+│   │   │   ├── merchantReservations.ts # 업체별 예약 조회
+│   │   │   ├── adminReservations.ts  # 관리자 캘린더 조회, 확정/취소
 │   │   │   ├── payments.ts           # 결제 조회, 환불
 │   │   │   ├── notifications.ts      # 알림 조회, 회원에게 메시지 발송(ADMIN)
 │   │   │   └── reviews.ts            # 리뷰 조회/작성/수정/삭제
 │   │   │
 │   │   ├── store/
-│   │   │   └── auth.ts               # Zustand: accessToken, user 정보
+│   │   │   ├── auth.ts                # Zustand: accessToken, user 정보
+│   │   │   └── toast.ts               # Zustand: 전역 토스트 알림
+│   │   │
+│   │   ├── constants/                 # 라벨·색상 등 화면 상수
+│   │   │   ├── merchant.ts
+│   │   │   ├── reservation.ts
+│   │   │   └── user.ts
+│   │   │
+│   │   ├── validation/                # React Hook Form용 zod 스키마
+│   │   │   ├── auth.ts
+│   │   │   └── merchant.ts
+│   │   │
+│   │   ├── hooks/
+│   │   │   ├── useDocumentTitle.ts    # 라우트별 <title> 설정
+│   │   │   └── useEscapeKey.ts        # ESC 키로 모달 닫기
 │   │   │
 │   │   ├── utils/
-│   │   │   └── format.ts             # 날짜/가격 포맷 헬퍼
+│   │   │   ├── format.ts             # 날짜/가격 포맷 헬퍼
+│   │   │   └── calendar.ts           # 월 이동/캘린더 그리드 계산
+│   │   │
+│   │   ├── test-utils/
+│   │   │   └── renderWithQuery.tsx    # QueryClientProvider로 감싼 테스트 렌더 헬퍼
+│   │   │
+│   │   ├── test/
+│   │   │   └── fixtures.ts            # 테스트 공용 목 데이터
 │   │   │
 │   │   └── types/                    # 백엔드 DTO 기반 TypeScript 타입
 │   │       ├── auth.ts
@@ -100,7 +131,7 @@ booking-web/
 │   │       ├── review.ts
 │   │       └── common.ts
 │   │
-│   └── middleware.ts                  # 라우트 보호 (미인증 → /login 리디렉션)
+│   └── middleware.ts                  # 라우트 보호 (미인증 → /login 리디렉션, exp 만료 검증)
 │
 ├── docs/                              # 프론트엔드 문서
 ├── public/                            # 정적 파일
@@ -114,7 +145,7 @@ booking-web/
 
 ## 라우트 보호 전략
 
-`middleware.ts`에서 JWT 토큰 유무 및 role을 확인한다.
+`middleware.ts`에서 JWT 토큰 유무·만료(`exp`)·role을 확인한다.
 
 ```
 /login, /signup          → 누구나 접근 가능
@@ -124,7 +155,7 @@ booking-web/
 /admin/**                → role=ADMIN 필수
 ```
 
-미인증 접근 시 `/login?redirect={pathname}`으로 리디렉션.
+미인증 접근(토큰 없음·만료·손상) 시 `/login?redirect={pathname}`으로 리디렉션.
 role 불충족 시 `/`로 리디렉션.
 
 ---

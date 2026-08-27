@@ -28,13 +28,12 @@ Next.js App Router 기반. 테마/레이아웃만 교체해 숙박·강의·시�
 | 프레임워크 | Next.js (App Router) | 15.x |
 | 언어 | TypeScript | 5.x |
 | 스타일 | Tailwind CSS | 3.x |
-| UI 컴포넌트 | shadcn/ui | - |
 | 서버 상태 | TanStack Query (React Query) | 5.x |
 | 클라이언트 상태 | Zustand | 5.x |
 | API 클라이언트 | Axios | 1.x |
 | 폼 | React Hook Form + Zod | - |
-| 날짜 | date-fns | 4.x |
-| 아이콘 | lucide-react | - |
+
+> `shadcn/ui`, `date-fns`, `lucide-react`, `class-variance-authority`, `clsx`, `tailwind-merge`는 `package.json`에 설치는 돼 있지만 아직 실제 코드에서 사용되지 않는다 (`shadcn/ui`는 `components.json` 초기화도 아직 안 된 상태). 커스텀 UI 컴포넌트(`src/components/ui/`)와 `src/lib/utils/format.ts`로 각각의 역할을 대신하고 있다.
 
 ---
 
@@ -50,9 +49,10 @@ Next.js App Router 기반. 테마/레이아웃만 교체해 숙박·강의·시�
 
 ---
 
-## 알려진 제약사항
+## 참고: 예약 처리 흐름
 
-| 항목 | 내용 |
-|------|------|
-| 예약 자동 확정 | Kafka 이벤트 미연결로 예약 생성 후 PENDING 상태가 자동으로 CONFIRMED 전환되지 않음. 업체 운영자가 캘린더에서 수동 확정 필요 |
-| 동시성 처리 | Redis 분산락 미적용 환경에서는 409(RSV_002) 에러가 발생할 수 있음 |
+예약 생성(`POST /reservations`) 시 결제까지 Kafka 이벤트(`reservation.created` → `payment.completed`)로 비동기 처리되며, 정상 처리 시 PENDING 상태가 잠시 후 자동으로 CONFIRMED로 전환된다. `/merchant/calendar`, `/merchant/{id}/reservations`의 수동 확정/취소 버튼은 이 자동 처리와 별개로 업체 운영자가 개입해야 하는 예외 상황(장애 재현 시나리오 등)을 위한 보조 수단이다.
+
+동시성 처리는 Redis 분산락(Redisson) + DB 비관적 락으로 방어하고 있다. 그럼에도 발생하는 409(RSV_002)는 락 획득 대기 중 타임아웃된 정상적인 재시도 유도 응답이다.
+
+장애 재현 시나리오(Kafka consumer lag, 서킷브레이커, 레이스 컨디션)는 백엔드 `docs/99-simulations.md` 참고.

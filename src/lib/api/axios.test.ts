@@ -23,6 +23,12 @@ describe('getErrorMessage', () => {
     expect(getErrorMessage(axiosErrorWith({ code: 'REVIEW_003' }))).toBe(
       '이미 리뷰를 작성한 예약입니다.'
     );
+    expect(getErrorMessage(axiosErrorWith({ code: 'PAY_004' }))).toBe(
+      '환불 처리에 실패했습니다. 다시 시도해 주세요.'
+    );
+    expect(getErrorMessage(axiosErrorWith({ code: 'API_003' }))).toBe(
+      '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.'
+    );
   });
 
   it('알려지지 않은 코드는 detail 필드를 사용한다', () => {

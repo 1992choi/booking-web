@@ -5,9 +5,11 @@
 ## 기술 스택
 
 - **Next.js 15** (App Router) + **TypeScript**
-- **Tailwind CSS** + **shadcn/ui**
+- **Tailwind CSS**
 - **TanStack Query** (서버 상태), **Zustand** (클라이언트 상태)
 - **Axios** (API 클라이언트), **React Hook Form + Zod** (폼)
+
+> `shadcn/ui`는 의존성만 설치돼 있고 아직 초기화·사용 전이다 (자세한 내용은 [01-overview](docs/01-overview.md) 참고).
 
 ---
 
@@ -118,10 +120,17 @@ src/
 ├── app/          # 페이지 (App Router)
 ├── components/   # UI 컴포넌트
 └── lib/
-    ├── api/      # API 호출 함수
-    ├── store/    # Zustand 상태
-    └── types/    # TypeScript 타입
+    ├── api/          # API 호출 함수
+    ├── store/        # Zustand 상태
+    ├── constants/    # 라벨·색상 등 화면 상수
+    ├── validation/   # React Hook Form용 zod 스키마
+    ├── hooks/        # 커스텀 훅
+    ├── utils/        # 포맷/캘린더 등 순수 함수
+    ├── test-utils/   # 테스트 렌더 헬퍼
+    └── types/        # TypeScript 타입
 ```
+
+세부 구조는 [02-architecture](docs/02-architecture.md) 참고.
 
 ---
 
@@ -129,7 +138,7 @@ src/
 
 | 문서 | 내용 |
 |------|------|
-| [01-overview](docs/01-overview.md) | 프로젝트 개요, 기술 스택, 개발 순서 |
+| [01-overview](docs/01-overview.md) | 프로젝트 개요, 연동 백엔드, 기술 스택, 사용자 역할 |
 | [02-architecture](docs/02-architecture.md) | 폴더 구조, 라우트 보호, 상태 관리 전략 |
 | [03-pages](docs/03-pages.md) | 페이지 목록, API 매핑, 에러 코드 |
 | [04-api-client](docs/04-api-client.md) | Axios 설정, API 함수 목록, 타입 정의 |
