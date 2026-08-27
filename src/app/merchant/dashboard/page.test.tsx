@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import MerchantDashboardPage from './page';
 import { useAuthStore } from '@/lib/store/auth';
+import { renderWithQuery } from '@/lib/test-utils/renderWithQuery';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
@@ -35,7 +36,7 @@ describe('MerchantDashboardPage', () => {
     setRole('MERCHANT');
     getMyMerchants.mockResolvedValue([{ id: 1, name: '한적한 펜션', type: 'PENSION' }]);
 
-    render(<MerchantDashboardPage />);
+    renderWithQuery(<MerchantDashboardPage />);
 
     expect(await screen.findByText('한적한 펜션')).toBeInTheDocument();
     expect(screen.getByText('예약 관리')).toBeInTheDocument();
@@ -47,7 +48,7 @@ describe('MerchantDashboardPage', () => {
     setRole('ADMIN');
     getMerchants.mockResolvedValue([{ id: 1, name: '한적한 펜션', type: 'PENSION' }]);
 
-    render(<MerchantDashboardPage />);
+    renderWithQuery(<MerchantDashboardPage />);
 
     expect(await screen.findByText('전체 등록 업체 목록입니다.')).toBeInTheDocument();
     expect(screen.queryByText('+ 업체 등록')).not.toBeInTheDocument();
@@ -58,7 +59,7 @@ describe('MerchantDashboardPage', () => {
     setRole('MERCHANT');
     getMyMerchants.mockResolvedValue([]);
 
-    render(<MerchantDashboardPage />);
+    renderWithQuery(<MerchantDashboardPage />);
 
     expect(await screen.findByText('등록된 업체가 없습니다.')).toBeInTheDocument();
   });
@@ -67,7 +68,7 @@ describe('MerchantDashboardPage', () => {
     setRole('MERCHANT');
     getMyMerchants.mockRejectedValue(new Error('network error'));
 
-    render(<MerchantDashboardPage />);
+    renderWithQuery(<MerchantDashboardPage />);
 
     expect(await screen.findByText('업체 목록을 불러오지 못했습니다.')).toBeInTheDocument();
   });

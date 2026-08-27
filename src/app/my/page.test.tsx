@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import MyPage from './page';
 import { useAuthStore } from '@/lib/store/auth';
+import { renderWithQuery } from '@/lib/test-utils/renderWithQuery';
 
 const push = vi.fn();
 vi.mock('next/navigation', () => ({
@@ -42,7 +43,7 @@ beforeEach(() => {
 describe('MyPage', () => {
   it('내 정보를 불러와 보여준다', async () => {
     getMe.mockResolvedValue(user);
-    render(<MyPage />);
+    renderWithQuery(<MyPage />);
 
     expect(await screen.findByText('홍길동')).toBeInTheDocument();
     expect(screen.getByText('hong@example.com')).toBeInTheDocument();
@@ -50,7 +51,7 @@ describe('MyPage', () => {
 
   it('불러오기 실패 시 에러 메시지를 보여준다', async () => {
     getMe.mockRejectedValue(new Error('network error'));
-    render(<MyPage />);
+    renderWithQuery(<MyPage />);
 
     expect(await screen.findByText('정보를 불러오지 못했습니다.')).toBeInTheDocument();
   });
@@ -59,7 +60,7 @@ describe('MyPage', () => {
     getMe.mockResolvedValue(user);
     updateMe.mockResolvedValue({ ...user, name: '김철수', phone: '010-9999-8888' });
 
-    render(<MyPage />);
+    renderWithQuery(<MyPage />);
     await screen.findByText('홍길동');
     await userEvent.click(screen.getByText('수정'));
 
@@ -74,7 +75,7 @@ describe('MyPage', () => {
 
   it('로그아웃 시 인증 상태를 정리하고 로그인 페이지로 이동한다', async () => {
     getMe.mockResolvedValue(user);
-    render(<MyPage />);
+    renderWithQuery(<MyPage />);
     await screen.findByText('홍길동');
 
     await userEvent.click(screen.getByText('로그아웃'));
@@ -88,7 +89,7 @@ describe('MyPage', () => {
     getMe.mockResolvedValue(user);
     deleteMe.mockResolvedValue(undefined);
 
-    render(<MyPage />);
+    renderWithQuery(<MyPage />);
     await screen.findByText('홍길동');
     await userEvent.click(screen.getByText('회원 탈퇴'));
     await userEvent.click(screen.getByRole('button', { name: '탈퇴하기' }));

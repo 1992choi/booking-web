@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import Row from '@/components/ui/Row';
@@ -36,80 +37,72 @@ const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
 
 export default function ReservationDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const numId = Number(id);
+  const queryClient = useQueryClient();
 
-  const [reservation, setReservation] = useState<Reservation | null>(null);
+  const { data: reservation, isLoading: reservationLoading, isError: error } = useQuery({
+    queryKey: ['reservation', id],
+    queryFn: () => getReservation(numId),
+  });
   useDocumentTitle(reservation ? reservation.resourceName : '예약 상세');
-  const [payment, setPayment] = useState<Payment | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [actionLoading, setActionLoading] = useState(false);
+
+  const { data: payment, isLoading: paymentLoading } = useQuery({
+    queryKey: ['payment', id],
+    queryFn: () => getPayment(numId).catch(() => null),
+  });
+
+  const loading = reservationLoading || paymentLoading;
+
   const [actionError, setActionError] = useState('');
 
   const [reviewContent, setReviewContent] = useState('');
-  const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewError, setReviewError] = useState('');
   const [reviewDone, setReviewDone] = useState(false);
 
-  useEffect(() => {
-    if (!id) return;
-    const numId = Number(id);
-    Promise.all([
-      getReservation(numId),
-      getPayment(numId).catch(() => null),
-    ])
-      .then(([res, pay]) => {
-        setReservation(res);
-        setPayment(pay);
-      })
-      .catch(() => setError('예약 정보를 불러오지 못했습니다.'))
-      .finally(() => setLoading(false));
-  }, [id]);
+  const { mutate: submitCancel, isPending: cancelLoading } = useMutation({
+    mutationFn: () => cancelReservation(numId),
+    onSuccess: () => {
+      queryClient.setQueryData(['reservation', id], (prev: Reservation | undefined) =>
+        prev ? { ...prev, status: 'CANCELLED' as const } : prev
+      );
+      setActionError('');
+    },
+    onError: (err) => setActionError(getErrorMessage(err)),
+  });
 
-  async function handleCancel() {
-    if (!reservation) return;
-    setActionLoading(true);
-    setActionError('');
-    try {
-      await cancelReservation(reservation.id);
-      setReservation((prev) => prev ? { ...prev, status: 'CANCELLED' } : prev);
-    } catch (err) {
-      setActionError(getErrorMessage(err));
-    } finally {
-      setActionLoading(false);
-    }
-  }
+  const { mutate: submitRefund, isPending: refundLoading } = useMutation({
+    mutationFn: () => refund(numId),
+    onSuccess: () => {
+      queryClient.setQueryData(['payment', id], (prev: Payment | null | undefined) =>
+        prev ? { ...prev, status: 'REFUNDED' as const } : prev
+      );
+      setActionError('');
+    },
+    onError: (err) => setActionError(getErrorMessage(err)),
+  });
 
-  async function handleRefund() {
-    if (!reservation) return;
-    setActionLoading(true);
-    setActionError('');
-    try {
-      await refund(reservation.id);
-      setPayment((prev) => prev ? { ...prev, status: 'REFUNDED' } : prev);
-    } catch (err) {
-      setActionError(getErrorMessage(err));
-    } finally {
-      setActionLoading(false);
-    }
-  }
+  const actionLoading = cancelLoading || refundLoading;
 
-  async function handleSubmitReview(e: React.FormEvent) {
-    e.preventDefault();
-    if (!reservation || !reviewContent.trim()) return;
-    setReviewSubmitting(true);
-    setReviewError('');
-    try {
-      await createReview({ reservationId: reservation.id, content: reviewContent.trim() });
+  const { mutate: submitReview, isPending: reviewSubmitting } = useMutation({
+    mutationFn: (content: string) => createReview({ reservationId: numId, content }),
+    onSuccess: () => {
       setReviewDone(true);
-    } catch (err) {
+      setReviewError('');
+    },
+    onError: (err) => {
       if (axios.isAxiosError(err) && (err.response?.data as ApiError | undefined)?.code === 'REVIEW_003') {
         setReviewDone(true);
       } else {
         setReviewError(getErrorMessage(err));
       }
-    } finally {
-      setReviewSubmitting(false);
-    }
+    },
+  });
+
+  function handleSubmitReview(e: React.FormEvent) {
+    e.preventDefault();
+    if (!reviewContent.trim()) return;
+    setReviewError('');
+    submitReview(reviewContent.trim());
   }
 
   const canCancel = reservation?.status === 'PENDING' || reservation?.status === 'CONFIRMED';
@@ -131,7 +124,7 @@ export default function ReservationDetailPage() {
         )}
 
         {!loading && error && (
-          <p className="text-sm text-red-400 text-center py-20">{error}</p>
+          <p className="text-sm text-red-400 text-center py-20">예약 정보를 불러오지 못했습니다.</p>
         )}
 
         {!loading && !error && reservation && (
@@ -207,7 +200,7 @@ export default function ReservationDetailPage() {
             )}
             {canCancel && (
               <button
-                onClick={handleCancel}
+                onClick={() => submitCancel()}
                 disabled={actionLoading}
                 className="w-full border border-gray-200 text-gray-500 hover:border-red-300 hover:text-red-500 disabled:opacity-50 text-sm font-medium rounded-xl py-3 transition-colors"
               >
@@ -216,7 +209,7 @@ export default function ReservationDetailPage() {
             )}
             {canRefund && (
               <button
-                onClick={handleRefund}
+                onClick={() => submitRefund()}
                 disabled={actionLoading}
                 className="w-full border border-gray-200 text-gray-500 hover:border-blue-300 hover:text-blue-500 disabled:opacity-50 text-sm font-medium rounded-xl py-3 transition-colors mt-2"
               >

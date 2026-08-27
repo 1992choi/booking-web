@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import ReservationDetailPage from './page';
+import { renderWithQuery } from '@/lib/test-utils/renderWithQuery';
 
 vi.mock('next/navigation', () => ({
   useParams: () => ({ id: '1' }),
@@ -50,7 +51,7 @@ describe('ReservationDetailPage', () => {
     getReservation.mockResolvedValue({ ...baseReservation, status: 'PENDING' });
     getPayment.mockRejectedValue(new Error('no payment yet'));
 
-    render(<ReservationDetailPage />);
+    renderWithQuery(<ReservationDetailPage />);
 
     expect(await screen.findByText('A동')).toBeInTheDocument();
     expect(screen.getByText('2명')).toBeInTheDocument();
@@ -60,7 +61,7 @@ describe('ReservationDetailPage', () => {
     getReservation.mockRejectedValue(new Error('network error'));
     getPayment.mockRejectedValue(new Error('no payment yet'));
 
-    render(<ReservationDetailPage />);
+    renderWithQuery(<ReservationDetailPage />);
 
     expect(await screen.findByText('예약 정보를 불러오지 못했습니다.')).toBeInTheDocument();
   });
@@ -70,7 +71,7 @@ describe('ReservationDetailPage', () => {
     getPayment.mockRejectedValue(new Error('no payment yet'));
     cancelReservation.mockResolvedValue(undefined);
 
-    render(<ReservationDetailPage />);
+    renderWithQuery(<ReservationDetailPage />);
     await screen.findByText('A동');
 
     await userEvent.click(screen.getByRole('button', { name: '예약 취소' }));
@@ -83,7 +84,7 @@ describe('ReservationDetailPage', () => {
     getReservation.mockResolvedValue({ ...baseReservation, status: 'CANCELLED' });
     getPayment.mockResolvedValue({ id: 1, reservationId: 1, amount: 100000, status: 'COMPLETED', createdAt: '2024-05-01T09:00:00' });
 
-    render(<ReservationDetailPage />);
+    renderWithQuery(<ReservationDetailPage />);
 
     expect(await screen.findByRole('button', { name: '환불 요청' })).toBeInTheDocument();
   });
@@ -93,7 +94,7 @@ describe('ReservationDetailPage', () => {
     getPayment.mockRejectedValue(new Error('no payment yet'));
     createReview.mockResolvedValue(undefined);
 
-    render(<ReservationDetailPage />);
+    renderWithQuery(<ReservationDetailPage />);
     await screen.findByText('A동');
 
     await userEvent.type(screen.getByPlaceholderText('이용하신 소감을 남겨주세요.'), '좋았어요');

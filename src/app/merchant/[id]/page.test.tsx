@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import MerchantDetailPage from './page';
 import { useAuthStore } from '@/lib/store/auth';
+import { renderWithQuery } from '@/lib/test-utils/renderWithQuery';
 
 vi.mock('next/navigation', () => ({
   useParams: () => ({ id: '1' }),
@@ -62,7 +63,7 @@ describe('MerchantDetailPage', () => {
     setRole('USER');
     getMerchant.mockResolvedValue(merchant);
 
-    render(<MerchantDetailPage />);
+    renderWithQuery(<MerchantDetailPage />);
 
     expect(await screen.findByText('한적한 펜션')).toBeInTheDocument();
     expect(screen.getByText('A동')).toBeInTheDocument();
@@ -74,7 +75,7 @@ describe('MerchantDetailPage', () => {
     setRole('MERCHANT');
     getMerchant.mockResolvedValue(merchant);
 
-    render(<MerchantDetailPage />);
+    renderWithQuery(<MerchantDetailPage />);
 
     expect(await screen.findByText('수정')).toBeInTheDocument();
     expect(screen.getByText('+ 추가')).toBeInTheDocument();
@@ -84,7 +85,7 @@ describe('MerchantDetailPage', () => {
     setRole('USER');
     getMerchant.mockResolvedValue({ ...merchant, resources: [] });
 
-    render(<MerchantDetailPage />);
+    renderWithQuery(<MerchantDetailPage />);
 
     expect(await screen.findByText('등록된 예약 대상이 없습니다.')).toBeInTheDocument();
   });
@@ -93,7 +94,7 @@ describe('MerchantDetailPage', () => {
     setRole('USER');
     getMerchant.mockRejectedValue(new Error('network error'));
 
-    render(<MerchantDetailPage />);
+    renderWithQuery(<MerchantDetailPage />);
 
     expect(await screen.findByText('업체 정보를 불러오지 못했습니다.')).toBeInTheDocument();
   });
@@ -103,7 +104,7 @@ describe('MerchantDetailPage', () => {
     getMerchant.mockResolvedValue(merchant);
     createResource.mockResolvedValue({ id: 20, merchantId: 1, name: 'B동', description: '', price: 50000, maxCapacity: 2 });
 
-    render(<MerchantDetailPage />);
+    renderWithQuery(<MerchantDetailPage />);
     await screen.findByText('+ 추가');
 
     await userEvent.click(screen.getByText('+ 추가'));

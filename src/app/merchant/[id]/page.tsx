@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import { getMerchant } from '@/lib/api/merchants';
@@ -23,27 +24,20 @@ export default function MerchantDetailPage() {
   const { id } = useParams<{ id: string }>();
   const role = useAuthStore((s) => s.role);
   const isMerchant = role === 'MERCHANT';
+  const queryClient = useQueryClient();
 
-  const [merchant, setMerchant] = useState<MerchantDetail | null>(null);
+  const { data: merchant, isLoading: loading, isError: error } = useQuery({
+    queryKey: ['merchant', id],
+    queryFn: () => getMerchant(Number(id)),
+  });
   useDocumentTitle(merchant ? merchant.name : '업체 상세');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
   const [formTarget, setFormTarget] = useState<ResourceFormTarget>(null);
   const [deleteTarget, setDeleteTarget] = useState<Resource | null>(null);
-  const [deleteLoading, setDeleteLoading] = useState(false);
   const [timeManageTarget, setTimeManageTarget] = useState<Resource | null>(null);
 
-  useEffect(() => {
-    if (!id) return;
-    getMerchant(Number(id))
-      .then(setMerchant)
-      .catch(() => setError('업체 정보를 불러오지 못했습니다.'))
-      .finally(() => setLoading(false));
-  }, [id]);
-
   function handleSaved(saved: Resource) {
-    setMerchant((prev) => {
+    queryClient.setQueryData(['merchant', id], (prev: MerchantDetail | undefined) => {
       if (!prev) return prev;
       const exists = prev.resources.some((r) => r.id === saved.id);
       const resources = exists
@@ -54,20 +48,20 @@ export default function MerchantDetailPage() {
     setFormTarget(null);
   }
 
-  async function handleDelete() {
-    if (!deleteTarget) return;
-    setDeleteLoading(true);
-    try {
-      await deleteResource(deleteTarget.id);
-      setMerchant((prev) =>
-        prev ? { ...prev, resources: prev.resources.filter((r) => r.id !== deleteTarget.id) } : prev
+  const { mutate: submitDelete, isPending: deleteLoading } = useMutation({
+    mutationFn: (resourceId: number) => deleteResource(resourceId),
+    onSuccess: (_, resourceId) => {
+      queryClient.setQueryData(['merchant', id], (prev: MerchantDetail | undefined) =>
+        prev ? { ...prev, resources: prev.resources.filter((r) => r.id !== resourceId) } : prev
       );
       setDeleteTarget(null);
-    } catch {
-      // 삭제 실패 시 모달 유지
-    } finally {
-      setDeleteLoading(false);
-    }
+    },
+    // 삭제 실패 시 모달 유지
+  });
+
+  function handleDelete() {
+    if (!deleteTarget) return;
+    submitDelete(deleteTarget.id);
   }
 
   return (
@@ -85,7 +79,7 @@ export default function MerchantDetailPage() {
         )}
 
         {!loading && error && (
-          <p className="text-sm text-red-400 text-center py-20">{error}</p>
+          <p className="text-sm text-red-400 text-center py-20">업체 정보를 불러오지 못했습니다.</p>
         )}
 
         {!loading && !error && merchant && (

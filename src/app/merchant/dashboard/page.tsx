@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
@@ -59,17 +59,10 @@ export default function MerchantDashboardPage() {
   const isAdmin = role === 'ADMIN';
   const isMerchant = role === 'MERCHANT';
 
-  const [merchants, setMerchants] = useState<MerchantSummary[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    const fetch = isAdmin ? getMerchants : getMyMerchants;
-    fetch()
-      .then(setMerchants)
-      .catch(() => setError('업체 목록을 불러오지 못했습니다.'))
-      .finally(() => setLoading(false));
-  }, [isAdmin]);
+  const { data: merchants = [], isLoading, isError } = useQuery({
+    queryKey: ['merchants-dashboard', isAdmin],
+    queryFn: (): Promise<MerchantSummary[]> => (isAdmin ? getMerchants() : getMyMerchants()),
+  });
 
   return (
     <>
@@ -92,7 +85,7 @@ export default function MerchantDashboardPage() {
           <p className="text-xs text-gray-400 mb-4">전체 등록 업체 목록입니다.</p>
         )}
 
-        {loading && (
+        {isLoading && (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-20 bg-gray-100 rounded-2xl animate-pulse" />
@@ -100,11 +93,11 @@ export default function MerchantDashboardPage() {
           </div>
         )}
 
-        {!loading && error && (
-          <p className="text-sm text-red-400 text-center py-16">{error}</p>
+        {!isLoading && isError && (
+          <p className="text-sm text-red-400 text-center py-16">업체 목록을 불러오지 못했습니다.</p>
         )}
 
-        {!loading && !error && merchants.length === 0 && (
+        {!isLoading && !isError && merchants.length === 0 && (
           <div className="text-center py-20">
             <p className="text-sm text-gray-400 mb-4">등록된 업체가 없습니다.</p>
             {!isAdmin && (
@@ -118,7 +111,7 @@ export default function MerchantDashboardPage() {
           </div>
         )}
 
-        {!loading && !error && merchants.length > 0 && (
+        {!isLoading && !isError && merchants.length > 0 && (
           <div className="space-y-3">
             {merchants.map((merchant) => (
               <MerchantCard key={merchant.id} merchant={merchant} isMerchant={isMerchant} />

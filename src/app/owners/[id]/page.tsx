@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useParams, usePathname, useRouter } from 'next/navigation';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import { getMerchant } from '@/lib/api/merchants';
@@ -15,7 +16,7 @@ import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merc
 import { formatDate, formatPrice, formatTime, today } from '@/lib/utils/format';
 import { useAuthStore } from '@/lib/store/auth';
 import { useToastStore } from '@/lib/store/toast';
-import type { AvailableTime, MerchantDetail, Resource } from '@/lib/types/merchant';
+import type { Resource } from '@/lib/types/merchant';
 import type { Review } from '@/lib/types/review';
 
 // ─── 예약 가능 시간 모달 ─────────────────────────────────────────────
@@ -32,23 +33,19 @@ function AvailableTimesModal({
   const showToast = useToastStore((s) => s.showToast);
 
   const [date, setDate] = useState(today());
-  const [times, setTimes] = useState<AvailableTime[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
-  const [booking, setBooking] = useState(false);
 
-  useEffect(() => {
-    setLoading(true);
-    setError('');
-    setSelectedIds(new Set());
-    getAvailableTimes(resource.id, date)
-      .then(setTimes)
-      .catch(() => setError('조회에 실패했습니다.'))
-      .finally(() => setLoading(false));
-  }, [resource.id, date]);
+  const { data: times = [], isLoading: loading, isError } = useQuery({
+    queryKey: ['available-times', resource.id, date],
+    queryFn: () => getAvailableTimes(resource.id, date),
+  });
 
   const openTimes = times.filter((t) => t.status === 'OPEN');
+
+  function changeDate(next: string) {
+    setDate(next);
+    setSelectedIds(new Set());
+  }
 
   function toggleSlot(id: number) {
     setSelectedIds((prev) => {
@@ -59,27 +56,30 @@ function AvailableTimesModal({
     });
   }
 
-  async function handleReserve() {
+  const { mutate: reserve, isPending: booking } = useMutation({
+    mutationFn: () =>
+      createReservation({
+        resourceId: resource.id,
+        availableTimeIds: Array.from(selectedIds),
+        headCount: 1,
+      }),
+    onSuccess: () => {
+      showToast('success', '예약 요청이 접수되었습니다.\n예약 상태는 내 예약에서 확인해주세요.');
+      onClose();
+    },
+    onError: (err) => {
+      console.error('[예약 오류]', err);
+      showToast('error', getErrorMessage(err));
+    },
+  });
+
+  function handleReserve() {
     if (!isAuthenticated) {
       router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
       return;
     }
     if (selectedIds.size === 0) return;
-    setBooking(true);
-    try {
-      await createReservation({
-        resourceId: resource.id,
-        availableTimeIds: Array.from(selectedIds),
-        headCount: 1,
-      });
-      showToast('success', '예약 요청이 접수되었습니다.\n예약 상태는 내 예약에서 확인해주세요.');
-      onClose();
-    } catch (err) {
-      console.error('[예약 오류]', err);
-      showToast('error', getErrorMessage(err));
-    } finally {
-      setBooking(false);
-    }
+    reserve();
   }
 
   const totalPrice = resource.price * selectedIds.size;
@@ -105,7 +105,7 @@ function AvailableTimesModal({
           type="date"
           value={date}
           min={today()}
-          onChange={(e) => setDate(e.target.value)}
+          onChange={(e) => changeDate(e.target.value)}
           className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
@@ -122,15 +122,15 @@ function AvailableTimesModal({
           </div>
         )}
 
-        {!loading && error && (
-          <p className="text-sm text-red-400 text-center py-6">{error}</p>
+        {!loading && isError && (
+          <p className="text-sm text-red-400 text-center py-6">조회에 실패했습니다.</p>
         )}
 
-        {!loading && !error && openTimes.length === 0 && (
+        {!loading && !isError && openTimes.length === 0 && (
           <p className="text-sm text-gray-400 text-center py-6">선택한 날짜에 예약 가능한 시간이 없습니다.</p>
         )}
 
-        {!loading && !error && openTimes.length > 0 && (
+        {!loading && !isError && openTimes.length > 0 && (
           <div className="space-y-2">
             {openTimes.map((t) => {
               const isSelected = selectedIds.has(t.id);
@@ -161,7 +161,7 @@ function AvailableTimesModal({
       </div>
 
       {/* 예약 버튼 영역 */}
-      {!loading && !error && openTimes.length > 0 && (
+      {!loading && !isError && openTimes.length > 0 && (
         <div className="mt-5 pt-4 border-t border-gray-100">
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-gray-500">
@@ -344,29 +344,19 @@ function ReviewCard({
 export default function MerchantPublicDetailPage() {
   const { id } = useParams<{ id: string }>();
   const user = useAuthStore((s) => s.user);
-  const [merchant, setMerchant] = useState<MerchantDetail | null>(null);
-  useDocumentTitle(merchant ? merchant.name : '업체 상세');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const queryClient = useQueryClient();
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [reviewsLoading, setReviewsLoading] = useState(true);
 
-  useEffect(() => {
-    if (!id) return;
-    getMerchant(Number(id))
-      .then(setMerchant)
-      .catch(() => setError('업체 정보를 불러오지 못했습니다.'))
-      .finally(() => setLoading(false));
-  }, [id]);
+  const { data: merchant, isLoading: loading, isError: error } = useQuery({
+    queryKey: ['merchant', id],
+    queryFn: () => getMerchant(Number(id)),
+  });
+  useDocumentTitle(merchant ? merchant.name : '업체 상세');
 
-  useEffect(() => {
-    if (!id) return;
-    getReviewsByMerchant(Number(id))
-      .then(setReviews)
-      .catch(() => {})
-      .finally(() => setReviewsLoading(false));
-  }, [id]);
+  const { data: reviews = [], isLoading: reviewsLoading } = useQuery({
+    queryKey: ['reviews', id],
+    queryFn: () => getReviewsByMerchant(Number(id)).catch(() => [] as Review[]),
+  });
 
   return (
     <>
@@ -385,7 +375,7 @@ export default function MerchantPublicDetailPage() {
         )}
 
         {!loading && error && (
-          <p className="text-sm text-red-400 text-center py-20">{error}</p>
+          <p className="text-sm text-red-400 text-center py-20">업체 정보를 불러오지 못했습니다.</p>
         )}
 
         {!loading && !error && merchant && (
@@ -445,10 +435,14 @@ export default function MerchantPublicDetailPage() {
                       review={review}
                       isMine={!!user && user.id === review.userId}
                       onUpdated={(updated) =>
-                        setReviews((prev) => prev.map((r) => (r.id === updated.id ? updated : r)))
+                        queryClient.setQueryData(['reviews', id], (prev: Review[] | undefined) =>
+                          prev?.map((r) => (r.id === updated.id ? updated : r))
+                        )
                       }
                       onDeleted={(reviewId) =>
-                        setReviews((prev) => prev.filter((r) => r.id !== reviewId))
+                        queryClient.setQueryData(['reviews', id], (prev: Review[] | undefined) =>
+                          prev?.filter((r) => r.id !== reviewId)
+                        )
                       }
                     />
                   ))}

@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import { getMyReservations } from '@/lib/api/reservations';
@@ -33,36 +34,22 @@ function ReservationCard({ reservation }: { reservation: Reservation }) {
 export default function MyReservationsPage() {
   useDocumentTitle('내 예약');
   const [tab, setTab] = useState<ReservationStatus | 'ALL'>('ALL');
-  const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [page, setPage] = useState(0);
-  const [isLast, setIsLast] = useState(true);
 
-  useEffect(() => {
-    setLoading(true);
-    setError('');
-    setPage(0);
+  const {
+    data,
+    isLoading: loading,
+    isError: error,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['my-reservations', tab],
+    queryFn: ({ pageParam }) => getMyReservations(tab === 'ALL' ? undefined : tab, pageParam),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => (lastPage.page < lastPage.totalPages - 1 ? lastPage.page + 1 : undefined),
+  });
 
-    getMyReservations(tab === 'ALL' ? undefined : tab, 0)
-      .then((res) => {
-        setReservations(res.content);
-        setIsLast(res.page >= res.totalPages - 1);
-      })
-      .catch(() => setError('예약 목록을 불러오지 못했습니다.'))
-      .finally(() => setLoading(false));
-  }, [tab]);
-
-  function loadMore() {
-    const next = page + 1;
-    getMyReservations(tab === 'ALL' ? undefined : tab, next)
-      .then((res) => {
-        setReservations((prev) => [...prev, ...res.content]);
-        setIsLast(res.page >= res.totalPages - 1);
-        setPage(next);
-      })
-      .catch(() => setError('불러오기에 실패했습니다.'));
-  }
+  const reservations: Reservation[] = data?.pages.flatMap((p) => p.content) ?? [];
+  const isLast = !hasNextPage;
 
   return (
     <>
@@ -99,7 +86,7 @@ export default function MyReservationsPage() {
         )}
 
         {!loading && error && (
-          <p className="text-sm text-red-400 text-center py-16">{error}</p>
+          <p className="text-sm text-red-400 text-center py-16">예약 목록을 불러오지 못했습니다.</p>
         )}
 
         {!loading && !error && reservations.length === 0 && (
@@ -116,7 +103,7 @@ export default function MyReservationsPage() {
 
             {!isLast && (
               <button
-                onClick={loadMore}
+                onClick={() => fetchNextPage()}
                 className="mt-5 w-full text-sm text-gray-500 border border-gray-200 rounded-xl py-3 hover:border-blue-300 hover:text-blue-500 transition-colors"
               >
                 더 보기

@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { z } from 'zod';
 import { useParams, useRouter } from 'next/navigation';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import { getMerchant, updateMerchant } from '@/lib/api/merchants';
@@ -20,8 +21,6 @@ export default function MerchantEditPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
 
-  const [initialLoading, setInitialLoading] = useState(true);
-  const [loadError, setLoadError] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
   const {
@@ -30,7 +29,7 @@ export default function MerchantEditPage() {
     watch,
     setValue,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(merchantSchema),
     defaultValues: { type: 'PENSION' },
@@ -38,24 +37,25 @@ export default function MerchantEditPage() {
 
   const type = watch('type');
 
-  useEffect(() => {
-    if (!id) return;
-    getMerchant(Number(id))
-      .then((merchant) => {
-        reset({ name: merchant.name, phone: merchant.phone, type: merchant.type });
-      })
-      .catch(() => setLoadError('업체 정보를 불러오지 못했습니다.'))
-      .finally(() => setInitialLoading(false));
-  }, [id, reset]);
+  const { data: merchant, isLoading: initialLoading, isError: loadError } = useQuery({
+    queryKey: ['merchant', id],
+    queryFn: () => getMerchant(Number(id)),
+  });
 
-  const onSubmit = async (values: FormValues) => {
+  useEffect(() => {
+    if (!merchant) return;
+    reset({ name: merchant.name, phone: merchant.phone, type: merchant.type });
+  }, [merchant, reset]);
+
+  const { mutate: submitUpdate, isPending: isSubmitting } = useMutation({
+    mutationFn: (values: FormValues) => updateMerchant(Number(id), values),
+    onSuccess: () => router.push(`/merchant/${id}`),
+    onError: (err) => setErrorMsg(getErrorMessage(err)),
+  });
+
+  const onSubmit = (values: FormValues) => {
     setErrorMsg('');
-    try {
-      await updateMerchant(Number(id), values);
-      router.push(`/merchant/${id}`);
-    } catch (err) {
-      setErrorMsg(getErrorMessage(err));
-    }
+    submitUpdate(values);
   };
 
   return (
@@ -74,7 +74,7 @@ export default function MerchantEditPage() {
             <div className="h-24 bg-gray-100 rounded-xl animate-pulse" />
           </div>
         ) : loadError ? (
-          <p className="text-sm text-red-400 text-center py-16">{loadError}</p>
+          <p className="text-sm text-red-400 text-center py-16">업체 정보를 불러오지 못했습니다.</p>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
             <div>

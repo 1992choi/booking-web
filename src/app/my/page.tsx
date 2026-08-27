@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import Row from '@/components/ui/Row';
 import { getMe, updateMe, deleteMe, logout } from '@/lib/api/auth';
@@ -9,7 +10,6 @@ import { getErrorMessage } from '@/lib/api/axios';
 import { formatDate } from '@/lib/utils/format';
 import { useAuthStore } from '@/lib/store/auth';
 import { ROLE_LABELS, ROLE_COLORS } from '@/lib/constants/user';
-import type { UserResponse } from '@/lib/types/auth';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 
 export default function MyPage() {
@@ -17,26 +17,39 @@ export default function MyPage() {
   const router = useRouter();
   const clearAuth = useAuthStore((s) => s.clearAuth);
   const updateUser = useAuthStore((s) => s.updateUser);
-  const [user, setUser] = useState<UserResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const queryClient = useQueryClient();
+
+  const { data: user, isLoading, isError } = useQuery({
+    queryKey: ['me'],
+    queryFn: getMe,
+  });
 
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState('');
   const [editPhone, setEditPhone] = useState('');
-  const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState('');
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState('');
 
-  useEffect(() => {
-    getMe()
-      .then(setUser)
-      .catch(() => setError('정보를 불러오지 못했습니다.'))
-      .finally(() => setLoading(false));
-  }, []);
+  const { mutate: submitUpdate, isPending: editLoading } = useMutation({
+    mutationFn: (values: { name: string; phone: string }) => updateMe(values),
+    onSuccess: (updated) => {
+      queryClient.setQueryData(['me'], updated);
+      updateUser(updated);
+      setEditing(false);
+    },
+    onError: (err) => setEditError(getErrorMessage(err)),
+  });
+
+  const { mutate: submitDelete, isPending: deleteLoading } = useMutation({
+    mutationFn: deleteMe,
+    onSuccess: () => {
+      clearAuth();
+      router.push('/login');
+    },
+    onError: (err) => setDeleteError(getErrorMessage(err)),
+  });
 
   function startEdit() {
     if (!user) return;
@@ -51,34 +64,16 @@ export default function MyPage() {
     setEditError('');
   }
 
-  async function handleUpdate(e: React.FormEvent) {
+  function handleUpdate(e: React.FormEvent) {
     e.preventDefault();
     if (!editName.trim() || !editPhone.trim()) return;
-    setEditLoading(true);
     setEditError('');
-    try {
-      const updated = await updateMe({ name: editName.trim(), phone: editPhone.trim() });
-      setUser(updated);
-      updateUser(updated);
-      setEditing(false);
-    } catch (err) {
-      setEditError(getErrorMessage(err));
-    } finally {
-      setEditLoading(false);
-    }
+    submitUpdate({ name: editName.trim(), phone: editPhone.trim() });
   }
 
-  async function handleDelete() {
-    setDeleteLoading(true);
+  function handleDelete() {
     setDeleteError('');
-    try {
-      await deleteMe();
-      clearAuth();
-      router.push('/login');
-    } catch (err) {
-      setDeleteError(getErrorMessage(err));
-      setDeleteLoading(false);
-    }
+    submitDelete();
   }
 
   async function handleLogout() {
@@ -94,18 +89,18 @@ export default function MyPage() {
       <main className="max-w-screen-sm mx-auto px-4 py-6">
         <h1 className="text-xl font-bold text-gray-900 mb-6">내 정보</h1>
 
-        {loading && (
+        {isLoading && (
           <div className="space-y-3">
             <div className="h-40 bg-gray-100 rounded-2xl animate-pulse" />
             <div className="h-12 bg-gray-100 rounded-xl animate-pulse" />
           </div>
         )}
 
-        {!loading && error && (
-          <p className="text-sm text-red-400 text-center py-20">{error}</p>
+        {!isLoading && isError && (
+          <p className="text-sm text-red-400 text-center py-20">정보를 불러오지 못했습니다.</p>
         )}
 
-        {!loading && !error && user && (
+        {!isLoading && !isError && user && (
           <>
             {/* 프로필 카드 */}
             <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-4">

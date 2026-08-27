@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import { getMyNotifications } from '@/lib/api/notifications';
@@ -36,16 +36,11 @@ function NotificationItem({ notification }: { notification: Notification }) {
 
 export default function NotificationsPage() {
   useDocumentTitle('알림');
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
-  useEffect(() => {
-    getMyNotifications()
-      .then(setNotifications)
-      .catch(() => setError('알림을 불러오지 못했습니다.'))
-      .finally(() => setLoading(false));
-  }, []);
+  const { data: notifications = [], isLoading, isError } = useQuery({
+    queryKey: ['my-notifications'],
+    queryFn: getMyNotifications,
+  });
 
   return (
     <>
@@ -56,7 +51,7 @@ export default function NotificationsPage() {
 
         <h1 className="text-xl font-bold text-gray-900 mb-5">알림</h1>
 
-        {loading && (
+        {isLoading && (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-20 rounded-2xl bg-gray-100 animate-pulse" />
@@ -64,15 +59,15 @@ export default function NotificationsPage() {
           </div>
         )}
 
-        {!loading && error && (
-          <p className="text-sm text-red-400 text-center py-16">{error}</p>
+        {!isLoading && isError && (
+          <p className="text-sm text-red-400 text-center py-16">알림을 불러오지 못했습니다.</p>
         )}
 
-        {!loading && !error && notifications.length === 0 && (
+        {!isLoading && !isError && notifications.length === 0 && (
           <p className="text-sm text-gray-400 text-center py-16">알림이 없습니다.</p>
         )}
 
-        {!loading && !error && notifications.length > 0 && (
+        {!isLoading && !isError && notifications.length > 0 && (
           <div className="space-y-2">
             {notifications.map((n) => (
               <NotificationItem key={n.id} notification={n} />

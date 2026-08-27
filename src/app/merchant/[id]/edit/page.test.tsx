@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import MerchantEditPage from './page';
+import { renderWithQuery } from '@/lib/test-utils/renderWithQuery';
 
 const push = vi.fn();
 vi.mock('next/navigation', () => ({
@@ -28,7 +29,7 @@ beforeEach(() => {
 describe('MerchantEditPage', () => {
   it('기존 업체 정보를 폼에 채워 보여준다', async () => {
     getMerchant.mockResolvedValue(merchant);
-    render(<MerchantEditPage />);
+    renderWithQuery(<MerchantEditPage />);
 
     expect(await screen.findByDisplayValue('한적한 펜션')).toBeInTheDocument();
     expect(screen.getByDisplayValue('010-1234-5678')).toBeInTheDocument();
@@ -36,7 +37,7 @@ describe('MerchantEditPage', () => {
 
   it('불러오기 실패 시 에러 메시지를 보여주고 폼을 숨긴다', async () => {
     getMerchant.mockRejectedValue(new Error('network error'));
-    render(<MerchantEditPage />);
+    renderWithQuery(<MerchantEditPage />);
 
     expect(await screen.findByText('업체 정보를 불러오지 못했습니다.')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: '수정 완료' })).not.toBeInTheDocument();
@@ -46,7 +47,7 @@ describe('MerchantEditPage', () => {
     getMerchant.mockResolvedValue(merchant);
     updateMerchant.mockResolvedValue({ ...merchant, name: '조용한 펜션' });
 
-    render(<MerchantEditPage />);
+    renderWithQuery(<MerchantEditPage />);
     const nameInput = await screen.findByDisplayValue('한적한 펜션');
     await userEvent.clear(nameInput);
     await userEvent.type(nameInput, '조용한 펜션');
@@ -62,7 +63,7 @@ describe('MerchantEditPage', () => {
     getMerchant.mockResolvedValue(merchant);
     updateMerchant.mockRejectedValue(new Error('network error'));
 
-    render(<MerchantEditPage />);
+    renderWithQuery(<MerchantEditPage />);
     await screen.findByDisplayValue('한적한 펜션');
     await userEvent.click(screen.getByRole('button', { name: '수정 완료' }));
 

@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import MerchantPublicDetailPage from './page';
 import { useAuthStore } from '@/lib/store/auth';
+import { renderWithQuery } from '@/lib/test-utils/renderWithQuery';
 
 const push = vi.fn();
 vi.mock('next/navigation', () => ({
@@ -80,7 +81,7 @@ describe('MerchantPublicDetailPage', () => {
   it('업체 정보와 예약 대상을 보여준다', async () => {
     getMerchant.mockResolvedValue(merchant);
 
-    render(<MerchantPublicDetailPage />);
+    renderWithQuery(<MerchantPublicDetailPage />);
 
     expect(await screen.findByText('한적한 펜션')).toBeInTheDocument();
     expect(screen.getByText('A동')).toBeInTheDocument();
@@ -89,7 +90,7 @@ describe('MerchantPublicDetailPage', () => {
   it('불러오기 실패 시 에러 메시지를 보여준다', async () => {
     getMerchant.mockRejectedValue(new Error('network error'));
 
-    render(<MerchantPublicDetailPage />);
+    renderWithQuery(<MerchantPublicDetailPage />);
 
     expect(await screen.findByText('업체 정보를 불러오지 못했습니다.')).toBeInTheDocument();
   });
@@ -98,7 +99,7 @@ describe('MerchantPublicDetailPage', () => {
     getMerchant.mockResolvedValue(merchant);
     getReviewsByMerchant.mockResolvedValue([review]);
 
-    render(<MerchantPublicDetailPage />);
+    renderWithQuery(<MerchantPublicDetailPage />);
 
     expect(await screen.findByText('좋았어요')).toBeInTheDocument();
     expect(screen.getByText('이용 후기 (1)')).toBeInTheDocument();
@@ -110,7 +111,7 @@ describe('MerchantPublicDetailPage', () => {
       { id: 100, startTime: '2024-05-01T09:00:00', endTime: '2024-05-01T10:00:00', status: 'OPEN' },
     ]);
 
-    render(<MerchantPublicDetailPage />);
+    renderWithQuery(<MerchantPublicDetailPage />);
     await screen.findByText('A동');
     await userEvent.click(screen.getByText('예약 가능 시간 보기'));
 
@@ -136,7 +137,7 @@ describe('MerchantPublicDetailPage', () => {
     ]);
     createReservation.mockResolvedValue(undefined);
 
-    render(<MerchantPublicDetailPage />);
+    renderWithQuery(<MerchantPublicDetailPage />);
     await screen.findByText('A동');
     await userEvent.click(screen.getByText('예약 가능 시간 보기'));
 

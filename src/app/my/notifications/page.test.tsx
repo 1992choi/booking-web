@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import NotificationsPage from './page';
+import { renderWithQuery } from '@/lib/test-utils/renderWithQuery';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
@@ -29,7 +30,7 @@ beforeEach(() => {
 describe('NotificationsPage', () => {
   it('알림 목록을 불러와 보여준다', async () => {
     getMyNotifications.mockResolvedValue([notification]);
-    render(<NotificationsPage />);
+    renderWithQuery(<NotificationsPage />);
 
     expect(await screen.findByText('[예약 확정]')).toBeInTheDocument();
     expect(screen.getByText('예약이 확정되었습니다.')).toBeInTheDocument();
@@ -37,14 +38,14 @@ describe('NotificationsPage', () => {
 
   it('알림이 없으면 안내 문구를 보여준다', async () => {
     getMyNotifications.mockResolvedValue([]);
-    render(<NotificationsPage />);
+    renderWithQuery(<NotificationsPage />);
 
     expect(await screen.findByText('알림이 없습니다.')).toBeInTheDocument();
   });
 
   it('불러오기 실패 시 에러 메시지를 보여준다', async () => {
     getMyNotifications.mockRejectedValue(new Error('network error'));
-    render(<NotificationsPage />);
+    renderWithQuery(<NotificationsPage />);
 
     expect(await screen.findByText('알림을 불러오지 못했습니다.')).toBeInTheDocument();
   });

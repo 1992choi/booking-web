@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import { getAdminCalendar, confirmReservation, cancelReservation } from '@/lib/api/adminReservations';
 import { getErrorMessage } from '@/lib/api/axios';
@@ -71,48 +72,37 @@ export default function AdminReservationsPage() {
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth() + 1);
-  const [calendarData, setCalendarData] = useState<AdminCalendarData>({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [actionError, setActionError] = useState('');
-  const [actioning, setActioning] = useState(false);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    setLoading(true);
-    setError('');
-    setSelectedDate(null);
-    getAdminCalendar(year, month)
-      .then(setCalendarData)
-      .catch(() => setError('캘린더를 불러오지 못했습니다.'))
-      .finally(() => setLoading(false));
-  }, [year, month]);
+  const { data: calendarData = {} as AdminCalendarData, isLoading, isError } = useQuery({
+    queryKey: ['admin-calendar', year, month],
+    queryFn: () => getAdminCalendar(year, month),
+  });
+
+  const { mutate: changeStatus, isPending: actioning } = useMutation({
+    mutationFn: ({ reservationId, action }: { reservationId: number; action: 'confirm' | 'cancel' }) =>
+      action === 'confirm' ? confirmReservation(reservationId) : cancelReservation(reservationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-calendar', year, month] });
+      setActionError('');
+    },
+    onError: (err) => setActionError(getErrorMessage(err)),
+  });
 
   function prevMonth() {
     const shifted = shiftMonth(year, month, -1);
     setYear(shifted.year);
     setMonth(shifted.month);
+    setSelectedDate(null);
   }
 
   function nextMonth() {
     const shifted = shiftMonth(year, month, 1);
     setYear(shifted.year);
     setMonth(shifted.month);
-  }
-
-  async function handleAction(reservationId: number, action: 'confirm' | 'cancel') {
-    setActioning(true);
-    setActionError('');
-    try {
-      if (action === 'confirm') await confirmReservation(reservationId);
-      else await cancelReservation(reservationId);
-      const updated = await getAdminCalendar(year, month);
-      setCalendarData(updated);
-    } catch (err) {
-      setActionError(getErrorMessage(err));
-    } finally {
-      setActioning(false);
-    }
+    setSelectedDate(null);
   }
 
   const weeks = buildCalendarGrid(year, month);
@@ -147,11 +137,11 @@ export default function AdminReservationsPage() {
           </button>
         </div>
 
-        {error && (
-          <p className="text-sm text-red-400 text-center py-16">{error}</p>
+        {isError && (
+          <p className="text-sm text-red-400 text-center py-16">캘린더를 불러오지 못했습니다.</p>
         )}
 
-        {!error && (
+        {!isError && (
           <>
             {/* 캘린더 */}
             <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden mb-4">
@@ -170,7 +160,7 @@ export default function AdminReservationsPage() {
               </div>
 
               {/* 날짜 그리드 */}
-              {loading ? (
+              {isLoading ? (
                 <div className="h-64 flex items-center justify-center">
                   <div className="text-sm text-gray-300">불러오는 중...</div>
                 </div>
@@ -254,8 +244,8 @@ export default function AdminReservationsPage() {
                         key={entry.reservationId}
                         entry={entry}
                         disabled={actioning}
-                        onConfirm={() => handleAction(entry.reservationId, 'confirm')}
-                        onCancel={() => handleAction(entry.reservationId, 'cancel')}
+                        onConfirm={() => changeStatus({ reservationId: entry.reservationId, action: 'confirm' })}
+                        onCancel={() => changeStatus({ reservationId: entry.reservationId, action: 'cancel' })}
                       />
                     ))}
                   </div>

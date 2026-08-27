@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import { getMerchants } from '@/lib/api/merchants';
 import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
-import type { MerchantSummary, MerchantType } from '@/lib/types/merchant';
+import type { MerchantType } from '@/lib/types/merchant';
 
 type FilterType = MerchantType | 'ALL';
 
@@ -26,17 +27,12 @@ const CATEGORY_TABS: CategoryTab[] = [
 const VISIBLE_TYPES = new Set<MerchantType>(['PENSION', 'CLASS', 'FACILITY']);
 
 export default function HomePage() {
-  const [merchants, setMerchants] = useState<MerchantSummary[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [selected, setSelected] = useState<FilterType>('ALL');
 
-  useEffect(() => {
-    getMerchants()
-      .then(setMerchants)
-      .catch(() => setError('업체 목록을 불러오지 못했습니다.'))
-      .finally(() => setLoading(false));
-  }, []);
+  const { data: merchants = [], isLoading, isError } = useQuery({
+    queryKey: ['merchants'],
+    queryFn: getMerchants,
+  });
 
   const filtered =
     selected === 'ALL'
@@ -80,7 +76,7 @@ export default function HomePage() {
 
       {/* 업체 카드 목록 */}
       <main className="max-w-screen-lg mx-auto px-4 py-6">
-        {loading && (
+        {isLoading && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="aspect-square rounded-2xl bg-gray-100 animate-pulse" />
@@ -88,15 +84,15 @@ export default function HomePage() {
           </div>
         )}
 
-        {!loading && error && (
-          <p className="text-sm text-red-400 text-center py-16">{error}</p>
+        {!isLoading && isError && (
+          <p className="text-sm text-red-400 text-center py-16">업체 목록을 불러오지 못했습니다.</p>
         )}
 
-        {!loading && !error && filtered.length === 0 && (
+        {!isLoading && !isError && filtered.length === 0 && (
           <p className="text-sm text-gray-400 text-center py-16">해당 유형의 업체가 없습니다.</p>
         )}
 
-        {!loading && !error && filtered.length > 0 && (
+        {!isLoading && !isError && filtered.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {filtered.map((merchant) => (
               <Link
