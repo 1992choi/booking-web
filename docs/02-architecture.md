@@ -37,7 +37,12 @@ booking-web/
 │   │   │   └── signup/page.tsx       # /signup
 │   │   │
 │   │   ├── owners/
-│   │   │   └── [id]/page.tsx         # /owners/{id} (업체 상세 + 예약)
+│   │   │   └── [id]/
+│   │   │       ├── page.tsx          # /owners/{id} (업체 상세 + 예약 + 리뷰)
+│   │   │       └── _components/      # page.tsx에서 분리한 모달/카드 컴포넌트
+│   │   │           ├── AvailableTimesModal.tsx
+│   │   │           ├── ResourceCard.tsx
+│   │   │           └── ReviewCard.tsx
 │   │   │
 │   │   ├── my/                       # 일반 사용자 마이페이지 (로그인 필수)
 │   │   │   ├── page.tsx              # /my (내 정보)
