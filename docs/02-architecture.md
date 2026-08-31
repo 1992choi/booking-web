@@ -53,6 +53,8 @@ booking-web/
 │   │   │       └── page.tsx          # /my/notifications (내 알림)
 │   │   │
 │   │   ├── merchant/                 # 업체 운영자 (role=MERCHANT 이상)
+│   │   │   ├── _components/
+│   │   │   │   └── MerchantForm.tsx  # register·edit 페이지가 공유하는 업체 정보 폼
 │   │   │   ├── register/page.tsx     # /merchant/register (업체 등록)
 │   │   │   ├── dashboard/page.tsx    # /merchant/dashboard (내 업체 목록)
 │   │   │   ├── calendar/page.tsx     # /merchant/calendar (예약 현황 캘린더)
