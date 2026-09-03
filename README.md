@@ -1,5 +1,7 @@
 # booking-web
 
+[![CI](https://github.com/1992choi/booking-web/actions/workflows/ci.yml/badge.svg)](https://github.com/1992choi/booking-web/actions/workflows/ci.yml)
+
 범용 예약 플랫폼 프론트엔드. [`booking`](../booking) 백엔드(MSA, Spring Boot)와 연동.
 
 ## 기술 스택
@@ -90,6 +92,10 @@ npm run test:watch
 ```
 
 테스트 러너로 [Vitest](https://vitest.dev)를 사용한다. 테스트 파일은 대상 파일과 같은 위치에 `*.test.ts`로 작성한다 (예: `src/lib/utils/format.ts` → `src/lib/utils/format.test.ts`).
+
+### 7. CI
+
+`master`로의 push/PR마다 GitHub Actions(`.github/workflows/ci.yml`)가 `lint` → `test` → `build` 순서로 동일한 명령을 실행한다. 로컬에서 세 명령이 모두 통과하면 CI도 통과한다.
 
 ---
 

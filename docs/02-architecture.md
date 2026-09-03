@@ -140,6 +140,7 @@ booking-web/
 │   │
 │   └── middleware.ts                  # 라우트 보호 (미인증 → /login 리디렉션, exp 만료 검증)
 │
+├── .github/workflows/ci.yml           # CI (push/PR 시 lint → test → build)
 ├── docs/                              # 프론트엔드 문서
 ├── public/                            # 정적 파일
 ├── next.config.ts                     # Next.js 설정 (백엔드 프록시 포함)
