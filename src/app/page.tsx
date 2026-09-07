@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
+import { SkeletonList } from '@/components/ui/Skeleton';
 import { getMerchants } from '@/lib/api/merchants';
 import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
 import type { MerchantType } from '@/lib/types/merchant';
@@ -77,11 +78,11 @@ export default function HomePage() {
       {/* 업체 카드 목록 */}
       <main className="max-w-screen-lg mx-auto px-4 py-6">
         {isLoading && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="aspect-square rounded-2xl bg-gray-100 animate-pulse" />
-            ))}
-          </div>
+          <SkeletonList
+            count={8}
+            itemClassName="aspect-square rounded-2xl"
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
+          />
         )}
 
         {!isLoading && isError && (

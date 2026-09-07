@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
+import { SkeletonList } from '@/components/ui/Skeleton';
 import { getMerchantReservations } from '@/lib/api/merchantReservations';
 import { confirmReservation, cancelReservation } from '@/lib/api/adminReservations';
 import { getErrorMessage } from '@/lib/api/axios';
@@ -120,13 +121,7 @@ export default function MerchantReservationsPage() {
           <p className="text-sm text-red-400 text-center mb-4">{actionError}</p>
         )}
 
-        {isLoading && (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-44 rounded-2xl bg-gray-100 animate-pulse" />
-            ))}
-          </div>
-        )}
+        {isLoading && <SkeletonList count={3} itemClassName="h-44 rounded-2xl" />}
 
         {!isLoading && isError && (
           <p className="text-sm text-red-400 text-center py-16">예약 목록을 불러오지 못했습니다.</p>

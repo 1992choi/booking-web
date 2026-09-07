@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
+import { SkeletonList } from '@/components/ui/Skeleton';
 import { getMerchantDailyStats } from '@/lib/api/merchants';
 import { formatPrice } from '@/lib/utils/format';
 import { shiftMonth } from '@/lib/utils/calendar';
@@ -111,13 +112,7 @@ export default function MerchantStatsPage() {
           <SummaryCard label="취소" value={`${totalCancelled}건`} />
         </div>
 
-        {isLoading && (
-          <div className="space-y-3">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-16 bg-gray-100 rounded-2xl animate-pulse" />
-            ))}
-          </div>
-        )}
+        {isLoading && <SkeletonList count={5} itemClassName="h-16 rounded-2xl" />}
 
         {!isLoading && isError && (
           <p className="text-sm text-red-400 text-center py-16">매출 데이터를 불러오지 못했습니다.</p>

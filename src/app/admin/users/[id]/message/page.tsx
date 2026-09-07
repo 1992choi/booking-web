@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
+import Skeleton from '@/components/ui/Skeleton';
 import { getUsers } from '@/lib/api/auth';
 import { sendNotificationToUser } from '@/lib/api/notifications';
 import { getErrorMessage } from '@/lib/api/axios';
@@ -49,7 +50,7 @@ export default function SendMessagePage() {
         <h1 className="text-xl font-bold text-gray-900 mb-6">메시지 보내기</h1>
 
         {isLoadingUser ? (
-          <div className="h-14 bg-gray-100 rounded-2xl animate-pulse mb-5" />
+          <Skeleton className="h-14 rounded-2xl mb-5" />
         ) : user ? (
           <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 mb-5">
             <p className="text-xs text-blue-400 mb-0.5">수신자</p>

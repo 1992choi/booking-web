@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
+import { SkeletonList } from '@/components/ui/Skeleton';
 import { getMerchants, getMyMerchants } from '@/lib/api/merchants';
 import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
 import { useAuthStore } from '@/lib/store/auth';
@@ -85,13 +86,7 @@ export default function MerchantDashboardPage() {
           <p className="text-xs text-gray-400 mb-4">전체 등록 업체 목록입니다.</p>
         )}
 
-        {isLoading && (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 bg-gray-100 rounded-2xl animate-pulse" />
-            ))}
-          </div>
-        )}
+        {isLoading && <SkeletonList count={3} itemClassName="h-20 rounded-2xl" />}
 
         {!isLoading && isError && (
           <p className="text-sm text-red-400 text-center py-16">업체 목록을 불러오지 못했습니다.</p>

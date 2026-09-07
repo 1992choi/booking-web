@@ -7,6 +7,7 @@ import { getAvailableTimes } from '@/lib/api/resources';
 import { createReservation } from '@/lib/api/reservations';
 import { getErrorMessage } from '@/lib/api/axios';
 import Modal from '@/components/ui/Modal';
+import { SkeletonList } from '@/components/ui/Skeleton';
 import { formatPrice, formatTime, today } from '@/lib/utils/format';
 import { useAuthStore } from '@/lib/store/auth';
 import { useToastStore } from '@/lib/store/toast';
@@ -106,13 +107,7 @@ export function AvailableTimesModal({
       <div>
         <p className="text-xs font-medium text-gray-500 mb-2">예약 가능 시간</p>
 
-        {loading && (
-          <div className="space-y-2">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-12 rounded-xl bg-gray-100 animate-pulse" />
-            ))}
-          </div>
-        )}
+        {loading && <SkeletonList count={3} itemClassName="h-12 rounded-xl" className="space-y-2" />}
 
         {!loading && isError && (
           <p className="text-sm text-red-400 text-center py-6">조회에 실패했습니다.</p>

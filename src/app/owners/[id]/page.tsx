@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
+import Skeleton, { SkeletonList } from '@/components/ui/Skeleton';
 import { getMerchant } from '@/lib/api/merchants';
 import { getReviewsByMerchant } from '@/lib/api/reviews';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
@@ -42,10 +43,10 @@ export default function MerchantPublicDetailPage() {
 
         {loading && (
           <div className="space-y-4">
-            <div className="h-8 w-48 bg-gray-100 rounded-lg animate-pulse" />
-            <div className="h-4 w-24 bg-gray-100 rounded-lg animate-pulse" />
-            <div className="h-40 bg-gray-100 rounded-2xl animate-pulse" />
-            <div className="h-40 bg-gray-100 rounded-2xl animate-pulse" />
+            <Skeleton className="h-8 w-48 rounded-lg" />
+            <Skeleton className="h-4 w-24 rounded-lg" />
+            <Skeleton className="h-40 rounded-2xl" />
+            <Skeleton className="h-40 rounded-2xl" />
           </div>
         )}
 
@@ -91,11 +92,7 @@ export default function MerchantPublicDetailPage() {
               </h2>
 
               {reviewsLoading && (
-                <div className="space-y-2">
-                  {[1, 2].map((i) => (
-                    <div key={i} className="h-20 rounded-2xl bg-gray-100 animate-pulse" />
-                  ))}
-                </div>
+                <SkeletonList count={2} itemClassName="h-20 rounded-2xl" className="space-y-2" />
               )}
 
               {!reviewsLoading && reviews.length === 0 && (

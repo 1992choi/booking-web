@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
+import { SkeletonList } from '@/components/ui/Skeleton';
 import { getMyReservations } from '@/lib/api/reservations';
 import { RESERVATION_STATUS_TABS } from '@/lib/constants/reservation';
 import { ReservationStatusBadge, ReservationSummaryRows } from '@/components/ReservationSummary';
@@ -77,13 +78,7 @@ export default function MyReservationsPage() {
           ))}
         </div>
 
-        {loading && (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-40 rounded-2xl bg-gray-100 animate-pulse" />
-            ))}
-          </div>
-        )}
+        {loading && <SkeletonList count={3} itemClassName="h-40 rounded-2xl" />}
 
         {!loading && error && (
           <p className="text-sm text-red-400 text-center py-16">예약 목록을 불러오지 못했습니다.</p>

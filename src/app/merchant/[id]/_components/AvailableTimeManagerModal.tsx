@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { getAvailableTimes, deleteAvailableTime } from '@/lib/api/resources';
 import Modal, { ModalHeader } from '@/components/ui/Modal';
+import { SkeletonList } from '@/components/ui/Skeleton';
 import type { Resource, AvailableTime } from '@/lib/types/merchant';
 import { STATUS_COLORS, STATUS_LABELS, formatTime, todayString } from './helpers';
 import { AvailableTimeFormModal } from './AvailableTimeFormModal';
@@ -77,10 +78,7 @@ export function AvailableTimeManagerModal({
         />
 
         {timesLoading ? (
-          <div className="space-y-2 mb-4">
-            <div className="h-10 bg-gray-100 rounded-xl animate-pulse" />
-            <div className="h-10 bg-gray-100 rounded-xl animate-pulse" />
-          </div>
+          <SkeletonList count={2} itemClassName="h-10 rounded-xl" className="space-y-2 mb-4" />
         ) : timesError ? (
           <p className="text-sm text-red-400 text-center py-4 mb-4">{timesError}</p>
         ) : times.length === 0 ? (

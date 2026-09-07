@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import Row from '@/components/ui/Row';
+import Skeleton from '@/components/ui/Skeleton';
 import axios from 'axios';
 import { cancelReservation, getReservation } from '@/lib/api/reservations';
 import { getErrorMessage } from '@/lib/api/axios';
@@ -117,9 +118,9 @@ export default function ReservationDetailPage() {
 
         {loading && (
           <div className="space-y-3">
-            <div className="h-8 w-40 bg-gray-100 rounded-lg animate-pulse" />
-            <div className="h-48 bg-gray-100 rounded-2xl animate-pulse" />
-            <div className="h-32 bg-gray-100 rounded-2xl animate-pulse" />
+            <Skeleton className="h-8 w-40 rounded-lg" />
+            <Skeleton className="h-48 rounded-2xl" />
+            <Skeleton className="h-32 rounded-2xl" />
           </div>
         )}
 

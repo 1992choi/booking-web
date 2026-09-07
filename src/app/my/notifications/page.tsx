@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
+import { SkeletonList } from '@/components/ui/Skeleton';
 import { getMyNotifications } from '@/lib/api/notifications';
 import { formatDateTime } from '@/lib/utils/format';
 import type { Notification } from '@/lib/types/notification';
@@ -51,13 +52,7 @@ export default function NotificationsPage() {
 
         <h1 className="text-xl font-bold text-gray-900 mb-5">알림</h1>
 
-        {isLoading && (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-20 rounded-2xl bg-gray-100 animate-pulse" />
-            ))}
-          </div>
-        )}
+        {isLoading && <SkeletonList count={3} itemClassName="h-20 rounded-2xl" />}
 
         {!isLoading && isError && (
           <p className="text-sm text-red-400 text-center py-16">알림을 불러오지 못했습니다.</p>

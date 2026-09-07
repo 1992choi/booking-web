@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import Row from '@/components/ui/Row';
+import Skeleton from '@/components/ui/Skeleton';
 import { getMe, updateMe, deleteMe, logout } from '@/lib/api/auth';
 import { getErrorMessage } from '@/lib/api/axios';
 import { formatDate } from '@/lib/utils/format';
@@ -91,8 +92,8 @@ export default function MyPage() {
 
         {isLoading && (
           <div className="space-y-3">
-            <div className="h-40 bg-gray-100 rounded-2xl animate-pulse" />
-            <div className="h-12 bg-gray-100 rounded-xl animate-pulse" />
+            <Skeleton className="h-40 rounded-2xl" />
+            <Skeleton className="h-12 rounded-xl" />
           </div>
         )}
 

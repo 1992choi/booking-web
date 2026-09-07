@@ -7,6 +7,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
+import Skeleton from '@/components/ui/Skeleton';
 import { getMerchant, updateMerchant } from '@/lib/api/merchants';
 import { getErrorMessage } from '@/lib/api/axios';
 import { merchantSchema } from '@/lib/validation/merchant';
@@ -58,9 +59,9 @@ export default function MerchantEditPage() {
 
         {initialLoading ? (
           <div className="space-y-4">
-            <div className="h-12 bg-gray-100 rounded-xl animate-pulse" />
-            <div className="h-12 bg-gray-100 rounded-xl animate-pulse" />
-            <div className="h-24 bg-gray-100 rounded-xl animate-pulse" />
+            <Skeleton className="h-12 rounded-xl" />
+            <Skeleton className="h-12 rounded-xl" />
+            <Skeleton className="h-24 rounded-xl" />
           </div>
         ) : loadError ? (
           <p className="text-sm text-red-400 text-center py-16">업체 정보를 불러오지 못했습니다.</p>

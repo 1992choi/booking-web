@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
+import { SkeletonList } from '@/components/ui/Skeleton';
 import { getUsers } from '@/lib/api/auth';
 import { formatDate } from '@/lib/utils/format';
 import { ROLE_LABELS, ROLE_COLORS } from '@/lib/constants/user';
@@ -91,13 +92,7 @@ export default function AdminUsersPage() {
           ))}
         </div>
 
-        {isLoading && (
-          <div className="space-y-3">
-            {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="h-20 bg-gray-100 rounded-2xl animate-pulse" />
-            ))}
-          </div>
-        )}
+        {isLoading && <SkeletonList count={5} itemClassName="h-20 rounded-2xl" />}
 
         {!isLoading && isError && (
           <p className="text-sm text-red-400 text-center py-16">회원 목록을 불러오지 못했습니다.</p>

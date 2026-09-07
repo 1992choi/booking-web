@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
+import Skeleton from '@/components/ui/Skeleton';
 import { getMerchant } from '@/lib/api/merchants';
 import { deleteResource } from '@/lib/api/resources';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
@@ -73,8 +74,8 @@ export default function MerchantDetailPage() {
 
         {loading && (
           <div className="space-y-3">
-            <div className="h-20 bg-gray-100 rounded-2xl animate-pulse" />
-            <div className="h-48 bg-gray-100 rounded-2xl animate-pulse" />
+            <Skeleton className="h-20 rounded-2xl" />
+            <Skeleton className="h-48 rounded-2xl" />
           </div>
         )}
 
