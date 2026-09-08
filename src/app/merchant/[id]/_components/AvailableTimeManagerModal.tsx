@@ -1,6 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getAvailableTimes, deleteAvailableTime } from '@/lib/api/resources';
 import Modal, { ModalHeader } from '@/components/ui/Modal';
 import { SkeletonList } from '@/components/ui/Skeleton';
@@ -20,41 +21,29 @@ export function AvailableTimeManagerModal({
   onClose: () => void;
 }) {
   const [date, setDate] = useState(todayString());
-  const [times, setTimes] = useState<AvailableTime[]>([]);
-  const [timesLoading, setTimesLoading] = useState(false);
-  const [timesError, setTimesError] = useState('');
   const [formTarget, setFormTarget] = useState<TimeFormTarget>(null);
   const [deleteTarget, setDeleteTarget] = useState<AvailableTime | null>(null);
-  const [deleteLoading, setDeleteLoading] = useState(false);
+  const queryClient = useQueryClient();
 
-  const fetchTimes = useCallback(async (d: string) => {
-    setTimesLoading(true);
-    setTimesError('');
-    try {
-      setTimes(await getAvailableTimes(resource.id, d));
-    } catch {
-      setTimesError('이용 시간을 불러오지 못했습니다.');
-    } finally {
-      setTimesLoading(false);
-    }
-  }, [resource.id]);
+  const timesQueryKey = ['available-times', resource.id, date];
 
-  useEffect(() => {
-    fetchTimes(date);
-  }, [date, fetchTimes]);
+  const { data: times = [], isLoading: timesLoading, isError: timesError } = useQuery({
+    queryKey: timesQueryKey,
+    queryFn: () => getAvailableTimes(resource.id, date),
+  });
 
-  async function handleDelete() {
-    if (!deleteTarget) return;
-    setDeleteLoading(true);
-    try {
-      await deleteAvailableTime(deleteTarget.id);
+  const { mutate: submitDelete, isPending: deleteLoading } = useMutation({
+    mutationFn: (id: number) => deleteAvailableTime(id),
+    onSuccess: () => {
       setDeleteTarget(null);
-      fetchTimes(date);
-    } catch {
-      // 삭제 실패 시 모달 유지
-    } finally {
-      setDeleteLoading(false);
-    }
+      queryClient.invalidateQueries({ queryKey: timesQueryKey });
+    },
+    // 삭제 실패 시 모달 유지
+  });
+
+  function handleDelete() {
+    if (!deleteTarget) return;
+    submitDelete(deleteTarget.id);
   }
 
   return (
@@ -80,7 +69,7 @@ export function AvailableTimeManagerModal({
         {timesLoading ? (
           <SkeletonList count={2} itemClassName="h-10 rounded-xl" className="space-y-2 mb-4" />
         ) : timesError ? (
-          <p className="text-sm text-red-400 text-center py-4 mb-4">{timesError}</p>
+          <p className="text-sm text-red-400 text-center py-4 mb-4">이용 시간을 불러오지 못했습니다.</p>
         ) : times.length === 0 ? (
           <p className="text-sm text-gray-400 text-center py-6 mb-4">해당 날짜에 등록된 이용 시간이 없습니다.</p>
         ) : (
@@ -128,7 +117,7 @@ export function AvailableTimeManagerModal({
           onClose={() => setFormTarget(null)}
           onSaved={() => {
             setFormTarget(null);
-            fetchTimes(date);
+            queryClient.invalidateQueries({ queryKey: timesQueryKey });
           }}
         />
       )}

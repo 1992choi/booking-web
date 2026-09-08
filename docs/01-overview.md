@@ -25,7 +25,7 @@ Next.js App Router 기반. 테마/레이아웃만 교체해 숙박·강의·시�
 
 | 분류 | 기술 | 버전 |
 |------|------|------|
-| 프레임워크 | Next.js (App Router) | 15.x |
+| 프레임워크 | Next.js (App Router, Turbopack) | 16.x |
 | 언어 | TypeScript | 5.x |
 | 스타일 | Tailwind CSS | 3.x |
 | 서버 상태 | TanStack Query (React Query) | 5.x |

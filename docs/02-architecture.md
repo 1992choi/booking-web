@@ -139,7 +139,7 @@ booking-web/
 │   │       ├── review.ts
 │   │       └── common.ts
 │   │
-│   └── middleware.ts                  # 라우트 보호 (미인증 → /login 리디렉션, exp 만료 검증)
+│   └── proxy.ts                       # 라우트 보호 (미인증 → /login 리디렉션, exp 만료 검증)
 │
 ├── .github/workflows/ci.yml           # CI (push/PR 시 lint → test → build)
 ├── docs/                              # 프론트엔드 문서
@@ -154,7 +154,7 @@ booking-web/
 
 ## 라우트 보호 전략
 
-`middleware.ts`에서 JWT 토큰 유무·만료(`exp`)·role을 확인한다.
+`proxy.ts`에서 JWT 토큰 유무·만료(`exp`)·role을 확인한다.
 
 ```
 /login, /signup          → 누구나 접근 가능
