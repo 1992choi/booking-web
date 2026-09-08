@@ -6,7 +6,7 @@
 
 ## 기술 스택
 
-- **Next.js 15** (App Router) + **TypeScript**
+- **Next.js 16** (App Router, Turbopack) + **TypeScript**
 - **Tailwind CSS**
 - **TanStack Query** (서버 상태), **Zustand** (클라이언트 상태)
 - **Axios** (API 클라이언트), **React Hook Form + Zod** (폼)
@@ -21,7 +21,7 @@
 
 | 항목 | 권장 버전 | 확인 명령 |
 |------|----------|----------|
-| Node.js | 20.x 이상 | `node -v` |
+| Node.js | 20.9 이상 | `node -v` |
 | npm | 10.x 이상 | `npm -v` |
 
 Node.js가 설치되어 있지 않다면 https://nodejs.org 에서 LTS 버전을 설치한다.

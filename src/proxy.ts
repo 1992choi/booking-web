@@ -10,7 +10,7 @@ const MERCHANT_PREFIXES = ['/merchant'];
 /** Routes that require ADMIN role */
 const ADMIN_ONLY_PREFIXES = ['/admin'];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get('access-token')?.value;
 
