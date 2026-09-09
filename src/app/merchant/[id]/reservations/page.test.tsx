@@ -74,4 +74,20 @@ describe('MerchantReservationsPage', () => {
 
     await vi.waitFor(() => expect(confirmReservation).toHaveBeenCalledWith(100));
   });
+
+  it('다음 페이지가 있으면 더 보기 버튼으로 추가 로드한다', async () => {
+    getMerchantReservations.mockResolvedValueOnce({ content: [reservation], page: 0, totalPages: 2 });
+    renderWithQuery(<MerchantReservationsPage />);
+    await screen.findByText('A동');
+
+    getMerchantReservations.mockResolvedValueOnce({
+      content: [{ ...reservation, id: 200, resourceName: 'B동' }],
+      page: 1,
+      totalPages: 2,
+    });
+    await userEvent.click(screen.getByText('더 보기'));
+
+    expect(await screen.findByText('B동')).toBeInTheDocument();
+    expect(screen.getByText('A동')).toBeInTheDocument();
+  });
 });

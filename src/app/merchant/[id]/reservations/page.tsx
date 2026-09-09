@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import { SkeletonList } from '@/components/ui/Skeleton';
@@ -74,13 +74,21 @@ export default function MerchantReservationsPage() {
   const [actionError, setActionError] = useState('');
   const queryClient = useQueryClient();
 
-  const { data: reservations = [], isLoading, isError } = useQuery({
+  const {
+    data,
+    isLoading,
+    isError,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
     queryKey: ['merchant-reservations', merchantId, tab],
-    queryFn: async () => {
-      const res = await getMerchantReservations(merchantId, tab === 'ALL' ? undefined : tab);
-      return res.content;
-    },
+    queryFn: ({ pageParam }) => getMerchantReservations(merchantId, tab === 'ALL' ? undefined : tab, pageParam),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => (lastPage.page < lastPage.totalPages - 1 ? lastPage.page + 1 : undefined),
   });
+
+  const reservations = data?.pages.flatMap((p) => p.content) ?? [];
+  const isLast = !hasNextPage;
 
   const { mutate: changeStatus, isPending: isMutating } = useMutation({
     mutationFn: ({ id, action }: { id: number; action: Action }) =>
@@ -132,16 +140,27 @@ export default function MerchantReservationsPage() {
         )}
 
         {!isLoading && !isError && reservations.length > 0 && (
-          <div className="space-y-3">
-            {reservations.map((r) => (
-              <ReservationCard
-                key={r.id}
-                reservation={r}
-                disabled={isMutating}
-                onAction={(action) => changeStatus({ id: r.id, action })}
-              />
-            ))}
-          </div>
+          <>
+            <div className="space-y-3">
+              {reservations.map((r) => (
+                <ReservationCard
+                  key={r.id}
+                  reservation={r}
+                  disabled={isMutating}
+                  onAction={(action) => changeStatus({ id: r.id, action })}
+                />
+              ))}
+            </div>
+
+            {!isLast && (
+              <button
+                onClick={() => fetchNextPage()}
+                className="mt-5 w-full text-sm text-gray-500 border border-gray-200 rounded-xl py-3 hover:border-blue-300 hover:text-blue-500 transition-colors"
+              >
+                더 보기
+              </button>
+            )}
+          </>
         )}
       </main>
     </>
