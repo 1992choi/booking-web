@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import Row from '@/components/ui/Row';
 import Skeleton from '@/components/ui/Skeleton';
+import { ErrorText } from '@/components/ui/StatusMessage';
 import { getMe, updateMe, deleteMe, logout } from '@/lib/api/auth';
 import { getErrorMessage } from '@/lib/api/axios';
 import { formatDate } from '@/lib/utils/format';
@@ -98,7 +99,7 @@ export default function MyPage() {
         )}
 
         {!isLoading && isError && (
-          <p className="text-sm text-red-400 text-center py-20">정보를 불러오지 못했습니다.</p>
+          <ErrorText className="py-20">정보를 불러오지 못했습니다.</ErrorText>
         )}
 
         {!isLoading && !isError && user && (

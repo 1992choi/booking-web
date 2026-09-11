@@ -7,6 +7,7 @@ import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import Row from '@/components/ui/Row';
 import Skeleton from '@/components/ui/Skeleton';
+import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import axios from 'axios';
 import { cancelReservation, getReservation } from '@/lib/api/reservations';
 import { getErrorMessage } from '@/lib/api/axios';
@@ -125,7 +126,7 @@ export default function ReservationDetailPage() {
         )}
 
         {!loading && error && (
-          <p className="text-sm text-red-400 text-center py-20">예약 정보를 불러오지 못했습니다.</p>
+          <ErrorText className="py-20">예약 정보를 불러오지 못했습니다.</ErrorText>
         )}
 
         {!loading && !error && reservation && (
@@ -168,7 +169,7 @@ export default function ReservationDetailPage() {
               <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-4">
                 <h3 className="text-sm font-semibold text-gray-700 mb-3">이용 후기</h3>
                 {reviewDone ? (
-                  <p className="text-sm text-gray-400 text-center py-4">리뷰가 등록되었습니다. 감사합니다!</p>
+                  <EmptyText className="py-4">리뷰가 등록되었습니다. 감사합니다!</EmptyText>
                 ) : (
                   <form onSubmit={handleSubmitReview}>
                     <label htmlFor="review-content" className="sr-only">
@@ -197,7 +198,7 @@ export default function ReservationDetailPage() {
 
             {/* 액션 버튼 */}
             {actionError && (
-              <p className="text-sm text-red-400 text-center mb-3">{actionError}</p>
+              <ErrorText className="mb-3">{actionError}</ErrorText>
             )}
             {canCancel && (
               <button

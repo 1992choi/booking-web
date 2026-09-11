@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { SkeletonList } from '@/components/ui/Skeleton';
+import { ErrorText } from '@/components/ui/StatusMessage';
 import { getMerchants, getMyMerchants } from '@/lib/api/merchants';
 import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
 import { useAuthStore } from '@/lib/store/auth';
@@ -89,7 +90,7 @@ export default function MerchantDashboardPage() {
         {isLoading && <SkeletonList count={3} itemClassName="h-20 rounded-2xl" />}
 
         {!isLoading && isError && (
-          <p className="text-sm text-red-400 text-center py-16">업체 목록을 불러오지 못했습니다.</p>
+          <ErrorText className="py-16">업체 목록을 불러오지 못했습니다.</ErrorText>
         )}
 
         {!isLoading && !isError && merchants.length === 0 && (

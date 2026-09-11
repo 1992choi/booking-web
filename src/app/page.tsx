@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import { SkeletonList } from '@/components/ui/Skeleton';
+import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import { getMerchants } from '@/lib/api/merchants';
 import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
 import type { MerchantType } from '@/lib/types/merchant';
@@ -86,11 +87,11 @@ export default function HomePage() {
         )}
 
         {!isLoading && isError && (
-          <p className="text-sm text-red-400 text-center py-16">업체 목록을 불러오지 못했습니다.</p>
+          <ErrorText className="py-16">업체 목록을 불러오지 못했습니다.</ErrorText>
         )}
 
         {!isLoading && !isError && filtered.length === 0 && (
-          <p className="text-sm text-gray-400 text-center py-16">해당 유형의 업체가 없습니다.</p>
+          <EmptyText className="py-16">해당 유형의 업체가 없습니다.</EmptyText>
         )}
 
         {!isLoading && !isError && filtered.length > 0 && (

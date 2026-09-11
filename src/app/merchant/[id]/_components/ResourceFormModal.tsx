@@ -7,6 +7,7 @@ import type { z } from 'zod';
 import { createResource, updateResource } from '@/lib/api/resources';
 import { getErrorMessage } from '@/lib/api/axios';
 import Modal, { ModalHeader } from '@/components/ui/Modal';
+import { ErrorText } from '@/components/ui/StatusMessage';
 import { resourceSchema } from '@/lib/validation/merchant';
 import type { Resource } from '@/lib/types/merchant';
 
@@ -139,7 +140,7 @@ export function ResourceFormModal({
           </div>
         </div>
 
-        {errorMsg && <p className="text-sm text-red-400 text-center">{errorMsg}</p>}
+        {errorMsg && <ErrorText>{errorMsg}</ErrorText>}
 
         <button
           type="submit"

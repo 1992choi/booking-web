@@ -6,6 +6,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import { SkeletonList } from '@/components/ui/Skeleton';
+import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import { getMyReservations } from '@/lib/api/reservations';
 import { RESERVATION_STATUS_TABS } from '@/lib/constants/reservation';
 import { ReservationStatusBadge, ReservationSummaryRows } from '@/components/ReservationSummary';
@@ -81,11 +82,11 @@ export default function MyReservationsPage() {
         {loading && <SkeletonList count={3} itemClassName="h-40 rounded-2xl" />}
 
         {!loading && error && (
-          <p className="text-sm text-red-400 text-center py-16">예약 목록을 불러오지 못했습니다.</p>
+          <ErrorText className="py-16">예약 목록을 불러오지 못했습니다.</ErrorText>
         )}
 
         {!loading && !error && reservations.length === 0 && (
-          <p className="text-sm text-gray-400 text-center py-16">예약 내역이 없습니다.</p>
+          <EmptyText className="py-16">예약 내역이 없습니다.</EmptyText>
         )}
 
         {!loading && !error && reservations.length > 0 && (

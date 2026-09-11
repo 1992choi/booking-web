@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import Skeleton from '@/components/ui/Skeleton';
+import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import { getMerchant } from '@/lib/api/merchants';
 import { deleteResource } from '@/lib/api/resources';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
@@ -80,7 +81,7 @@ export default function MerchantDetailPage() {
         )}
 
         {!loading && error && (
-          <p className="text-sm text-red-400 text-center py-20">업체 정보를 불러오지 못했습니다.</p>
+          <ErrorText className="py-20">업체 정보를 불러오지 못했습니다.</ErrorText>
         )}
 
         {!loading && !error && merchant && (
@@ -120,7 +121,7 @@ export default function MerchantDetailPage() {
               </div>
 
               {merchant.resources.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-6">등록된 예약 대상이 없습니다.</p>
+                <EmptyText className="py-6">등록된 예약 대상이 없습니다.</EmptyText>
               ) : (
                 <div>
                   {merchant.resources.map((r) => (

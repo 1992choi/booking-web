@@ -6,6 +6,7 @@ import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-q
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import { SkeletonList } from '@/components/ui/Skeleton';
+import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import { getMerchantReservations } from '@/lib/api/merchantReservations';
 import { confirmReservation, cancelReservation } from '@/lib/api/adminReservations';
 import { getErrorMessage } from '@/lib/api/axios';
@@ -126,17 +127,17 @@ export default function MerchantReservationsPage() {
         </div>
 
         {actionError && (
-          <p className="text-sm text-red-400 text-center mb-4">{actionError}</p>
+          <ErrorText className="mb-4">{actionError}</ErrorText>
         )}
 
         {isLoading && <SkeletonList count={3} itemClassName="h-44 rounded-2xl" />}
 
         {!isLoading && isError && (
-          <p className="text-sm text-red-400 text-center py-16">예약 목록을 불러오지 못했습니다.</p>
+          <ErrorText className="py-16">예약 목록을 불러오지 못했습니다.</ErrorText>
         )}
 
         {!isLoading && !isError && reservations.length === 0 && (
-          <p className="text-sm text-gray-400 text-center py-16">예약 내역이 없습니다.</p>
+          <EmptyText className="py-16">예약 내역이 없습니다.</EmptyText>
         )}
 
         {!isLoading && !isError && reservations.length > 0 && (

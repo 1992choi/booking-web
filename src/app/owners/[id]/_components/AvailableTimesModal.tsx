@@ -8,6 +8,7 @@ import { createReservation } from '@/lib/api/reservations';
 import { getErrorMessage } from '@/lib/api/axios';
 import Modal from '@/components/ui/Modal';
 import { SkeletonList } from '@/components/ui/Skeleton';
+import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import { formatPrice, formatTime, today } from '@/lib/utils/format';
 import { useAuthStore } from '@/lib/store/auth';
 import { useToastStore } from '@/lib/store/toast';
@@ -110,11 +111,11 @@ export function AvailableTimesModal({
         {loading && <SkeletonList count={3} itemClassName="h-12 rounded-xl" className="space-y-2" />}
 
         {!loading && isError && (
-          <p className="text-sm text-red-400 text-center py-6">조회에 실패했습니다.</p>
+          <ErrorText className="py-6">조회에 실패했습니다.</ErrorText>
         )}
 
         {!loading && !isError && openTimes.length === 0 && (
-          <p className="text-sm text-gray-400 text-center py-6">선택한 날짜에 예약 가능한 시간이 없습니다.</p>
+          <EmptyText className="py-6">선택한 날짜에 예약 가능한 시간이 없습니다.</EmptyText>
         )}
 
         {!loading && !isError && openTimes.length > 0 && (

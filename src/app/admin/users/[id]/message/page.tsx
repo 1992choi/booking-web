@@ -6,6 +6,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import Skeleton from '@/components/ui/Skeleton';
+import { ErrorText } from '@/components/ui/StatusMessage';
 import { getUsers } from '@/lib/api/auth';
 import { sendNotificationToUser } from '@/lib/api/notifications';
 import { getErrorMessage } from '@/lib/api/axios';
@@ -58,7 +59,7 @@ export default function SendMessagePage() {
             <p className="text-xs text-gray-500 mt-0.5">{user.email}</p>
           </div>
         ) : (
-          <p className="text-sm text-red-400 text-center py-8">회원 정보를 찾을 수 없습니다.</p>
+          <ErrorText className="py-8">회원 정보를 찾을 수 없습니다.</ErrorText>
         )}
 
         {user && (

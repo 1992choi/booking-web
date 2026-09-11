@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { SkeletonList } from '@/components/ui/Skeleton';
+import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import { getUsers } from '@/lib/api/auth';
 import { formatDate } from '@/lib/utils/format';
 import { ROLE_LABELS, ROLE_COLORS } from '@/lib/constants/user';
@@ -95,11 +96,11 @@ export default function AdminUsersPage() {
         {isLoading && <SkeletonList count={5} itemClassName="h-20 rounded-2xl" />}
 
         {!isLoading && isError && (
-          <p className="text-sm text-red-400 text-center py-16">회원 목록을 불러오지 못했습니다.</p>
+          <ErrorText className="py-16">회원 목록을 불러오지 못했습니다.</ErrorText>
         )}
 
         {!isLoading && !isError && data?.length === 0 && (
-          <p className="text-sm text-gray-400 text-center py-20">해당하는 회원이 없습니다.</p>
+          <EmptyText className="py-20">해당하는 회원이 없습니다.</EmptyText>
         )}
 
         {!isLoading && !isError && data && data.length > 0 && (

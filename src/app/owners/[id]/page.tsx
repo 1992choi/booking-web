@@ -6,6 +6,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import Skeleton, { SkeletonList } from '@/components/ui/Skeleton';
+import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import { getMerchant } from '@/lib/api/merchants';
 import { getReviewsByMerchant } from '@/lib/api/reviews';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
@@ -51,7 +52,7 @@ export default function MerchantPublicDetailPage() {
         )}
 
         {!loading && error && (
-          <p className="text-sm text-red-400 text-center py-20">업체 정보를 불러오지 못했습니다.</p>
+          <ErrorText className="py-20">업체 정보를 불러오지 못했습니다.</ErrorText>
         )}
 
         {!loading && !error && merchant && (
@@ -71,7 +72,7 @@ export default function MerchantPublicDetailPage() {
             <div className="border-t border-gray-100 mb-6" />
 
             {merchant.resources.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-16">등록된 항목이 없습니다.</p>
+              <EmptyText className="py-16">등록된 항목이 없습니다.</EmptyText>
             ) : (
               <div className="space-y-4">
                 {merchant.resources.map((resource) => (
@@ -96,7 +97,7 @@ export default function MerchantPublicDetailPage() {
               )}
 
               {!reviewsLoading && reviews.length === 0 && (
-                <p className="text-sm text-gray-400 text-center py-8">아직 작성된 후기가 없습니다.</p>
+                <EmptyText className="py-8">아직 작성된 후기가 없습니다.</EmptyText>
               )}
 
               {!reviewsLoading && reviews.length > 0 && (

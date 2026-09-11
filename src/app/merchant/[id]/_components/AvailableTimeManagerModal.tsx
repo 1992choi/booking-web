@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getAvailableTimes, deleteAvailableTime } from '@/lib/api/resources';
 import Modal, { ModalHeader } from '@/components/ui/Modal';
 import { SkeletonList } from '@/components/ui/Skeleton';
+import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import type { Resource, AvailableTime } from '@/lib/types/merchant';
 import { STATUS_COLORS, STATUS_LABELS, formatTime, todayString } from './helpers';
 import { AvailableTimeFormModal } from './AvailableTimeFormModal';
@@ -69,9 +70,9 @@ export function AvailableTimeManagerModal({
         {timesLoading ? (
           <SkeletonList count={2} itemClassName="h-10 rounded-xl" className="space-y-2 mb-4" />
         ) : timesError ? (
-          <p className="text-sm text-red-400 text-center py-4 mb-4">이용 시간을 불러오지 못했습니다.</p>
+          <ErrorText className="py-4 mb-4">이용 시간을 불러오지 못했습니다.</ErrorText>
         ) : times.length === 0 ? (
-          <p className="text-sm text-gray-400 text-center py-6 mb-4">해당 날짜에 등록된 이용 시간이 없습니다.</p>
+          <EmptyText className="py-6 mb-4">해당 날짜에 등록된 이용 시간이 없습니다.</EmptyText>
         ) : (
           <div className="divide-y divide-gray-50 mb-4 max-h-60 overflow-y-auto">
             {times.map((t) => (

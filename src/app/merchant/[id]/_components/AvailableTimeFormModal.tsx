@@ -7,6 +7,7 @@ import type { z } from 'zod';
 import { createAvailableTime, updateAvailableTime } from '@/lib/api/resources';
 import { getErrorMessage } from '@/lib/api/axios';
 import Modal, { ModalHeader } from '@/components/ui/Modal';
+import { ErrorText } from '@/components/ui/StatusMessage';
 import { availableTimeSchema } from '@/lib/validation/merchant';
 import type { AvailableTime } from '@/lib/types/merchant';
 import { toBackendTime, toDatetimeLocal } from './helpers';
@@ -101,7 +102,7 @@ export function AvailableTimeFormModal({
           )}
         </div>
 
-        {errorMsg && <p className="text-sm text-red-400 text-center">{errorMsg}</p>}
+        {errorMsg && <ErrorText>{errorMsg}</ErrorText>}
 
         <button
           type="submit"

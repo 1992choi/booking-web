@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import { SkeletonList } from '@/components/ui/Skeleton';
+import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import { getMyNotifications } from '@/lib/api/notifications';
 import { formatDateTime } from '@/lib/utils/format';
 import type { Notification } from '@/lib/types/notification';
@@ -55,11 +56,11 @@ export default function NotificationsPage() {
         {isLoading && <SkeletonList count={3} itemClassName="h-20 rounded-2xl" />}
 
         {!isLoading && isError && (
-          <p className="text-sm text-red-400 text-center py-16">알림을 불러오지 못했습니다.</p>
+          <ErrorText className="py-16">알림을 불러오지 못했습니다.</ErrorText>
         )}
 
         {!isLoading && !isError && notifications.length === 0 && (
-          <p className="text-sm text-gray-400 text-center py-16">알림이 없습니다.</p>
+          <EmptyText className="py-16">알림이 없습니다.</EmptyText>
         )}
 
         {!isLoading && !isError && notifications.length > 0 && (

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
+import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import { getAdminCalendar, confirmReservation, cancelReservation } from '@/lib/api/adminReservations';
 import { getErrorMessage } from '@/lib/api/axios';
 import { toDateKey, buildCalendarGrid, shiftMonth } from '@/lib/utils/calendar';
@@ -138,7 +139,7 @@ export default function AdminReservationsPage() {
         </div>
 
         {isError && (
-          <p className="text-sm text-red-400 text-center py-16">캘린더를 불러오지 못했습니다.</p>
+          <ErrorText className="py-16">캘린더를 불러오지 못했습니다.</ErrorText>
         )}
 
         {!isError && (
@@ -232,11 +233,11 @@ export default function AdminReservationsPage() {
                 </h2>
 
                 {actionError && (
-                  <p className="text-sm text-red-400 text-center mb-3">{actionError}</p>
+                  <ErrorText className="mb-3">{actionError}</ErrorText>
                 )}
 
                 {selectedEntries.length === 0 ? (
-                  <p className="text-sm text-gray-400 text-center py-8">예약 내역이 없습니다.</p>
+                  <EmptyText className="py-8">예약 내역이 없습니다.</EmptyText>
                 ) : (
                   <div className="space-y-2">
                     {selectedEntries.map((entry) => (

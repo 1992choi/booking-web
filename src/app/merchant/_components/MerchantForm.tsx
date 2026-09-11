@@ -2,6 +2,7 @@
 
 import type { UseFormReturn } from 'react-hook-form';
 import type { z } from 'zod';
+import { ErrorText } from '@/components/ui/StatusMessage';
 import { MERCHANT_TYPE_OPTIONS } from '@/lib/constants/merchant';
 import { merchantSchema } from '@/lib/validation/merchant';
 
@@ -96,7 +97,7 @@ export function MerchantForm({
         </div>
       </div>
 
-      {errorMsg && <p className="text-sm text-red-400 text-center">{errorMsg}</p>}
+      {errorMsg && <ErrorText>{errorMsg}</ErrorText>}
 
       <button
         type="submit"

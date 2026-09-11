@@ -87,6 +87,7 @@ booking-web/
 │   │       ├── Modal.tsx              # 오버레이+접근성을 갖춘 공용 모달 셸
 │   │       ├── Row.tsx
 │   │       ├── Skeleton.tsx           # 로딩 스켈레톤 블록 (단일/반복 목록)
+│   │       ├── StatusMessage.tsx      # 에러(ErrorText)/빈 상태(EmptyText) 공용 안내 텍스트
 │   │       └── ToastContainer.tsx
 │   │
 │   ├── lib/
