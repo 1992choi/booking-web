@@ -86,6 +86,7 @@ booking-web/
 │   │       ├── BackButton.tsx
 │   │       ├── Modal.tsx              # 오버레이+접근성을 갖춘 공용 모달 셸
 │   │       ├── Row.tsx
+│   │       ├── MonthNav.tsx           # 연/월 이동 네비게이션 UI
 │   │       ├── Skeleton.tsx           # 로딩 스켈레톤 블록 (단일/반복 목록)
 │   │       ├── StatusMessage.tsx      # 에러(ErrorText)/빈 상태(EmptyText) 공용 안내 텍스트
 │   │       └── ToastContainer.tsx
@@ -113,12 +114,14 @@ booking-web/
 │   │   │   └── user.ts
 │   │   │
 │   │   ├── validation/                # React Hook Form용 zod 스키마
+│   │   │   ├── common.ts              # 공용 필드 스키마 (전화번호 등)
 │   │   │   ├── auth.ts
 │   │   │   └── merchant.ts
 │   │   │
 │   │   ├── hooks/
 │   │   │   ├── useDocumentTitle.ts    # 라우트별 <title> 설정
-│   │   │   └── useEscapeKey.ts        # ESC 키로 모달 닫기
+│   │   │   ├── useEscapeKey.ts        # ESC 키로 모달 닫기
+│   │   │   └── useMonthNavigation.ts  # 연/월 상태 + 이전/다음 달 이동
 │   │   │
 │   │   ├── utils/
 │   │   │   ├── format.ts             # 날짜/가격 포맷 헬퍼

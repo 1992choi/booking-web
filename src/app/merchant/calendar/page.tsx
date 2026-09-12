@@ -3,14 +3,16 @@
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
+import MonthNav from '@/components/ui/MonthNav';
 import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import { getAdminCalendar, confirmReservation, cancelReservation } from '@/lib/api/adminReservations';
 import { getErrorMessage } from '@/lib/api/axios';
-import { toDateKey, buildCalendarGrid, shiftMonth } from '@/lib/utils/calendar';
+import { toDateKey, buildCalendarGrid } from '@/lib/utils/calendar';
 import type { AdminCalendarEntry, AdminCalendarData } from '@/lib/types/admin';
 import type { ReservationStatus } from '@/lib/types/reservation';
 import { RESERVATION_STATUS_LABELS, RESERVATION_STATUS_STYLES } from '@/lib/constants/reservation';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
+import { useMonthNavigation } from '@/lib/hooks/useMonthNavigation';
 
 const STATUS_DOT: Record<ReservationStatus, string> = {
   PENDING:   'bg-yellow-400',
@@ -71,9 +73,8 @@ function EntryCard({
 export default function AdminReservationsPage() {
   useDocumentTitle('예약 현황');
   const today = new Date();
-  const [year, setYear] = useState(today.getFullYear());
-  const [month, setMonth] = useState(today.getMonth() + 1);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const { year, month, prevMonth, nextMonth } = useMonthNavigation(() => setSelectedDate(null));
   const [actionError, setActionError] = useState('');
   const queryClient = useQueryClient();
 
@@ -92,20 +93,6 @@ export default function AdminReservationsPage() {
     onError: (err) => setActionError(getErrorMessage(err)),
   });
 
-  function prevMonth() {
-    const shifted = shiftMonth(year, month, -1);
-    setYear(shifted.year);
-    setMonth(shifted.month);
-    setSelectedDate(null);
-  }
-
-  function nextMonth() {
-    const shifted = shiftMonth(year, month, 1);
-    setYear(shifted.year);
-    setMonth(shifted.month);
-    setSelectedDate(null);
-  }
-
   const weeks = buildCalendarGrid(year, month);
   const todayKey = toDateKey(today.getFullYear(), today.getMonth() + 1, today.getDate());
   const selectedEntries = selectedDate ? (calendarData[selectedDate] ?? []) : [];
@@ -117,26 +104,7 @@ export default function AdminReservationsPage() {
       <main className="max-w-screen-md mx-auto px-4 py-6">
         <h1 className="text-xl font-bold text-gray-900 mb-6">예약 현황</h1>
 
-        {/* 월 네비게이션 */}
-        <div className="flex items-center justify-between mb-4">
-          <button
-            onClick={prevMonth}
-            aria-label="이전 달"
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
-          >
-            ‹
-          </button>
-          <span className="text-base font-semibold text-gray-800">
-            {year}년 {month}월
-          </span>
-          <button
-            onClick={nextMonth}
-            aria-label="다음 달"
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
-          >
-            ›
-          </button>
-        </div>
+        <MonthNav year={year} month={month} onPrev={prevMonth} onNext={nextMonth} className="mb-4" />
 
         {isError && (
           <ErrorText className="py-16">캘린더를 불러오지 못했습니다.</ErrorText>

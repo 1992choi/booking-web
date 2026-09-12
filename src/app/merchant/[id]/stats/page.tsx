@@ -1,17 +1,17 @@
 'use client';
 
-import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
+import MonthNav from '@/components/ui/MonthNav';
 import { SkeletonList } from '@/components/ui/Skeleton';
 import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import { getMerchantDailyStats } from '@/lib/api/merchants';
 import { formatPrice } from '@/lib/utils/format';
-import { shiftMonth } from '@/lib/utils/calendar';
 import type { DailyMerchantStats } from '@/lib/types/merchant';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
+import { useMonthNavigation } from '@/lib/hooks/useMonthNavigation';
 
 function SummaryCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
@@ -57,26 +57,12 @@ export default function MerchantStatsPage() {
   useDocumentTitle('일별 매출');
   const { id } = useParams<{ id: string }>();
   const merchantId = Number(id);
-  const now = new Date();
-  const [year, setYear] = useState(now.getFullYear());
-  const [month, setMonth] = useState(now.getMonth() + 1);
+  const { year, month, prevMonth, nextMonth } = useMonthNavigation();
 
   const { data: stats = [], isLoading, isError } = useQuery({
     queryKey: ['merchant-daily-stats', merchantId, year, month],
     queryFn: () => getMerchantDailyStats(merchantId, year, month),
   });
-
-  function prevMonth() {
-    const shifted = shiftMonth(year, month, -1);
-    setYear(shifted.year);
-    setMonth(shifted.month);
-  }
-
-  function nextMonth() {
-    const shifted = shiftMonth(year, month, 1);
-    setYear(shifted.year);
-    setMonth(shifted.month);
-  }
 
   const totalRevenue = stats.reduce((sum, s) => sum + s.totalRevenue, 0);
   const totalConfirmed = stats.reduce((sum, s) => sum + s.confirmedCount, 0);
@@ -91,21 +77,7 @@ export default function MerchantStatsPage() {
 
         <h1 className="text-xl font-bold text-gray-900 mb-5">일별 매출</h1>
 
-        <div className="flex items-center justify-between mb-5">
-          <button
-            onClick={prevMonth}
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
-          >
-            ‹
-          </button>
-          <span className="text-base font-semibold text-gray-800">{year}년 {month}월</span>
-          <button
-            onClick={nextMonth}
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 text-gray-500 transition-colors"
-          >
-            ›
-          </button>
-        </div>
+        <MonthNav year={year} month={month} onPrev={prevMonth} onNext={nextMonth} className="mb-5" />
 
         <div className="grid grid-cols-3 gap-3 mb-6">
           <SummaryCard label="월 매출" value={formatPrice(totalRevenue)} accent />
