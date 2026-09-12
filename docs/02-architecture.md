@@ -57,7 +57,11 @@ booking-web/
 │   │   │   │   └── MerchantForm.tsx  # register·edit 페이지가 공유하는 업체 정보 폼
 │   │   │   ├── register/page.tsx     # /merchant/register (업체 등록)
 │   │   │   ├── dashboard/page.tsx    # /merchant/dashboard (내 업체 목록)
-│   │   │   ├── calendar/page.tsx     # /merchant/calendar (예약 현황 캘린더)
+│   │   │   ├── calendar/
+│   │   │   │   ├── page.tsx          # /merchant/calendar (예약 현황 캘린더)
+│   │   │   │   └── _components/
+│   │   │   │       ├── CalendarGrid.tsx
+│   │   │   │       └── EntryCard.tsx
 │   │   │   └── [id]/
 │   │   │       ├── page.tsx          # /merchant/{id} (업체 상세 + 리소스·이용시간 관리)
 │   │   │       ├── _components/      # page.tsx에서 분리한 모달/행 컴포넌트
