@@ -2,23 +2,23 @@
 
 프론트엔드 구조 개선 및 기능 추가 후보 (백엔드 작업과 무관, 우선순위순).
 
-## 1. Tailwind CSS v4 마이그레이션 검토
-
-현재 `tailwindcss@3.4.19`를 쓰고 있는데 v4가 나온 지 한참 됐고(설정을 `tailwind.config.ts`의 JS 객체 대신 CSS `@theme`로 옮기는 구조적 변화, Oxide 엔진으로 빌드 속도 대폭 개선), Next.js 16의 Turbopack 기본 전환과 궁합도 좋다. `flex-shrink-0` 같은 레거시 유틸리티 별칭이 13개 파일에서 쓰이고 있어(v4에서 `shrink-0`로 대체) 공식 codemod가 기계적 변경의 대부분을 처리해줄 것으로 보인다.
-
-**방향**: 공식 업그레이드 codemod 실행 → `tailwind.config.ts` → CSS `@theme` 마이그레이션 → 전체 페이지 스타일 회귀 확인(스크린샷 비교 권장). Next.js 16 업그레이드와 마찬가지로 별도 브랜치에서 진행.
-
-## 2. Zod v4 + @hookform/resolvers v5 업그레이드
+## 1. Zod v4 + @hookform/resolvers v5 업그레이드
 
 `zod@3.25.76` / `@hookform/resolvers@3.10.0`을 쓰고 있는데 Zod v4가 나온 지 오래됐다. `resourceSchema`(`src/lib/validation/merchant.ts`)가 쓰는 `z.coerce.number({ invalid_type_error: '...' })` 같은 에러 커스터마이징 옵션이 v4에서 API가 바뀌었고, resolver도 zod v4 내부 구조에 맞는 v5로 함께 올려야 한다.
 
 **방향**: 두 패키지를 함께 업그레이드하고, `src/lib/validation/*.ts`의 에러 메시지 옵션(`invalid_type_error`, `.email()` 등)을 v4 API로 교체 후 관련 폼 테스트(회원가입/로그인/업체 등록/리소스 등록) 전체 재검증. 전화번호 스키마가 `common.ts`로 공용화돼 있어 API 교체 지점이 한 곳으로 줄어든 상태다.
 
-## 3. React Compiler 도입 검토 (낮은 우선순위)
+## 2. React Compiler 도입 검토 (낮은 우선순위)
 
 Next.js 16에서 React Compiler 지원이 정식(stable)으로 승격되어 `next.config.ts`에 `reactCompiler: true` 한 줄과 `babel-plugin-react-compiler` 설치만으로 자동 메모이제이션을 켤 수 있다. 다만 이 코드베이스는 현재 `useMemo`/`useCallback` 수동 사용이 전무해서 당장 얻을 이득은 크지 않다. 향후 리스트가 커지거나 렌더 비용이 문제되면 재검토.
 
 **방향**: 빌드 시간 증가분(Babel 기반) 대비 실익이 있는지 작은 스파이크로 먼저 확인 후 도입 여부 결정.
+
+## 3. 실시간 알림(WebSocket/SSE) 연동 (백엔드 선행 작업 대기 — 아직 착수 불가)
+
+백엔드 backlog에 "WebSocket/SSE 실시간 알림" 항목이 예정돼 있음(아직 커밋 전, 미착수). 백엔드 쪽 명세상으로는 서버 push 자체를 검증하기 위한 최소 데모 HTML 페이지(EventSource/WebSocket으로 메시지를 화면에 찍어보는 수준)만 요구하지만, 실제로는 이 레포의 `/my/notifications` 화면에도 반영돼야 제품으로서 의미가 있다. 현재 `src/app/my/notifications/page.tsx`는 `useQuery`로 마운트 시 `GET /notifications/me`를 한 번만 조회하는 구조라(폴링/구독 없음) 새 알림이 와도 새로고침 전까지 화면에 반영되지 않는다.
+
+**방향**: 백엔드가 SSE(`EventSource`) 또는 WebSocket 채널을 열면, 알림 페이지 진입 시 구독을 시작해 수신 메시지를 `queryClient.setQueryData(['my-notifications'], ...)`로 캐시에 실시간 반영하고, `Header.tsx`에 안읽음 뱃지 표시를 함께 검토(알림 읽음 처리 항목과 묶어서 진행하면 효율적). SSE는 커스텀 헤더를 지원하지 않으므로 JWT를 쿼리 파라미터로 전달하거나 별도 단기 토큰 발급 방식이 필요 — 백엔드 인증 방식 확정 후 맞춰서 구현. **백엔드 엔드포인트가 실제로 나오기 전까지는 착수 불가** — 백엔드 진행 상황 확인 후 시작.
 
 ---
 
@@ -31,3 +31,6 @@ Next.js 16에서 React Compiler 지원이 정식(stable)으로 승격되어 `nex
 - 업체 등록에 승인/심사 절차가 없어 MERCHANT 권한만 있으면 즉시 노출됨
 - 알림에 읽음 처리·채널별 수신 설정이 없음
 - 리뷰에 사진 첨부 기능이 없음
+- 리뷰에 별점(rating) 필드가 없어 텍스트만 저장됨 (`Review` 엔티티에 컬럼 추가 + 업체 평균 평점 집계 필요)
+- 예약 시작 전 리마인더 알림이 없음 (현재 알림은 결제완료 등 이벤트 기반뿐, 시간 기반 스케줄러 트리거 부재)
+- 업체용 정산/매출 집계 API가 없음 (`PaymentController`는 예약 단건 조회/환불만 제공, 기간별 합계 집계 엔드포인트 부재)

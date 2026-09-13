@@ -31,7 +31,7 @@ export function ResourceRow({
       {isMerchant && (
         <button
           onClick={() => onManageTimes(resource)}
-          className="text-xs text-gray-400 hover:text-blue-500 transition-colors flex-shrink-0"
+          className="text-xs text-gray-400 hover:text-blue-500 transition-colors shrink-0"
         >
           이용시간
         </button>

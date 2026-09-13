@@ -72,7 +72,7 @@ export default function MerchantStatsPage() {
     <>
       <Header />
 
-      <main className="max-w-screen-sm mx-auto px-4 py-6">
+      <main className="max-w-(--breakpoint-sm) mx-auto px-4 py-6">
         <BackButton />
 
         <h1 className="text-xl font-bold text-gray-900 mb-5">일별 매출</h1>

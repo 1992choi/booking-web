@@ -88,7 +88,7 @@ export default function MyPage() {
     <>
       <Header />
 
-      <main className="max-w-screen-sm mx-auto px-4 py-6">
+      <main className="max-w-(--breakpoint-sm) mx-auto px-4 py-6">
         <h1 className="text-xl font-bold text-gray-900 mb-6">내 정보</h1>
 
         {isLoading && (
@@ -108,7 +108,7 @@ export default function MyPage() {
             <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-4">
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+                  <div className="w-14 h-14 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
                     <span className="text-xl font-bold text-blue-500">{user.name[0]}</span>
                   </div>
                   <div>
@@ -140,7 +140,7 @@ export default function MyPage() {
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
                       required
-                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div>
@@ -153,7 +153,7 @@ export default function MyPage() {
                       value={editPhone}
                       onChange={(e) => setEditPhone(e.target.value)}
                       required
-                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div className="pt-1 border-t border-gray-50">

@@ -46,7 +46,7 @@ export default function SendMessagePage() {
     <>
       <Header />
 
-      <main className="max-w-screen-sm mx-auto px-4 py-6">
+      <main className="max-w-(--breakpoint-sm) mx-auto px-4 py-6">
         <BackButton />
         <h1 className="text-xl font-bold text-gray-900 mb-6">메시지 보내기</h1>
 
@@ -74,7 +74,7 @@ export default function SendMessagePage() {
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="보낼 메시지를 입력하세요."
                 rows={6}
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500 resize-none"
               />
               <p className="text-xs text-gray-400 mt-1 text-right">{message.length}자</p>
             </div>

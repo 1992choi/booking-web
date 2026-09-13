@@ -37,7 +37,7 @@ function UserCard({ user }: { user: UserResponse }) {
           <p className="text-xs text-gray-500 truncate">{user.email}</p>
           <p className="text-xs text-gray-400 mt-0.5">{user.phone}</p>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={() => router.push(`/admin/users/${user.id}/message`)}
             className="p-1.5 rounded-full text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-colors"
@@ -68,7 +68,7 @@ export default function AdminUsersPage() {
     <>
       <Header />
 
-      <main className="max-w-screen-sm mx-auto px-4 py-6">
+      <main className="max-w-(--breakpoint-sm) mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-5">
           <h1 className="text-xl font-bold text-gray-900">회원 관리</h1>
           {data && (
@@ -82,7 +82,7 @@ export default function AdminUsersPage() {
             <button
               key={value}
               onClick={() => setTab(value)}
-              className={`flex-shrink-0 text-xs font-medium px-3.5 py-1.5 rounded-full transition-colors ${
+              className={`shrink-0 text-xs font-medium px-3.5 py-1.5 rounded-full transition-colors ${
                 tab === value
                   ? 'bg-blue-500 text-white'
                   : 'bg-gray-100 text-gray-500 hover:bg-gray-200'

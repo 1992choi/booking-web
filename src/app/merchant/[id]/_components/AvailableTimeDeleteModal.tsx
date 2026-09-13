@@ -21,7 +21,7 @@ export function AvailableTimeDeleteModal({
       labelId="available-time-delete-title"
       position="center"
       maxWidthClassName="max-w-sm mx-4"
-      zIndexClassName="z-[70]"
+      zIndexClassName="z-70"
     >
       <h2 id="available-time-delete-title" className="text-base font-bold text-gray-900 mb-2">
         이용 시간 삭제

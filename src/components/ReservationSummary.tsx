@@ -4,7 +4,7 @@ import type { ReservationStatus } from '@/lib/types/reservation';
 
 export function ReservationStatusBadge({ status }: { status: ReservationStatus }) {
   return (
-    <span className={`flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${RESERVATION_STATUS_STYLES[status]}`}>
+    <span className={`shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${RESERVATION_STATUS_STYLES[status]}`}>
       {RESERVATION_STATUS_LABELS[status]}
     </span>
   );

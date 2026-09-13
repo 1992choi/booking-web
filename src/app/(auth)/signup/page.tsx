@@ -40,7 +40,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="w-full max-w-md bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+    <div className="w-full max-w-md bg-white rounded-2xl shadow-xs border border-gray-100 p-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">회원가입</h1>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
@@ -56,7 +56,7 @@ export default function SignupPage() {
             placeholder="홍길동"
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? 'name-error' : undefined}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
           />
           {errors.name && (
             <p id="name-error" className="mt-1 text-xs text-red-500">
@@ -77,7 +77,7 @@ export default function SignupPage() {
             placeholder="example@email.com"
             aria-invalid={!!errors.email}
             aria-describedby={errors.email ? 'email-error' : undefined}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
           />
           {errors.email && (
             <p id="email-error" className="mt-1 text-xs text-red-500">
@@ -98,7 +98,7 @@ export default function SignupPage() {
             placeholder="010-1234-5678"
             aria-invalid={!!errors.phone}
             aria-describedby={errors.phone ? 'phone-error' : undefined}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
           />
           {errors.phone && (
             <p id="phone-error" className="mt-1 text-xs text-red-500">
@@ -119,7 +119,7 @@ export default function SignupPage() {
             placeholder="8자 이상 입력해 주세요."
             aria-invalid={!!errors.password}
             aria-describedby={errors.password ? 'password-error' : undefined}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
           />
           {errors.password && (
             <p id="password-error" className="mt-1 text-xs text-red-500">
@@ -140,7 +140,7 @@ export default function SignupPage() {
             placeholder="비밀번호를 한 번 더 입력해 주세요."
             aria-invalid={!!errors.passwordConfirm}
             aria-describedby={errors.passwordConfirm ? 'passwordConfirm-error' : undefined}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
           />
           {errors.passwordConfirm && (
             <p id="passwordConfirm-error" className="mt-1 text-xs text-red-500">

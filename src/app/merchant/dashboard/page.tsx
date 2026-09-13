@@ -16,18 +16,18 @@ function MerchantCard({ merchant, isMerchant }: { merchant: MerchantSummary; isM
   const router = useRouter();
   return (
     <div
-      className="bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-200 hover:shadow-sm transition-all cursor-pointer"
+      className="bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-200 hover:shadow-xs transition-all cursor-pointer"
       onClick={() => router.push(`/merchant/${merchant.id}`)}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 min-w-0">
           <h2 className="text-base font-semibold text-gray-900 truncate">{merchant.name}</h2>
-          <span className={`flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full ${MERCHANT_TYPE_COLORS[merchant.type]}`}>
+          <span className={`shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full ${MERCHANT_TYPE_COLORS[merchant.type]}`}>
             {MERCHANT_TYPE_LABELS[merchant.type]}
           </span>
         </div>
         {isMerchant && (
-          <div className="flex items-center ml-3 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center ml-3 shrink-0" onClick={(e) => e.stopPropagation()}>
             <Link
               href={`/merchant/${merchant.id}/reservations`}
               className="text-xs font-medium text-blue-500 hover:text-blue-600 transition-colors"
@@ -70,7 +70,7 @@ export default function MerchantDashboardPage() {
     <>
       <Header />
 
-      <main className="max-w-screen-sm mx-auto px-4 py-6">
+      <main className="max-w-(--breakpoint-sm) mx-auto px-4 py-6">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-xl font-bold text-gray-900">업체 관리</h1>
           {!isAdmin && (

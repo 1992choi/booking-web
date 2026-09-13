@@ -45,7 +45,7 @@ export default function AdminReservationsPage() {
     <>
       <Header />
 
-      <main className="max-w-screen-md mx-auto px-4 py-6">
+      <main className="max-w-(--breakpoint-md) mx-auto px-4 py-6">
         <h1 className="text-xl font-bold text-gray-900 mb-6">예약 현황</h1>
 
         <MonthNav year={year} month={month} onPrev={prevMonth} onNext={nextMonth} className="mb-4" />

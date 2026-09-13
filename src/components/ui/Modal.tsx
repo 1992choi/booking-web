@@ -59,7 +59,7 @@ export function ModalHeader({
       <button
         onClick={onClose}
         aria-label="닫기"
-        className="text-gray-400 hover:text-gray-600 text-xl leading-none flex-shrink-0"
+        className="text-gray-400 hover:text-gray-600 text-xl leading-none shrink-0"
       >
         ✕
       </button>

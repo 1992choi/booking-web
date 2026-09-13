@@ -47,7 +47,7 @@ export default function HomePage() {
 
       {/* 카테고리 탭 */}
       <div className="sticky top-14 z-40 bg-white border-b border-gray-100 pt-[70px]">
-        <div className="max-w-screen-lg mx-auto px-4">
+        <div className="max-w-(--breakpoint-lg) mx-auto px-4">
           <div className="flex justify-center">
             {CATEGORY_TABS.map((tab) => {
               const active = selected === tab.value;
@@ -77,7 +77,7 @@ export default function HomePage() {
       </div>
 
       {/* 업체 카드 목록 */}
-      <main className="max-w-screen-lg mx-auto px-4 py-6">
+      <main className="max-w-(--breakpoint-lg) mx-auto px-4 py-6">
         {isLoading && (
           <SkeletonList
             count={8}

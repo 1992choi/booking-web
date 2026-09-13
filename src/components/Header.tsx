@@ -34,7 +34,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
-      <div className="max-w-screen-lg mx-auto px-4 h-14 flex items-center justify-between">
+      <div className="max-w-(--breakpoint-lg) mx-auto px-4 h-14 flex items-center justify-between">
 
         {/* 로고 */}
         <Link href="/" className="text-xl font-bold text-blue-500 tracking-tight">

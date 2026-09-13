@@ -114,7 +114,7 @@ export default function ReservationDetailPage() {
     <>
       <Header />
 
-      <main className="max-w-screen-sm mx-auto px-4 py-6">
+      <main className="max-w-(--breakpoint-sm) mx-auto px-4 py-6">
         <BackButton label="내 예약" />
 
         {loading && (
@@ -135,7 +135,7 @@ export default function ReservationDetailPage() {
             <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-4">
               <div className="flex items-start justify-between gap-3 mb-4">
                 <h2 className="text-lg font-bold text-gray-900">{reservation.resourceName}</h2>
-                <span className={`flex-shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${RESERVATION_STATUS_STYLES[reservation.status]}`}>
+                <span className={`shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${RESERVATION_STATUS_STYLES[reservation.status]}`}>
                   {RESERVATION_STATUS_LABELS[reservation.status]}
                 </span>
               </div>
@@ -181,7 +181,7 @@ export default function ReservationDetailPage() {
                       onChange={(e) => setReviewContent(e.target.value)}
                       placeholder="이용하신 소감을 남겨주세요."
                       rows={3}
-                      className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                      className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500 resize-none"
                     />
                     {reviewError && <p className="text-sm text-red-400 mt-2">{reviewError}</p>}
                     <button

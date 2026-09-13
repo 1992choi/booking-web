@@ -5,7 +5,7 @@ export default function NotFound() {
   return (
     <>
       <Header />
-      <main className="max-w-screen-sm mx-auto px-4 py-20 text-center">
+      <main className="max-w-(--breakpoint-sm) mx-auto px-4 py-20 text-center">
         <p className="text-sm text-gray-400 mb-4">페이지를 찾을 수 없습니다.</p>
         <Link
           href="/"

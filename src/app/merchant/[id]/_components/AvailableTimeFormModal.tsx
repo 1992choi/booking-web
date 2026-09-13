@@ -57,7 +57,7 @@ export function AvailableTimeFormModal({
   };
 
   return (
-    <Modal onClose={onClose} labelId="available-time-form-title" zIndexClassName="z-[60]">
+    <Modal onClose={onClose} labelId="available-time-form-title" zIndexClassName="z-60">
       <ModalHeader
         id="available-time-form-title"
         title={isEdit ? '이용 시간 수정' : '이용 시간 추가'}
@@ -75,7 +75,7 @@ export function AvailableTimeFormModal({
             type="datetime-local"
             aria-invalid={!!errors.startTime}
             aria-describedby={errors.startTime ? 'available-time-start-error' : undefined}
-            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
           />
           {errors.startTime && (
             <p id="available-time-start-error" className="mt-1 text-xs text-red-500">
@@ -93,7 +93,7 @@ export function AvailableTimeFormModal({
             type="datetime-local"
             aria-invalid={!!errors.endTime}
             aria-describedby={errors.endTime ? 'available-time-end-error' : undefined}
-            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
           />
           {errors.endTime && (
             <p id="available-time-end-error" className="mt-1 text-xs text-red-500">

@@ -153,7 +153,7 @@ booking-web/
 ├── docs/                              # 프론트엔드 문서
 ├── public/                            # 정적 파일
 ├── next.config.ts                     # Next.js 설정 (백엔드 프록시 포함)
-├── tailwind.config.ts
+├── postcss.config.mjs                 # @tailwindcss/postcss (Tailwind v4)
 ├── tsconfig.json
 └── package.json
 ```

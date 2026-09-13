@@ -17,7 +17,7 @@ function ReservationCard({ reservation }: { reservation: Reservation }) {
   return (
     <Link
       href={`/my/reservations/${reservation.id}`}
-      className="block bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-200 hover:shadow-sm transition-all">
+      className="block bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-200 hover:shadow-xs transition-all">
       <div className="flex items-start justify-between gap-3 mb-3">
         <h3 className="text-base font-semibold text-gray-900 truncate">{reservation.resourceName}</h3>
         <ReservationStatusBadge status={reservation.status} />
@@ -57,7 +57,7 @@ export default function MyReservationsPage() {
     <>
       <Header />
 
-      <main className="max-w-screen-sm mx-auto px-4 py-6">
+      <main className="max-w-(--breakpoint-sm) mx-auto px-4 py-6">
         <BackButton />
 
         <h1 className="text-xl font-bold text-gray-900 mb-5">내 예약</h1>
@@ -68,7 +68,7 @@ export default function MyReservationsPage() {
             <button
               key={t.value}
               onClick={() => setTab(t.value)}
-              className={`flex-shrink-0 text-sm font-medium px-4 py-1.5 rounded-full border transition-colors ${
+              className={`shrink-0 text-sm font-medium px-4 py-1.5 rounded-full border transition-colors ${
                 tab === t.value
                   ? 'bg-blue-500 text-white border-blue-500'
                   : 'bg-white text-gray-500 border-gray-200 hover:border-blue-300 hover:text-blue-500'

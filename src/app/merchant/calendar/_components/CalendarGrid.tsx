@@ -89,13 +89,13 @@ export function CalendarGrid({
                       <div className="space-y-0.5">
                         {pending > 0 && (
                           <div className="flex items-center gap-1">
-                            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${STATUS_DOT.PENDING}`} />
+                            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${STATUS_DOT.PENDING}`} />
                             <span className="text-[10px] text-gray-500 truncate">대기 {pending}</span>
                           </div>
                         )}
                         {confirmed > 0 && (
                           <div className="flex items-center gap-1">
-                            <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${STATUS_DOT.CONFIRMED}`} />
+                            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${STATUS_DOT.CONFIRMED}`} />
                             <span className="text-[10px] text-gray-500 truncate">확정 {confirmed}</span>
                           </div>
                         )}

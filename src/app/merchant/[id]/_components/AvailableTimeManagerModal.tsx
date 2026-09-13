@@ -64,7 +64,7 @@ export function AvailableTimeManagerModal({
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4"
+          className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500 mb-4"
         />
 
         {timesLoading ? (
@@ -80,7 +80,7 @@ export function AvailableTimeManagerModal({
                 <p className="text-sm text-gray-800 min-w-0 truncate">
                   {formatTime(t.startTime)} ~ {formatTime(t.endTime)}
                 </p>
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex items-center gap-2 shrink-0">
                   <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[t.status]}`}>
                     {STATUS_LABELS[t.status]}
                   </span>

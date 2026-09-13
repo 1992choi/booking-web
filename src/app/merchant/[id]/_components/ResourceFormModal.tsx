@@ -75,7 +75,7 @@ export function ResourceFormModal({
             placeholder="예: A동, 오전반, 1번 코트"
             aria-invalid={!!errors.name}
             aria-describedby={errors.name ? 'resource-name-error' : undefined}
-            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
           />
           {errors.name && (
             <p id="resource-name-error" className="mt-1 text-xs text-red-500">
@@ -93,7 +93,7 @@ export function ResourceFormModal({
             id="resource-description"
             type="text"
             placeholder="간단한 설명을 입력하세요"
-            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -110,7 +110,7 @@ export function ResourceFormModal({
               min={0}
               aria-invalid={!!errors.price}
               aria-describedby={errors.price ? 'resource-price-error' : undefined}
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
             />
             {errors.price && (
               <p id="resource-price-error" className="mt-1 text-xs text-red-500">
@@ -130,7 +130,7 @@ export function ResourceFormModal({
               min={1}
               aria-invalid={!!errors.maxCapacity}
               aria-describedby={errors.maxCapacity ? 'resource-maxCapacity-error' : undefined}
-              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
             />
             {errors.maxCapacity && (
               <p id="resource-maxCapacity-error" className="mt-1 text-xs text-red-500">

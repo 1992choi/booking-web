@@ -11,7 +11,7 @@ export function ResourceCard({
   onBook: (r: Resource) => void;
 }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-300 hover:shadow-sm transition-all">
+    <div className="bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-300 hover:shadow-xs transition-all">
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <h3 className="text-base font-semibold text-gray-900 truncate">{resource.name}</h3>
@@ -22,7 +22,7 @@ export function ResourceCard({
             <span>👥 최대 {resource.maxCapacity}인</span>
           </div>
         </div>
-        <div className="text-right flex-shrink-0">
+        <div className="text-right shrink-0">
           <p className="text-base font-bold text-blue-500">{formatPrice(resource.price)}</p>
           <p className="text-xs text-gray-400 mt-0.5">1회</p>
         </div>

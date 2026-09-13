@@ -105,7 +105,7 @@ export default function MerchantReservationsPage() {
     <>
       <Header />
 
-      <main className="max-w-screen-sm mx-auto px-4 py-6">
+      <main className="max-w-(--breakpoint-sm) mx-auto px-4 py-6">
         <BackButton />
 
         <h1 className="text-xl font-bold text-gray-900 mb-5">예약 관리</h1>
@@ -115,7 +115,7 @@ export default function MerchantReservationsPage() {
             <button
               key={t.value}
               onClick={() => setTab(t.value)}
-              className={`flex-shrink-0 text-sm font-medium px-4 py-1.5 rounded-full border transition-colors ${
+              className={`shrink-0 text-sm font-medium px-4 py-1.5 rounded-full border transition-colors ${
                 tab === t.value
                   ? 'bg-blue-500 text-white border-blue-500'
                   : 'bg-white text-gray-500 border-gray-200 hover:border-blue-300 hover:text-blue-500'

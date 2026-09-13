@@ -39,7 +39,7 @@ export default function MerchantPublicDetailPage() {
     <>
       <Header />
 
-      <main className="max-w-screen-sm mx-auto px-4 py-6">
+      <main className="max-w-(--breakpoint-sm) mx-auto px-4 py-6">
         <BackButton label="목록으로" />
 
         {loading && (

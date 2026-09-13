@@ -45,7 +45,7 @@ export function MerchantForm({
           placeholder="업체명을 입력하세요"
           aria-invalid={!!errors.name}
           aria-describedby={errors.name ? 'merchant-name-error' : undefined}
-          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
         />
         {errors.name && (
           <p id="merchant-name-error" className="mt-1 text-xs text-red-500">
@@ -65,7 +65,7 @@ export function MerchantForm({
           placeholder="010-0000-0000"
           aria-invalid={!!errors.phone}
           aria-describedby={errors.phone ? 'merchant-phone-error' : undefined}
-          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
         />
         {errors.phone && (
           <p id="merchant-phone-error" className="mt-1 text-xs text-red-500">

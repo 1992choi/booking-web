@@ -62,7 +62,7 @@ export function ReviewCard({
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={3}
-            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500 resize-none"
           />
           {error && <p className="text-xs text-red-400 mt-2">{error}</p>}
           <div className="flex gap-2 mt-2">

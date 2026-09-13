@@ -23,7 +23,7 @@ function NotificationItem({ notification }: { notification: Notification }) {
   return (
     <div className="rounded-2xl px-5 py-4 border bg-white border-gray-100">
       <div className="flex items-start gap-3">
-        <span className="mt-0.5 w-2 h-2 rounded-full flex-shrink-0 bg-blue-400" />
+        <span className="mt-0.5 w-2 h-2 rounded-full shrink-0 bg-blue-400" />
         <div className="flex-1 min-w-0">
           <p className="text-sm text-gray-800 leading-relaxed">
             <span className="font-medium">[{label}]</span>
@@ -48,7 +48,7 @@ export default function NotificationsPage() {
     <>
       <Header />
 
-      <main className="max-w-screen-sm mx-auto px-4 py-6">
+      <main className="max-w-(--breakpoint-sm) mx-auto px-4 py-6">
         <BackButton />
 
         <h1 className="text-xl font-bold text-gray-900 mb-5">알림</h1>
