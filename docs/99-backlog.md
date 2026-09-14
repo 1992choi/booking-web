@@ -2,13 +2,7 @@
 
 프론트엔드 구조 개선 및 기능 추가 후보 (백엔드 작업과 무관, 우선순위순).
 
-## 1. React Compiler 도입 검토 (낮은 우선순위)
-
-Next.js 16에서 React Compiler 지원이 정식(stable)으로 승격되어 `next.config.ts`에 `reactCompiler: true` 한 줄과 `babel-plugin-react-compiler` 설치만으로 자동 메모이제이션을 켤 수 있다. 다만 이 코드베이스는 현재 `useMemo`/`useCallback` 수동 사용이 전무해서 당장 얻을 이득은 크지 않다. 향후 리스트가 커지거나 렌더 비용이 문제되면 재검토.
-
-**방향**: 빌드 시간 증가분(Babel 기반) 대비 실익이 있는지 작은 스파이크로 먼저 확인 후 도입 여부 결정.
-
-## 2. 실시간 알림(WebSocket/SSE) 연동 (백엔드 선행 작업 대기 — 아직 착수 불가)
+## 1. 실시간 알림(WebSocket/SSE) 연동 (백엔드 선행 작업 대기 — 아직 착수 불가)
 
 백엔드 backlog에 "WebSocket/SSE 실시간 알림" 항목이 예정돼 있음(아직 커밋 전, 미착수). 백엔드 쪽 명세상으로는 서버 push 자체를 검증하기 위한 최소 데모 HTML 페이지(EventSource/WebSocket으로 메시지를 화면에 찍어보는 수준)만 요구하지만, 실제로는 이 레포의 `/my/notifications` 화면에도 반영돼야 제품으로서 의미가 있다. 현재 `src/app/my/notifications/page.tsx`는 `useQuery`로 마운트 시 `GET /notifications/me`를 한 번만 조회하는 구조라(폴링/구독 없음) 새 알림이 와도 새로고침 전까지 화면에 반영되지 않는다.
 

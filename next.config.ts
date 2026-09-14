@@ -7,6 +7,7 @@ const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL ?? "http:/
 const REVIEW_SERVICE_URL = process.env.REVIEW_SERVICE_URL ?? "http://localhost:8084";
 
 const nextConfig: NextConfig = {
+  reactCompiler: true,
   async rewrites() {
     return [
       // reservation 서비스 — 이관된 도메인 포함
