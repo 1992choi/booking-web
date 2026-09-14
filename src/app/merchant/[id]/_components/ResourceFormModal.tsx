@@ -12,6 +12,7 @@ import { resourceSchema } from '@/lib/validation/merchant';
 import type { Resource } from '@/lib/types/merchant';
 
 type ResourceFormValues = z.infer<typeof resourceSchema>;
+type ResourceFormInput = z.input<typeof resourceSchema>;
 
 export function ResourceFormModal({
   merchantId,
@@ -33,7 +34,7 @@ export function ResourceFormModal({
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<ResourceFormValues>({
+  } = useForm<ResourceFormInput, unknown, ResourceFormValues>({
     resolver: zodResolver(resourceSchema),
     defaultValues: {
       name: initial?.name ?? '',

@@ -10,9 +10,9 @@ export const merchantSchema = z.object({
 export const resourceSchema = z.object({
   name: z.string().min(1, '이름을 입력해 주세요.'),
   description: z.string(),
-  price: z.coerce.number({ invalid_type_error: '가격을 입력해 주세요.' }).min(0, '가격은 0 이상이어야 합니다.'),
+  price: z.coerce.number({ error: '가격을 입력해 주세요.' }).min(0, '가격은 0 이상이어야 합니다.'),
   maxCapacity: z.coerce
-    .number({ invalid_type_error: '최대 인원을 입력해 주세요.' })
+    .number({ error: '최대 인원을 입력해 주세요.' })
     .min(1, '최대 인원은 1명 이상이어야 합니다.'),
 });
 
