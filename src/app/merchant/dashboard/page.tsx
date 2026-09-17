@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
@@ -61,10 +61,35 @@ export default function MerchantDashboardPage() {
   const isAdmin = role === 'ADMIN';
   const isMerchant = role === 'MERCHANT';
 
-  const { data: merchants = [], isLoading, isError } = useQuery({
-    queryKey: ['merchants-dashboard', isAdmin],
-    queryFn: (): Promise<MerchantSummary[]> => (isAdmin ? getMerchants() : getMyMerchants()),
+  const {
+    data: allMerchantsData,
+    isLoading: allLoading,
+    isError: allError,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['merchants-dashboard-all'],
+    queryFn: ({ pageParam }) => getMerchants(pageParam),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => (lastPage.page < lastPage.totalPages - 1 ? lastPage.page + 1 : undefined),
+    enabled: isAdmin,
   });
+
+  const {
+    data: myMerchants = [],
+    isLoading: myLoading,
+    isError: myError,
+  } = useQuery({
+    queryKey: ['merchants-dashboard-mine'],
+    queryFn: getMyMerchants,
+    enabled: !isAdmin,
+  });
+
+  const merchants: MerchantSummary[] = isAdmin
+    ? (allMerchantsData?.pages.flatMap((p) => p.content) ?? [])
+    : myMerchants;
+  const isLoading = isAdmin ? allLoading : myLoading;
+  const isError = isAdmin ? allError : myError;
 
   return (
     <>
@@ -112,6 +137,15 @@ export default function MerchantDashboardPage() {
             {merchants.map((merchant) => (
               <MerchantCard key={merchant.id} merchant={merchant} isMerchant={isMerchant} />
             ))}
+
+            {isAdmin && hasNextPage && (
+              <button
+                onClick={() => fetchNextPage()}
+                className="w-full text-sm text-gray-500 border border-gray-200 rounded-xl py-3 hover:border-blue-300 hover:text-blue-500 transition-colors"
+              >
+                더 보기
+              </button>
+            )}
           </div>
         )}
       </main>

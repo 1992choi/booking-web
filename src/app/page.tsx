@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import { SkeletonList } from '@/components/ui/Skeleton';
 import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
@@ -31,10 +31,20 @@ const VISIBLE_TYPES = new Set<MerchantType>(['PENSION', 'CLASS', 'FACILITY']);
 export default function HomePage() {
   const [selected, setSelected] = useState<FilterType>('ALL');
 
-  const { data: merchants = [], isLoading, isError } = useQuery({
+  const {
+    data,
+    isLoading,
+    isError,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
     queryKey: ['merchants'],
-    queryFn: getMerchants,
+    queryFn: ({ pageParam }) => getMerchants(pageParam),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => (lastPage.page < lastPage.totalPages - 1 ? lastPage.page + 1 : undefined),
   });
+
+  const merchants = data?.pages.flatMap((p) => p.content) ?? [];
 
   const filtered =
     selected === 'ALL'
@@ -95,27 +105,38 @@ export default function HomePage() {
         )}
 
         {!isLoading && !isError && filtered.length > 0 && (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {filtered.map((merchant) => (
-              <Link
-                key={merchant.id}
-                href={`/owners/${merchant.id}`}
-                className="group flex flex-col items-center justify-center aspect-square rounded-2xl border border-gray-200 bg-white hover:border-blue-400 hover:shadow-md transition-all"
-              >
-                <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center mb-3 group-hover:bg-blue-100 transition-colors">
-                  <span className="text-lg font-semibold text-blue-500">
-                    {merchant.name[0]}
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {filtered.map((merchant) => (
+                <Link
+                  key={merchant.id}
+                  href={`/owners/${merchant.id}`}
+                  className="group flex flex-col items-center justify-center aspect-square rounded-2xl border border-gray-200 bg-white hover:border-blue-400 hover:shadow-md transition-all"
+                >
+                  <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center mb-3 group-hover:bg-blue-100 transition-colors">
+                    <span className="text-lg font-semibold text-blue-500">
+                      {merchant.name[0]}
+                    </span>
+                  </div>
+                  <span className="text-sm font-medium text-gray-800 text-center px-4 leading-snug">
+                    {merchant.name}
                   </span>
-                </div>
-                <span className="text-sm font-medium text-gray-800 text-center px-4 leading-snug">
-                  {merchant.name}
-                </span>
-                <span className={`mt-3 text-xs font-semibold px-2 py-0.5 rounded-full ${MERCHANT_TYPE_COLORS[merchant.type]}`}>
-                  {MERCHANT_TYPE_LABELS[merchant.type]}
-                </span>
-              </Link>
-            ))}
-          </div>
+                  <span className={`mt-3 text-xs font-semibold px-2 py-0.5 rounded-full ${MERCHANT_TYPE_COLORS[merchant.type]}`}>
+                    {MERCHANT_TYPE_LABELS[merchant.type]}
+                  </span>
+                </Link>
+              ))}
+            </div>
+
+            {hasNextPage && (
+              <button
+                onClick={() => fetchNextPage()}
+                className="mt-5 w-full text-sm text-gray-500 border border-gray-200 rounded-xl py-3 hover:border-blue-300 hover:text-blue-500 transition-colors"
+              >
+                더 보기
+              </button>
+            )}
+          </>
         )}
       </main>
     </>

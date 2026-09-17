@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import MerchantDashboardPage from './page';
 import { useAuthStore } from '@/lib/store/auth';
@@ -46,13 +47,26 @@ describe('MerchantDashboardPage', () => {
 
   it('ADMIN은 전체 업체 목록을 조회하고 등록 링크는 숨긴다', async () => {
     setRole('ADMIN');
-    getMerchants.mockResolvedValue([{ id: 1, name: '한적한 펜션', type: 'PENSION' }]);
+    getMerchants.mockResolvedValue({ content: [{ id: 1, name: '한적한 펜션', type: 'PENSION' }], page: 0, totalPages: 1 });
 
     renderWithQuery(<MerchantDashboardPage />);
 
     expect(await screen.findByText('전체 등록 업체 목록입니다.')).toBeInTheDocument();
     expect(screen.queryByText('+ 업체 등록')).not.toBeInTheDocument();
     expect(getMerchants).toHaveBeenCalled();
+  });
+
+  it('ADMIN 목록에 다음 페이지가 있으면 더 보기 버튼으로 추가 로드한다', async () => {
+    setRole('ADMIN');
+    getMerchants.mockResolvedValueOnce({ content: [{ id: 1, name: '한적한 펜션', type: 'PENSION' }], page: 0, totalPages: 2 });
+
+    renderWithQuery(<MerchantDashboardPage />);
+    await screen.findByText('한적한 펜션');
+
+    getMerchants.mockResolvedValueOnce({ content: [{ id: 2, name: '요가 클래스', type: 'CLASS' }], page: 1, totalPages: 2 });
+    await userEvent.click(screen.getByText('더 보기'));
+
+    expect(await screen.findByText('요가 클래스')).toBeInTheDocument();
   });
 
   it('목록이 비어 있으면 안내 문구를 보여준다', async () => {

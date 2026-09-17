@@ -2,7 +2,13 @@
 
 프론트엔드 구조 개선 및 기능 추가 후보 (백엔드 작업과 무관, 우선순위순).
 
-## 1. 실시간 알림(WebSocket/SSE) 연동 (백엔드 선행 작업 대기 — 아직 착수 불가)
+## 1. 홈 화면 카테고리 필터가 로드된 페이지 안에서만 동작함
+
+`GET /api/v1/merchants`가 페이징 적용되면서(`PageResponse<MerchantSummary>`) 홈 화면(`src/app/page.tsx`)과 업체 관리 화면(`src/app/merchant/dashboard/page.tsx`)을 `useInfiniteQuery` + "더 보기" 패턴으로 전환 완료. 다만 백엔드에 `type` 필터 쿼리 파라미터는 추가되지 않아, 홈 화면의 카테고리 탭(펜션/클래스/시설)은 여전히 "지금까지 로드된 페이지들의 콘텐츠"만 클라이언트에서 필터링한다 — 첫 페이지에 특정 유형이 적으면 "더 보기"를 누르기 전까지 그 카테고리 결과가 실제보다 적어 보일 수 있다.
+
+**방향**: 백엔드에 `GET /api/v1/merchants`용 `type` 쿼리 파라미터 추가를 요청하고, 프론트는 탭 전환 시 `queryKey`에 `type`을 포함시켜 서버 필터링으로 재조회하도록 변경(현재 `queryKey: ['merchants']` → `['merchants', selected]`, `getMerchants(pageParam, size, type)`). 백엔드 쪽 API 변경이 선행되어야 함.
+
+## 2. 실시간 알림(WebSocket/SSE) 연동 (백엔드 선행 작업 대기 — 아직 착수 불가)
 
 백엔드 backlog에 "WebSocket/SSE 실시간 알림" 항목이 예정돼 있음(아직 커밋 전, 미착수). 백엔드 쪽 명세상으로는 서버 push 자체를 검증하기 위한 최소 데모 HTML 페이지(EventSource/WebSocket으로 메시지를 화면에 찍어보는 수준)만 요구하지만, 실제로는 이 레포의 `/my/notifications` 화면에도 반영돼야 제품으로서 의미가 있다. 현재 `src/app/my/notifications/page.tsx`는 `useQuery`로 마운트 시 `GET /notifications/me`를 한 번만 조회하는 구조라(폴링/구독 없음) 새 알림이 와도 새로고침 전까지 화면에 반영되지 않는다.
 

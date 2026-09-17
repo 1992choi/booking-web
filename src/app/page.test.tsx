@@ -33,7 +33,7 @@ beforeEach(() => {
 
 describe('HomePage', () => {
   it('업체 목록을 불러와 보여준다', async () => {
-    getMerchants.mockResolvedValue(merchants);
+    getMerchants.mockResolvedValue({ content: merchants, page: 0, totalPages: 1 });
     renderWithQuery(<HomePage />);
 
     expect(await screen.findByText('한적한 펜션')).toBeInTheDocument();
@@ -41,7 +41,7 @@ describe('HomePage', () => {
   });
 
   it('카테고리 탭으로 필터링한다', async () => {
-    getMerchants.mockResolvedValue(merchants);
+    getMerchants.mockResolvedValue({ content: merchants, page: 0, totalPages: 1 });
     renderWithQuery(<HomePage />);
     await screen.findByText('한적한 펜션');
 
@@ -59,9 +59,24 @@ describe('HomePage', () => {
   });
 
   it('목록이 비어 있으면 안내 문구를 보여준다', async () => {
-    getMerchants.mockResolvedValue([]);
+    getMerchants.mockResolvedValue({ content: [], page: 0, totalPages: 0 });
     renderWithQuery(<HomePage />);
 
     expect(await screen.findByText('해당 유형의 업체가 없습니다.')).toBeInTheDocument();
+  });
+
+  it('다음 페이지가 있으면 더 보기 버튼으로 추가 로드한다', async () => {
+    getMerchants.mockResolvedValueOnce({ content: merchants, page: 0, totalPages: 2 });
+    renderWithQuery(<HomePage />);
+    await screen.findByText('한적한 펜션');
+
+    getMerchants.mockResolvedValueOnce({
+      content: [{ id: 3, name: '테니스장', type: 'FACILITY' as const }],
+      page: 1,
+      totalPages: 2,
+    });
+    await userEvent.click(screen.getByText('더 보기'));
+
+    expect(await screen.findByText('테니스장')).toBeInTheDocument();
   });
 });
