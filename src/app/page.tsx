@@ -38,18 +38,16 @@ export default function HomePage() {
     hasNextPage,
     fetchNextPage,
   } = useInfiniteQuery({
-    queryKey: ['merchants'],
-    queryFn: ({ pageParam }) => getMerchants(pageParam),
+    queryKey: ['merchants', selected],
+    queryFn: ({ pageParam }) => getMerchants(selected === 'ALL' ? undefined : selected, pageParam),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.page < lastPage.totalPages - 1 ? lastPage.page + 1 : undefined),
   });
 
   const merchants = data?.pages.flatMap((p) => p.content) ?? [];
 
-  const filtered =
-    selected === 'ALL'
-      ? merchants.filter((o) => VISIBLE_TYPES.has(o.type as MerchantType))
-      : merchants.filter((o) => o.type === selected);
+  // ALL 탭은 서버가 타입 필터 없이 반환하므로, 알려진 카테고리(탭에 없는 유형이 추가될 경우 대비)만 클라이언트에서 한 번 더 걸러낸다.
+  const filtered = selected === 'ALL' ? merchants.filter((o) => VISIBLE_TYPES.has(o.type as MerchantType)) : merchants;
 
   return (
     <>

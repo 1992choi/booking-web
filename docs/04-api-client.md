@@ -48,7 +48,7 @@ refresh(refreshToken: string) → RefreshResponse
 
 ### merchants.ts
 ```
-getMerchants(page?, size?) → PageResponse<MerchantSummary>  // 전체 업체 목록 (공개, 페이징)
+getMerchants(type?, page?, size?) → PageResponse<MerchantSummary>  // 업체 목록 (공개, 페이징 + 타입 필터)
 getMyMerchants() → MerchantResponse[]                        // MERCHANT
 createMerchant(params: MerchantRequest) → MerchantResponse
 getMerchant(id) → MerchantDetail

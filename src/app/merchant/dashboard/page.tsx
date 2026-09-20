@@ -69,7 +69,7 @@ export default function MerchantDashboardPage() {
     fetchNextPage,
   } = useInfiniteQuery({
     queryKey: ['merchants-dashboard-all'],
-    queryFn: ({ pageParam }) => getMerchants(pageParam),
+    queryFn: ({ pageParam }) => getMerchants(undefined, pageParam),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.page < lastPage.totalPages - 1 ? lastPage.page + 1 : undefined),
     enabled: isAdmin,

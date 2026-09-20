@@ -40,15 +40,23 @@ describe('HomePage', () => {
     expect(screen.getByText('요가 클래스')).toBeInTheDocument();
   });
 
-  it('카테고리 탭으로 필터링한다', async () => {
-    getMerchants.mockResolvedValue({ content: merchants, page: 0, totalPages: 1 });
+  it('카테고리 탭을 선택하면 서버에 type 필터를 넘겨 다시 조회한다', async () => {
+    getMerchants.mockImplementation((type?: string) =>
+      Promise.resolve({
+        content: type ? merchants.filter((m) => m.type === type) : merchants,
+        page: 0,
+        totalPages: 1,
+      }),
+    );
     renderWithQuery(<HomePage />);
     await screen.findByText('한적한 펜션');
+    expect(screen.getByText('요가 클래스')).toBeInTheDocument();
 
     await userEvent.click(screen.getAllByText('펜션')[0]);
 
-    expect(screen.getByText('한적한 펜션')).toBeInTheDocument();
+    expect(await screen.findByText('한적한 펜션')).toBeInTheDocument();
     expect(screen.queryByText('요가 클래스')).not.toBeInTheDocument();
+    expect(getMerchants).toHaveBeenLastCalledWith('PENSION', 0);
   });
 
   it('불러오기 실패 시 에러 메시지를 보여준다', async () => {

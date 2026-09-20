@@ -5,13 +5,14 @@ import type {
   MerchantRequest,
   MerchantResponse,
   MerchantSummary,
+  MerchantType,
 } from '@/lib/types/merchant';
 import type { PageResponse } from '@/lib/types/common';
 
-/** GET /api/v1/merchants — 전체 업체 목록 (페이징) */
-export async function getMerchants(page = 0, size = 10): Promise<PageResponse<MerchantSummary>> {
+/** GET /api/v1/merchants — 업체 목록 (페이징, type으로 서버 필터링) */
+export async function getMerchants(type?: MerchantType, page = 0, size = 10): Promise<PageResponse<MerchantSummary>> {
   const { data } = await apiClient.get<PageResponse<MerchantSummary>>('/merchants', {
-    params: { page, size },
+    params: { ...(type ? { type } : {}), page, size },
   });
   return data;
 }
