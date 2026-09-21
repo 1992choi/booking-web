@@ -33,7 +33,7 @@ Next.js App Router 기반. 테마/레이아웃만 교체해 숙박·강의·시�
 | API 클라이언트 | Axios | 1.x |
 | 폼 | React Hook Form + Zod | - |
 
-> `shadcn/ui`, `date-fns`, `lucide-react`, `class-variance-authority`, `clsx`, `tailwind-merge`는 `package.json`에 설치는 돼 있지만 아직 실제 코드에서 사용되지 않는다 (`shadcn/ui`는 `components.json` 초기화도 아직 안 된 상태). 커스텀 UI 컴포넌트(`src/components/ui/`)와 `src/lib/utils/format.ts`로 각각의 역할을 대신하고 있다.
+> `date-fns`, `lucide-react`, `class-variance-authority`, `clsx`, `tailwind-merge`는 `package.json`에 설치는 돼 있지만 아직 실제 코드에서 사용되지 않는다. 커스텀 UI 컴포넌트(`src/components/ui/`)와 `src/lib/utils/format.ts`로 각각의 역할을 대신하고 있다.
 
 ---
 

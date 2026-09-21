@@ -30,6 +30,10 @@ booking-web/
 │   │   ├── layout.tsx                # 루트 레이아웃 (공통 Provider 포함)
 │   │   ├── page.tsx                  # 홈 (/)
 │   │   ├── providers.tsx             # TanStack Query Provider
+│   │   ├── globals.css               # 전역 스타일 + Tailwind v4 @theme
+│   │   ├── loading.tsx               # 라우트 전환 중 공용 로딩 스켈레톤
+│   │   ├── error.tsx                 # 라우트 세그먼트 에러 바운더리
+│   │   ├── not-found.tsx             # 404 화면
 │   │   │
 │   │   ├── (auth)/                   # 인증 라우트 그룹 (헤더 없음)
 │   │   │   ├── layout.tsx

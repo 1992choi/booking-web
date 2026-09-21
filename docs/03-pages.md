@@ -27,7 +27,7 @@
 | GET | `/api/v1/reservations/me?status=&page=&size=` | 내 예약 목록 |
 | PUT | `/api/v1/reservations/{id}/cancel` | 예약 취소 |
 | POST | `/api/v1/merchants` | 업체 등록 |
-| GET | `/api/v1/merchants` | 전체 업체 목록 |
+| GET | `/api/v1/merchants?type=&page=&size=` | 업체 목록 (타입 필터 + 페이징) |
 | GET | `/api/v1/merchants/me` | 내 업체 목록 |
 | GET | `/api/v1/merchants/{id}` | 업체 상세 |
 | PUT | `/api/v1/merchants/{id}` | 업체 수정 |
@@ -81,6 +81,7 @@
 
 | 페이지 | URL | 사용 API |
 |--------|-----|---------|
+| 홈 (업체 목록 + 카테고리 필터) | `/` | `GET /merchants?type=&page=&size=` |
 | 업체 상세 + 예약 + 리뷰 | `/owners/{id}` | `GET /merchants/{id}`, `GET /resources/{id}/available-times`, `POST /reservations`, `GET /reviews?merchantId=`, `PATCH /reviews/{id}`, `DELETE /reviews/{id}` |
 
 ### 마이페이지

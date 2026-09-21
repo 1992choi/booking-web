@@ -6,12 +6,12 @@
 
 ## 기술 스택
 
-- **Next.js 16** (App Router, Turbopack) + **TypeScript**
-- **Tailwind CSS**
+- **Next.js 16** (App Router, Turbopack, React Compiler) + **TypeScript**
+- **Tailwind CSS v4**
 - **TanStack Query** (서버 상태), **Zustand** (클라이언트 상태)
 - **Axios** (API 클라이언트), **React Hook Form + Zod** (폼)
 
-> `shadcn/ui`는 의존성만 설치돼 있고 아직 초기화·사용 전이다 (자세한 내용은 [01-overview](docs/01-overview.md) 참고).
+> `date-fns`, `lucide-react` 등 일부 의존성은 설치만 돼 있고 아직 사용 전이다 (자세한 내용은 [01-overview](docs/01-overview.md) 참고).
 
 ---
 
