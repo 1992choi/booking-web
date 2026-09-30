@@ -56,6 +56,7 @@
 | 메서드 | 경로 | 설명 |
 |--------|------|------|
 | GET | `/api/v1/notifications/me` | 내 알림 목록 |
+| GET | `/api/v1/notifications/stream?token=` | 실시간 알림 구독 (SSE, `EventSource`) |
 
 ### review 서비스 (8084)
 
@@ -91,7 +92,7 @@
 | 내 정보 | `/my` | `GET /users/me`, `PUT /users/me`, `DELETE /users/me` |
 | 내 예약 목록 | `/my/reservations` | `GET /reservations/me` |
 | 예약 상세 + 결제 + 취소/환불 + 리뷰 작성 | `/my/reservations/{id}` | `GET /reservations/{id}`, `GET /payments/{id}`, `PUT /reservations/{id}/cancel`, `POST /payments/{id}/refund`, `POST /reviews` |
-| 내 알림 | `/my/notifications` | `GET /notifications/me` |
+| 내 알림 | `/my/notifications` | `GET /notifications/me`, `GET /notifications/stream` (SSE, 전역 구독) |
 
 ### 업체 운영자 (role=MERCHANT 이상)
 

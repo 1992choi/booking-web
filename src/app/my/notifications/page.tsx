@@ -7,18 +7,12 @@ import { SkeletonList } from '@/components/ui/Skeleton';
 import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import { getMyNotifications } from '@/lib/api/notifications';
 import { formatDateTime } from '@/lib/utils/format';
+import { NOTIFICATION_TYPE_LABELS } from '@/lib/constants/notification';
 import type { Notification } from '@/lib/types/notification';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 
-const TYPE_LABELS: Record<string, string> = {
-  RESERVATION_CONFIRMED: '예약 확정',
-  RESERVATION_CANCELLED: '예약 취소',
-  RESERVATION_REMINDER: '예약 알림',
-  ADMIN_MESSAGE: '관리자 메시지',
-};
-
 function NotificationItem({ notification }: { notification: Notification }) {
-  const label = TYPE_LABELS[notification.type] ?? notification.type;
+  const label = NOTIFICATION_TYPE_LABELS[notification.type] ?? notification.type;
 
   return (
     <div className="rounded-2xl px-5 py-4 border bg-white border-gray-100">

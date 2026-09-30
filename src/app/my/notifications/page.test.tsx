@@ -17,7 +17,7 @@ const notification = {
   id: 1,
   reservationId: 10,
   message: '예약이 확정되었습니다.',
-  type: 'RESERVATION_CONFIRMED' as const,
+  type: 'CONFIRMED' as const,
   channel: 'EMAIL' as const,
   status: 'SENT' as const,
   sentAt: '2024-05-01T09:00:00',

@@ -29,7 +29,7 @@ booking-web/
 │   ├── app/                          # Next.js App Router (폴더 = 라우트)
 │   │   ├── layout.tsx                # 루트 레이아웃 (공통 Provider 포함)
 │   │   ├── page.tsx                  # 홈 (/)
-│   │   ├── providers.tsx             # TanStack Query Provider
+│   │   ├── providers.tsx             # TanStack Query Provider + 알림 SSE 구독 마운트
 │   │   ├── globals.css               # 전역 스타일 + Tailwind v4 @theme
 │   │   ├── loading.tsx               # 라우트 전환 중 공용 로딩 스켈레톤
 │   │   ├── error.tsx                 # 라우트 세그먼트 에러 바운더리
@@ -119,6 +119,7 @@ booking-web/
 │   │   ├── constants/                 # 라벨·색상 등 화면 상수
 │   │   │   ├── merchant.ts
 │   │   │   ├── reservation.ts
+│   │   │   ├── notification.ts
 │   │   │   └── user.ts
 │   │   │
 │   │   ├── validation/                # React Hook Form용 zod 스키마
@@ -129,7 +130,8 @@ booking-web/
 │   │   ├── hooks/
 │   │   │   ├── useDocumentTitle.ts    # 라우트별 <title> 설정
 │   │   │   ├── useEscapeKey.ts        # ESC 키로 모달 닫기
-│   │   │   └── useMonthNavigation.ts  # 연/월 상태 + 이전/다음 달 이동
+│   │   │   ├── useMonthNavigation.ts  # 연/월 상태 + 이전/다음 달 이동
+│   │   │   └── useNotificationStream.ts # SSE 알림 구독 (캐시 갱신 + 토스트)
 │   │   │
 │   │   ├── utils/
 │   │   │   ├── format.ts             # 날짜/가격 포맷 헬퍼

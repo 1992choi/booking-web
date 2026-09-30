@@ -97,6 +97,7 @@ refund(reservationId) → void
 ```
 getMyNotifications() → Notification[]
 sendNotificationToUser(userId, message) → void  // ADMIN only
+getNotificationStreamUrl(token) → string  // EventSource로 구독할 SSE URL (JWT를 쿼리로 전달)
 ```
 
 ### reviews.ts
