@@ -57,4 +57,23 @@ describe('MerchantStatsPage', () => {
 
     await vi.waitFor(() => expect(getMerchantDailyStats.mock.calls.length).toBeGreaterThan(callsBefore));
   });
+
+  it('이번 달 조회 시 당일 데이터 미반영 안내를 보여준다', async () => {
+    getMerchantDailyStats.mockResolvedValue([]);
+    renderWithQuery(<MerchantStatsPage />);
+
+    expect(await screen.findByText('오늘 매출은 다음 날 새벽에 집계되어 반영됩니다.')).toBeInTheDocument();
+  });
+
+  it('다른 달로 이동하면 당일 데이터 미반영 안내가 사라진다', async () => {
+    getMerchantDailyStats.mockResolvedValue([]);
+    renderWithQuery(<MerchantStatsPage />);
+    await screen.findByText('오늘 매출은 다음 날 새벽에 집계되어 반영됩니다.');
+
+    await userEvent.click(screen.getByText('‹'));
+
+    await vi.waitFor(() =>
+      expect(screen.queryByText('오늘 매출은 다음 날 새벽에 집계되어 반영됩니다.')).not.toBeInTheDocument()
+    );
+  });
 });

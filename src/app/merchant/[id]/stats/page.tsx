@@ -68,6 +68,9 @@ export default function MerchantStatsPage() {
   const totalConfirmed = stats.reduce((sum, s) => sum + s.confirmedCount, 0);
   const totalCancelled = stats.reduce((sum, s) => sum + s.cancelledCount, 0);
 
+  const today = new Date();
+  const isCurrentMonth = year === today.getFullYear() && month === today.getMonth() + 1;
+
   return (
     <>
       <Header />
@@ -78,6 +81,12 @@ export default function MerchantStatsPage() {
         <h1 className="text-xl font-bold text-gray-900 mb-5">일별 매출</h1>
 
         <MonthNav year={year} month={month} onPrev={prevMonth} onNext={nextMonth} className="mb-5" />
+
+        {isCurrentMonth && (
+          <p className="text-xs text-gray-400 mb-4">
+            오늘 매출은 다음 날 새벽에 집계되어 반영됩니다.
+          </p>
+        )}
 
         <div className="grid grid-cols-3 gap-3 mb-6">
           <SummaryCard label="월 매출" value={formatPrice(totalRevenue)} accent />
