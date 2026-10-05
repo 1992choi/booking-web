@@ -10,4 +10,5 @@ export interface Notification {
   channel: NotificationChannel;
   status: NotificationStatus;
   sentAt: string;
+  readAt: string | null;
 }

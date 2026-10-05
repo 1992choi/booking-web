@@ -33,6 +33,11 @@ vi.mock('@/lib/api/resources', () => ({
   deleteAvailableTime: (...args: unknown[]) => deleteAvailableTime(...args),
 }));
 
+const getMyNotifications = vi.fn();
+vi.mock('@/lib/api/notifications', () => ({
+  getMyNotifications: (...args: unknown[]) => getMyNotifications(...args),
+}));
+
 const merchant = {
   id: 1,
   name: '한적한 펜션',
@@ -56,6 +61,8 @@ function setRole(role: 'MERCHANT' | 'USER') {
 beforeEach(() => {
   getMerchant.mockReset();
   createResource.mockReset();
+  getMyNotifications.mockReset();
+  getMyNotifications.mockResolvedValue([]);
 });
 
 describe('MerchantDetailPage', () => {

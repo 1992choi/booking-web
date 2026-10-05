@@ -17,8 +17,10 @@ vi.mock('@/lib/api/auth', () => ({
 }));
 
 const sendNotificationToUser = vi.fn();
+const getMyNotifications = vi.fn();
 vi.mock('@/lib/api/notifications', () => ({
   sendNotificationToUser: (...args: unknown[]) => sendNotificationToUser(...args),
+  getMyNotifications: (...args: unknown[]) => getMyNotifications(...args),
 }));
 
 const users = [
@@ -29,6 +31,8 @@ beforeEach(() => {
   back.mockClear();
   getUsers.mockReset();
   sendNotificationToUser.mockReset();
+  getMyNotifications.mockReset();
+  getMyNotifications.mockResolvedValue([]);
 });
 
 describe('SendMessagePage', () => {

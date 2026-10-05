@@ -37,6 +37,11 @@ vi.mock('@/lib/api/reviews', () => ({
   deleteReview: (...args: unknown[]) => deleteReview(...args),
 }));
 
+const getMyNotifications = vi.fn();
+vi.mock('@/lib/api/notifications', () => ({
+  getMyNotifications: (...args: unknown[]) => getMyNotifications(...args),
+}));
+
 const merchant = {
   id: 1,
   name: '한적한 펜션',
@@ -74,6 +79,8 @@ beforeEach(() => {
   createReservation.mockReset();
   getReviewsByMerchant.mockReset();
   getReviewsByMerchant.mockResolvedValue([]);
+  getMyNotifications.mockReset();
+  getMyNotifications.mockResolvedValue([]);
   resetAuth();
 });
 

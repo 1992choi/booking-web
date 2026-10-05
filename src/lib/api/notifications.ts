@@ -7,6 +7,11 @@ export async function getMyNotifications(): Promise<Notification[]> {
   return data;
 }
 
+/** PATCH /api/v1/notifications/{notificationId}/read */
+export async function markNotificationRead(notificationId: number): Promise<void> {
+  await apiClient.patch(`/notifications/${notificationId}/read`);
+}
+
 /** POST /api/v1/admin/users/{userId}/message (ADMIN only) */
 export async function sendNotificationToUser(userId: number, message: string): Promise<void> {
   await apiClient.post(`/admin/users/${userId}/message`, { message });

@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import MerchantRegisterPage from './page';
+import { renderWithQuery } from '@/lib/test-utils/renderWithQuery';
 
 const push = vi.fn();
 const back = vi.fn();
@@ -15,14 +16,21 @@ vi.mock('@/lib/api/merchants', () => ({
   createMerchant: (...args: unknown[]) => createMerchant(...args),
 }));
 
+const getMyNotifications = vi.fn();
+vi.mock('@/lib/api/notifications', () => ({
+  getMyNotifications: (...args: unknown[]) => getMyNotifications(...args),
+}));
+
 beforeEach(() => {
   push.mockClear();
   createMerchant.mockReset();
+  getMyNotifications.mockReset();
+  getMyNotifications.mockResolvedValue([]);
 });
 
 describe('MerchantRegisterPage', () => {
   it('업체 등록 입력 필드를 보여준다', () => {
-    render(<MerchantRegisterPage />);
+    renderWithQuery(<MerchantRegisterPage />);
 
     expect(screen.getByPlaceholderText('업체명을 입력하세요')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('010-0000-0000')).toBeInTheDocument();
@@ -30,7 +38,7 @@ describe('MerchantRegisterPage', () => {
   });
 
   it('빈 값으로 제출하면 유효성 에러를 보여준다', async () => {
-    render(<MerchantRegisterPage />);
+    renderWithQuery(<MerchantRegisterPage />);
     await userEvent.click(screen.getByRole('button', { name: '업체 등록' }));
 
     expect(await screen.findByText('업체명을 입력해 주세요.')).toBeInTheDocument();
@@ -40,7 +48,7 @@ describe('MerchantRegisterPage', () => {
   it('등록 성공 시 대시보드로 이동한다', async () => {
     createMerchant.mockResolvedValue({ id: 1, name: '한적한 펜션', phone: '010-1234-5678', type: 'PENSION' });
 
-    render(<MerchantRegisterPage />);
+    renderWithQuery(<MerchantRegisterPage />);
     await userEvent.type(screen.getByPlaceholderText('업체명을 입력하세요'), '한적한 펜션');
     await userEvent.type(screen.getByPlaceholderText('010-0000-0000'), '010-1234-5678');
     await userEvent.click(screen.getByRole('button', { name: '클래스' }));
@@ -55,7 +63,7 @@ describe('MerchantRegisterPage', () => {
   it('등록 실패 시 에러 메시지를 보여준다', async () => {
     createMerchant.mockRejectedValue(new Error('network error'));
 
-    render(<MerchantRegisterPage />);
+    renderWithQuery(<MerchantRegisterPage />);
     await userEvent.type(screen.getByPlaceholderText('업체명을 입력하세요'), '한적한 펜션');
     await userEvent.type(screen.getByPlaceholderText('010-0000-0000'), '010-1234-5678');
     await userEvent.click(screen.getByRole('button', { name: '업체 등록' }));

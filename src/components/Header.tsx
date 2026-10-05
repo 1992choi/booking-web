@@ -3,8 +3,10 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/lib/store/auth';
 import { logout } from '@/lib/api/auth';
+import { getMyNotifications } from '@/lib/api/notifications';
 
 export default function Header() {
   const router = useRouter();
@@ -14,6 +16,13 @@ export default function Header() {
   const clearAuth = useAuthStore((s) => s.clearAuth);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const { data: notifications = [] } = useQuery({
+    queryKey: ['my-notifications'],
+    queryFn: getMyNotifications,
+    enabled: isAuthenticated,
+  });
+  const hasUnread = notifications.some((n) => n.readAt == null);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -120,12 +129,15 @@ export default function Header() {
               {/* 알림 아이콘 */}
               <Link
                 href="/my/notifications"
-                className="w-9 h-9 rounded-full bg-blue-50 hover:opacity-80 transition-opacity flex items-center justify-center"
+                className="relative w-9 h-9 rounded-full bg-blue-50 hover:opacity-80 transition-opacity flex items-center justify-center"
                 aria-label="알림"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                 </svg>
+                {hasUnread && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500" aria-hidden="true" />
+                )}
               </Link>
             </>
           ) : (

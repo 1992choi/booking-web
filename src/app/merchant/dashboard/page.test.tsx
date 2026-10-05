@@ -17,6 +17,11 @@ vi.mock('@/lib/api/merchants', () => ({
   getMyMerchants: (...args: unknown[]) => getMyMerchants(...args),
 }));
 
+const getMyNotifications = vi.fn();
+vi.mock('@/lib/api/notifications', () => ({
+  getMyNotifications: (...args: unknown[]) => getMyNotifications(...args),
+}));
+
 function setRole(role: 'MERCHANT' | 'ADMIN') {
   useAuthStore.setState({
     accessToken: 'access-1',
@@ -30,6 +35,8 @@ function setRole(role: 'MERCHANT' | 'ADMIN') {
 beforeEach(() => {
   getMerchants.mockReset();
   getMyMerchants.mockReset();
+  getMyNotifications.mockReset();
+  getMyNotifications.mockResolvedValue([]);
 });
 
 describe('MerchantDashboardPage', () => {

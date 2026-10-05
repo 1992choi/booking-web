@@ -1,23 +1,35 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
 import { SkeletonList } from '@/components/ui/Skeleton';
 import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
-import { getMyNotifications } from '@/lib/api/notifications';
+import { getMyNotifications, markNotificationRead } from '@/lib/api/notifications';
 import { formatDateTime } from '@/lib/utils/format';
 import { NOTIFICATION_TYPE_LABELS } from '@/lib/constants/notification';
 import type { Notification } from '@/lib/types/notification';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 
-function NotificationItem({ notification }: { notification: Notification }) {
+function NotificationItem({
+  notification,
+  onRead,
+}: {
+  notification: Notification;
+  onRead: (id: number) => void;
+}) {
   const label = NOTIFICATION_TYPE_LABELS[notification.type] ?? notification.type;
+  const isUnread = notification.readAt == null;
 
   return (
-    <div className="rounded-2xl px-5 py-4 border bg-white border-gray-100">
+    <div
+      onClick={() => isUnread && onRead(notification.id)}
+      className={`rounded-2xl px-5 py-4 border transition-colors ${
+        isUnread ? 'bg-white border-gray-100 cursor-pointer' : 'bg-gray-50 border-gray-100'
+      }`}
+    >
       <div className="flex items-start gap-3">
-        <span className="mt-0.5 w-2 h-2 rounded-full shrink-0 bg-blue-400" />
+        <span className={`mt-0.5 w-2 h-2 rounded-full shrink-0 ${isUnread ? 'bg-blue-400' : 'bg-gray-200'}`} />
         <div className="flex-1 min-w-0">
           <p className="text-sm text-gray-800 leading-relaxed">
             <span className="font-medium">[{label}]</span>
@@ -32,10 +44,20 @@ function NotificationItem({ notification }: { notification: Notification }) {
 
 export default function NotificationsPage() {
   useDocumentTitle('알림');
+  const queryClient = useQueryClient();
 
   const { data: notifications = [], isLoading, isError } = useQuery({
     queryKey: ['my-notifications'],
     queryFn: getMyNotifications,
+  });
+
+  const { mutate: markRead } = useMutation({
+    mutationFn: (id: number) => markNotificationRead(id),
+    onSuccess: (_, id) => {
+      queryClient.setQueryData<Notification[]>(['my-notifications'], (prev) =>
+        prev?.map((n) => (n.id === id ? { ...n, readAt: new Date().toISOString() } : n))
+      );
+    },
   });
 
   return (
@@ -60,7 +82,7 @@ export default function NotificationsPage() {
         {!isLoading && !isError && notifications.length > 0 && (
           <div className="space-y-2">
             {notifications.map((n) => (
-              <NotificationItem key={n.id} notification={n} />
+              <NotificationItem key={n.id} notification={n} onRead={markRead} />
             ))}
           </div>
         )}
