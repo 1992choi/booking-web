@@ -42,6 +42,15 @@ describe('NotificationsPage', () => {
     expect(screen.getByText('예약이 확정되었습니다.')).toBeInTheDocument();
   });
 
+  it('예약 리마인더 알림을 보여준다', async () => {
+    getMyNotifications.mockResolvedValue([
+      { ...notification, id: 2, message: null, type: 'REMINDER' as const },
+    ]);
+    renderWithQuery(<NotificationsPage />);
+
+    expect(await screen.findByText('[예약 리마인더]')).toBeInTheDocument();
+  });
+
   it('알림이 없으면 안내 문구를 보여준다', async () => {
     getMyNotifications.mockResolvedValue([]);
     renderWithQuery(<NotificationsPage />);

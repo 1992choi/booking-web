@@ -1,4 +1,4 @@
-export type NotificationType = 'CONFIRMED' | 'CANCELLED' | 'ADMIN_MESSAGE';
+export type NotificationType = 'CONFIRMED' | 'CANCELLED' | 'ADMIN_MESSAGE' | 'REMINDER';
 export type NotificationChannel = string;
 export type NotificationStatus = string;
 
