@@ -30,6 +30,7 @@ const VISIBLE_TYPES = new Set<MerchantType>(['PENSION', 'CLASS', 'FACILITY']);
 
 export default function HomePage() {
   const [selected, setSelected] = useState<FilterType>('ALL');
+  const [keyword, setKeyword] = useState('');
 
   const {
     data,
@@ -47,7 +48,13 @@ export default function HomePage() {
   const merchants = data?.pages.flatMap((p) => p.content) ?? [];
 
   // ALL 탭은 서버가 타입 필터 없이 반환하므로, 알려진 카테고리(탭에 없는 유형이 추가될 경우 대비)만 클라이언트에서 한 번 더 걸러낸다.
-  const filtered = selected === 'ALL' ? merchants.filter((o) => VISIBLE_TYPES.has(o.type as MerchantType)) : merchants;
+  const byType = selected === 'ALL' ? merchants.filter((o) => VISIBLE_TYPES.has(o.type as MerchantType)) : merchants;
+
+  // 현재까지 로드된 페이지 범위 내에서만 이름으로 필터링 (전체 검색은 백엔드 미지원)
+  const trimmedKeyword = keyword.trim();
+  const filtered = trimmedKeyword
+    ? byType.filter((o) => o.name.toLowerCase().includes(trimmedKeyword.toLowerCase()))
+    : byType;
 
   return (
     <>
@@ -86,6 +93,17 @@ export default function HomePage() {
 
       {/* 업체 카드 목록 */}
       <main className="max-w-(--breakpoint-lg) mx-auto px-4 py-6">
+        <div className="relative mb-5">
+          <input
+            type="text"
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            placeholder="업체 이름 검색 (현재 불러온 목록 내)"
+            aria-label="업체 이름 검색"
+            className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
         {isLoading && (
           <SkeletonList
             count={8}
@@ -99,7 +117,9 @@ export default function HomePage() {
         )}
 
         {!isLoading && !isError && filtered.length === 0 && (
-          <EmptyText className="py-16">해당 유형의 업체가 없습니다.</EmptyText>
+          <EmptyText className="py-16">
+            {trimmedKeyword ? '검색 결과가 없습니다.' : '해당 유형의 업체가 없습니다.'}
+          </EmptyText>
         )}
 
         {!isLoading && !isError && filtered.length > 0 && (
