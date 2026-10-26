@@ -6,8 +6,11 @@ import HomePage from './page';
 import { useAuthStore } from '@/lib/store/auth';
 import { renderWithQuery } from '@/lib/test-utils/renderWithQuery';
 
+const replace = vi.fn();
+let searchParams = new URLSearchParams();
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  useRouter: () => ({ push: vi.fn(), replace }),
+  useSearchParams: () => searchParams,
 }));
 
 const getMerchants = vi.fn();
@@ -22,6 +25,8 @@ const merchants = [
 
 beforeEach(() => {
   getMerchants.mockReset();
+  replace.mockReset();
+  searchParams = new URLSearchParams();
   useAuthStore.setState({
     accessToken: null,
     refreshToken: null,
@@ -57,6 +62,7 @@ describe('HomePage', () => {
     expect(await screen.findByText('한적한 펜션')).toBeInTheDocument();
     expect(screen.queryByText('요가 클래스')).not.toBeInTheDocument();
     expect(getMerchants).toHaveBeenLastCalledWith('PENSION', 0);
+    expect(replace).toHaveBeenLastCalledWith('/?category=PENSION', { scroll: false });
   });
 
   it('불러오기 실패 시 에러 메시지를 보여준다', async () => {
@@ -86,5 +92,21 @@ describe('HomePage', () => {
     await userEvent.click(screen.getByText('더 보기'));
 
     expect(await screen.findByText('테니스장')).toBeInTheDocument();
+  });
+
+  it('URL에 category 쿼리가 있으면 해당 탭을 선택된 상태로 조회한다', async () => {
+    searchParams = new URLSearchParams('category=CLASS');
+    getMerchants.mockImplementation((type?: string) =>
+      Promise.resolve({
+        content: type ? merchants.filter((m) => m.type === type) : merchants,
+        page: 0,
+        totalPages: 1,
+      }),
+    );
+    renderWithQuery(<HomePage />);
+
+    expect(await screen.findByText('요가 클래스')).toBeInTheDocument();
+    expect(screen.queryByText('한적한 펜션')).not.toBeInTheDocument();
+    expect(getMerchants).toHaveBeenLastCalledWith('CLASS', 0);
   });
 });
