@@ -7,7 +7,9 @@ import { toDateKey } from '@/lib/utils/calendar';
 import { renderWithQuery } from '@/lib/test-utils/renderWithQuery';
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: vi.fn() }),
+  usePathname: () => '/merchant/calendar',
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 const getAdminCalendar = vi.fn();

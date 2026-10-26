@@ -7,7 +7,9 @@ import { renderWithQuery } from '@/lib/test-utils/renderWithQuery';
 
 vi.mock('next/navigation', () => ({
   useParams: () => ({ id: '1' }),
-  useRouter: () => ({ push: vi.fn() }),
+  usePathname: () => '/merchant/1/reservations',
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
+  useSearchParams: () => new URLSearchParams(),
 }));
 
 const getMerchantReservations = vi.fn();

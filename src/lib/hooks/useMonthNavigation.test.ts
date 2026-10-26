@@ -1,7 +1,20 @@
 // @vitest-environment jsdom
 import { act, renderHook } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useMonthNavigation } from './useMonthNavigation';
+
+const replace = vi.fn();
+let searchParams = new URLSearchParams();
+vi.mock('next/navigation', () => ({
+  usePathname: () => '/example',
+  useRouter: () => ({ replace }),
+  useSearchParams: () => searchParams,
+}));
+
+beforeEach(() => {
+  replace.mockReset();
+  searchParams = new URLSearchParams();
+});
 
 describe('useMonthNavigation', () => {
   it('현재 연/월로 초기화된다', () => {
@@ -9,6 +22,22 @@ describe('useMonthNavigation', () => {
     const { result } = renderHook(() => useMonthNavigation());
 
     expect(result.current.year).toBe(now.getFullYear());
+    expect(result.current.month).toBe(now.getMonth() + 1);
+  });
+
+  it('URL에 year/month 쿼리가 있으면 해당 값으로 초기화된다', () => {
+    searchParams = new URLSearchParams('year=2024&month=5');
+    const { result } = renderHook(() => useMonthNavigation());
+
+    expect(result.current.year).toBe(2024);
+    expect(result.current.month).toBe(5);
+  });
+
+  it('URL의 month가 범위를 벗어나면 현재 달로 초기화된다', () => {
+    const now = new Date();
+    searchParams = new URLSearchParams('year=2024&month=13');
+    const { result } = renderHook(() => useMonthNavigation());
+
     expect(result.current.month).toBe(now.getMonth() + 1);
   });
 
@@ -36,6 +65,15 @@ describe('useMonthNavigation', () => {
       : { year: before.year, month: before.month - 1 };
     expect(result.current.year).toBe(expected.year);
     expect(result.current.month).toBe(expected.month);
+  });
+
+  it('월 이동 시 URL의 year/month 쿼리를 갱신한다', () => {
+    searchParams = new URLSearchParams('year=2024&month=5');
+    const { result } = renderHook(() => useMonthNavigation());
+
+    act(() => result.current.nextMonth());
+
+    expect(replace).toHaveBeenLastCalledWith('/example?year=2024&month=6', { scroll: false });
   });
 
   it('월 이동 시 onChange 콜백을 호출한다', () => {

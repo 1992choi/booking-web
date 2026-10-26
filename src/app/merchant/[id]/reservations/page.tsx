@@ -14,8 +14,11 @@ import { RESERVATION_STATUS_TABS } from '@/lib/constants/reservation';
 import { ReservationStatusBadge, ReservationSummaryRows } from '@/components/ReservationSummary';
 import type { MerchantReservation, ReservationStatus } from '@/lib/types/reservation';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
+import { useQueryParamState } from '@/lib/hooks/useQueryParamState';
 
 type Action = 'confirm' | 'cancel';
+
+const RESERVATION_STATUS_TAB_VALUES = RESERVATION_STATUS_TABS.map((t) => t.value);
 
 function ReservationCard({
   reservation,
@@ -71,7 +74,7 @@ export default function MerchantReservationsPage() {
   useDocumentTitle('예약 관리');
   const { id } = useParams<{ id: string }>();
   const merchantId = Number(id);
-  const [tab, setTab] = useState<ReservationStatus | 'ALL'>('ALL');
+  const [tab, setTab] = useQueryParamState<ReservationStatus | 'ALL'>('status', 'ALL', RESERVATION_STATUS_TAB_VALUES);
   const [actionError, setActionError] = useState('');
   const queryClient = useQueryClient();
 

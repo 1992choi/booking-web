@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
@@ -12,6 +11,9 @@ import { RESERVATION_STATUS_TABS } from '@/lib/constants/reservation';
 import { ReservationStatusBadge, ReservationSummaryRows } from '@/components/ReservationSummary';
 import type { Reservation, ReservationStatus } from '@/lib/types/reservation';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
+import { useQueryParamState } from '@/lib/hooks/useQueryParamState';
+
+const RESERVATION_STATUS_TAB_VALUES = RESERVATION_STATUS_TABS.map((t) => t.value);
 
 function ReservationCard({ reservation }: { reservation: Reservation }) {
   return (
@@ -35,7 +37,7 @@ function ReservationCard({ reservation }: { reservation: Reservation }) {
 
 export default function MyReservationsPage() {
   useDocumentTitle('내 예약');
-  const [tab, setTab] = useState<ReservationStatus | 'ALL'>('ALL');
+  const [tab, setTab] = useQueryParamState<ReservationStatus | 'ALL'>('status', 'ALL', RESERVATION_STATUS_TAB_VALUES);
 
   const {
     data,

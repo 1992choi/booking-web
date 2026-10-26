@@ -7,7 +7,6 @@
 - React Server Components 전환 — 현재 `src/app`의 페이지 17개가 전부 `'use client'`. Next 16 App Router를 쓰면서 서버 컴포넌트를 하나도 안 씀. 홈 화면처럼 초기 데이터 패칭이 큰 화면 하나를 서버 컴포넌트로 바꾸고 인터랙션만 client leaf로 분리
 - Cache Components(`"use cache"`) 적용 검토 — Next 16 신규 캐싱 모델(`node_modules/next/dist/docs/01-app/02-guides/migrating-to-cache-components.md`). RSC 전환과 함께 가면 자연스러움
 - `cva` + `clsx` + `tailwind-merge` 실사용 — `package.json`에 설치만 돼 있고 미사용(`docs/01-overview.md`에 명시). `cn()` 유틸 추가 후 `MERCHANT_TYPE_COLORS` 같은 반복 variant 스타일을 `cva`로 정리
-- 주요 화면 상태를 URL 쿼리 파라미터로 동기화 — `MonthNav`의 year/month, 예약 상태 필터 등이 `useState`뿐이라 새로고침/뒤로가기 시 유실됨 (홈 카테고리 탭은 `category` 쿼리 파라미터 동기화로 해결 완료)
 - Intersection Observer 기반 무한 스크롤 — 홈/대시보드/통계 페이징이 전부 "더 보기" 버튼 수동 클릭(`fetchNextPage`)
 - React 19 `useOptimistic` 적용 — 알림 읽음 처리(`src/app/my/notifications/page.tsx`)가 현재 `onSuccess` 캐시 갱신 패턴
 - Playwright E2E 테스트 도입 — 현재 테스트는 vitest + RTL 컴포넌트/통합 테스트뿐, 로그인→탐색→예약 흐름을 실제 브라우저로 검증하는 E2E 없음

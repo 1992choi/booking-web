@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
@@ -11,6 +10,7 @@ import { formatDate } from '@/lib/utils/format';
 import { ROLE_LABELS, ROLE_COLORS } from '@/lib/constants/user';
 import type { Role, UserResponse } from '@/lib/types/auth';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
+import { useQueryParamState } from '@/lib/hooks/useQueryParamState';
 
 type FilterRole = Role | 'ALL';
 
@@ -20,6 +20,8 @@ const TABS: { label: string; value: FilterRole }[] = [
   { label: '업체 운영자', value: 'MERCHANT' },
   { label: '관리자', value: 'ADMIN' },
 ];
+
+const TAB_VALUES = TABS.map((t) => t.value);
 
 function UserCard({ user }: { user: UserResponse }) {
   const router = useRouter();
@@ -57,7 +59,7 @@ function UserCard({ user }: { user: UserResponse }) {
 
 export default function AdminUsersPage() {
   useDocumentTitle('회원 관리');
-  const [tab, setTab] = useState<FilterRole>('ALL');
+  const [tab, setTab] = useQueryParamState<FilterRole>('role', 'ALL', TAB_VALUES);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['admin-users', tab],

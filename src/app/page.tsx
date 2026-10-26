@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import { SkeletonList } from '@/components/ui/Skeleton';
@@ -11,6 +10,7 @@ import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import { getMerchants } from '@/lib/api/merchants';
 import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
 import type { MerchantType } from '@/lib/types/merchant';
+import { useQueryParamState } from '@/lib/hooks/useQueryParamState';
 
 type FilterType = MerchantType | 'ALL';
 
@@ -28,32 +28,11 @@ const CATEGORY_TABS: CategoryTab[] = [
 ];
 
 const VISIBLE_TYPES = new Set<MerchantType>(['PENSION', 'CLASS', 'FACILITY']);
-const CATEGORY_VALUES = new Set<string>(CATEGORY_TABS.map((t) => t.value));
-
-function isFilterType(value: string | null): value is FilterType {
-  return value !== null && CATEGORY_VALUES.has(value);
-}
+const CATEGORY_TAB_VALUES = CATEGORY_TABS.map((t) => t.value);
 
 export default function HomePage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [selected, setSelected] = useState<FilterType>(() => {
-    const category = searchParams.get('category');
-    return isFilterType(category) ? category : 'ALL';
-  });
+  const [selected, setSelected] = useQueryParamState<FilterType>('category', 'ALL', CATEGORY_TAB_VALUES);
   const [keyword, setKeyword] = useState('');
-
-  const handleSelect = (value: FilterType) => {
-    setSelected(value);
-    const params = new URLSearchParams(searchParams.toString());
-    if (value === 'ALL') {
-      params.delete('category');
-    } else {
-      params.set('category', value);
-    }
-    const query = params.toString();
-    router.replace(query ? `/?${query}` : '/', { scroll: false });
-  };
 
   const {
     data,
@@ -92,7 +71,7 @@ export default function HomePage() {
               return (
                 <button
                   key={tab.value}
-                  onClick={() => handleSelect(tab.value)}
+                  onClick={() => setSelected(tab.value)}
                   className={`flex flex-col items-center gap-1 flex-1 max-w-[120px] pt-3 pb-2.5 border-b-2 transition-colors ${
                     active
                       ? 'border-blue-500 text-blue-500'
