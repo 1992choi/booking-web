@@ -1,7 +1,8 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 import { useEscapeKey } from '@/lib/hooks/useEscapeKey';
+import { useFocusTrap } from '@/lib/hooks/useFocusTrap';
 
 interface ModalProps {
   onClose: () => void;
@@ -23,6 +24,8 @@ export default function Modal({
   panelClassName = '',
 }: ModalProps) {
   useEscapeKey(onClose);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(panelRef);
 
   const alignClass = position === 'center' ? 'items-center' : 'items-end sm:items-center';
   const shapeClass = position === 'center' ? 'rounded-2xl' : 'rounded-t-2xl sm:rounded-2xl';
@@ -35,7 +38,11 @@ export default function Modal({
       aria-labelledby={labelId}
     >
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className={`relative w-full ${maxWidthClassName} bg-white ${shapeClass} shadow-xl p-6 ${panelClassName}`}>
+      <div
+        ref={panelRef}
+        tabIndex={-1}
+        className={`relative w-full ${maxWidthClassName} bg-white ${shapeClass} shadow-xl p-6 ${panelClassName} focus:outline-hidden`}
+      >
         {children}
       </div>
     </div>

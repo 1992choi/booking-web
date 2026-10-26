@@ -14,7 +14,6 @@
 
 ## 미구현 기능
 
-- Modal 접근성 보강 — `src/components/ui/Modal.tsx`에 포커스 트랩/포커스 복원 없음. 열릴 때 첫 포커스 이동, Tab 순환 가둠, 닫히면 트리거로 포커스 복귀 (`useEscapeKey`와 같은 패턴으로 `useFocusTrap` 추가)
 - 동적 SEO 메타데이터 — 업체 상세(`/owners/[id]`) 등 공개 페이지가 전부 client component라 `generateMetadata` 못 씀(루트 레이아웃 고정 메타데이터뿐). RSC 전환과 묶으면 자연스럽게 해결
 - 홈 화면에서 이미 로드된 범위 내 업체 이름 클라이언트 필터링 — 전체 데이터셋 검색(Elasticsearch)은 백엔드 선행 필요하지만, 현재 로드된 페이지 안에서의 필터링은 프론트만으로 가능
 
