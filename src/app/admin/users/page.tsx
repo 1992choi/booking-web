@@ -7,7 +7,8 @@ import { SkeletonList } from '@/components/ui/Skeleton';
 import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import { getUsers } from '@/lib/api/auth';
 import { formatDate } from '@/lib/utils/format';
-import { ROLE_LABELS, ROLE_COLORS } from '@/lib/constants/user';
+import { ROLE_LABELS, roleBadgeVariants } from '@/lib/constants/user';
+import { cn } from '@/lib/utils/cn';
 import type { Role, UserResponse } from '@/lib/types/auth';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 import { useQueryParamState } from '@/lib/hooks/useQueryParamState';
@@ -32,7 +33,7 @@ function UserCard({ user }: { user: UserResponse }) {
         <div className="min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-sm font-semibold text-gray-900">{user.name}</span>
-            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${ROLE_COLORS[user.role]}`}>
+            <span className={cn(roleBadgeVariants({ role: user.role }), 'font-medium')}>
               {ROLE_LABELS[user.role]}
             </span>
           </div>

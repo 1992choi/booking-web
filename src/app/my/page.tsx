@@ -11,7 +11,7 @@ import { getMe, updateMe, deleteMe, logout } from '@/lib/api/auth';
 import { getErrorMessage } from '@/lib/api/axios';
 import { formatDate } from '@/lib/utils/format';
 import { useAuthStore } from '@/lib/store/auth';
-import { ROLE_LABELS, ROLE_COLORS } from '@/lib/constants/user';
+import { ROLE_LABELS, roleBadgeVariants } from '@/lib/constants/user';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 
 export default function MyPage() {
@@ -113,7 +113,7 @@ export default function MyPage() {
                   </div>
                   <div>
                     <p className="text-base font-bold text-gray-900">{user.name}</p>
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${ROLE_COLORS[user.role]}`}>
+                    <span className={roleBadgeVariants({ role: user.role })}>
                       {ROLE_LABELS[user.role]}
                     </span>
                   </div>

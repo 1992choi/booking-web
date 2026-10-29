@@ -10,7 +10,7 @@ import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import { getMerchant } from '@/lib/api/merchants';
 import { getReviewsByMerchant } from '@/lib/api/reviews';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
-import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
+import { merchantTypeBadgeVariants, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
 import { useAuthStore } from '@/lib/store/auth';
 import type { Resource } from '@/lib/types/merchant';
 import type { Review } from '@/lib/types/review';
@@ -60,7 +60,7 @@ export default function MerchantPublicDetailPage() {
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-1">
                 <h1 className="text-2xl font-bold text-gray-900">{merchant.name}</h1>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${MERCHANT_TYPE_COLORS[merchant.type]}`}>
+                <span className={merchantTypeBadgeVariants({ type: merchant.type })}>
                   {MERCHANT_TYPE_LABELS[merchant.type]}
                 </span>
               </div>

@@ -1,5 +1,6 @@
-import { RESERVATION_STATUS_LABELS, RESERVATION_STATUS_STYLES } from '@/lib/constants/reservation';
+import { RESERVATION_STATUS_LABELS, reservationStatusBadgeVariants } from '@/lib/constants/reservation';
 import type { AdminCalendarEntry } from '@/lib/types/admin';
+import { cn } from '@/lib/utils/cn';
 
 export function EntryCard({
   entry,
@@ -16,7 +17,7 @@ export function EntryCard({
     <div className="bg-white border border-gray-100 rounded-xl p-4">
       <div className="flex items-center justify-between mb-2">
         <p className="text-sm font-medium text-gray-900 truncate">{entry.resourceName}</p>
-        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ml-2 shrink-0 ${RESERVATION_STATUS_STYLES[entry.status]}`}>
+        <span className={cn(reservationStatusBadgeVariants({ status: entry.status }), 'ml-2 shrink-0')}>
           {RESERVATION_STATUS_LABELS[entry.status]}
         </span>
       </div>

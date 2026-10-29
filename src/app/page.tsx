@@ -8,9 +8,10 @@ import Header from '@/components/Header';
 import { SkeletonList } from '@/components/ui/Skeleton';
 import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import { getMerchants } from '@/lib/api/merchants';
-import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
+import { merchantTypeBadgeVariants, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
 import type { MerchantType } from '@/lib/types/merchant';
 import { useQueryParamState } from '@/lib/hooks/useQueryParamState';
+import { cn } from '@/lib/utils/cn';
 
 type FilterType = MerchantType | 'ALL';
 
@@ -141,7 +142,7 @@ export default function HomePage() {
                   <span className="text-sm font-medium text-gray-800 text-center px-4 leading-snug">
                     {merchant.name}
                   </span>
-                  <span className={`mt-3 text-xs font-semibold px-2 py-0.5 rounded-full ${MERCHANT_TYPE_COLORS[merchant.type]}`}>
+                  <span className={cn(merchantTypeBadgeVariants({ type: merchant.type }), 'mt-3')}>
                     {MERCHANT_TYPE_LABELS[merchant.type]}
                   </span>
                 </Link>

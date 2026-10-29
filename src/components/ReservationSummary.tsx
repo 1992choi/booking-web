@@ -1,10 +1,11 @@
-import { RESERVATION_STATUS_LABELS, RESERVATION_STATUS_STYLES } from '@/lib/constants/reservation';
+import { RESERVATION_STATUS_LABELS, reservationStatusBadgeVariants } from '@/lib/constants/reservation';
 import { formatDate, formatPrice, formatTime } from '@/lib/utils/format';
 import type { ReservationStatus } from '@/lib/types/reservation';
+import { cn } from '@/lib/utils/cn';
 
 export function ReservationStatusBadge({ status }: { status: ReservationStatus }) {
   return (
-    <span className={`shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${RESERVATION_STATUS_STYLES[status]}`}>
+    <span className={cn(reservationStatusBadgeVariants({ status, size: 'md' }), 'shrink-0')}>
       {RESERVATION_STATUS_LABELS[status]}
     </span>
   );

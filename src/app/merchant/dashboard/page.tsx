@@ -7,10 +7,11 @@ import Header from '@/components/Header';
 import { SkeletonList } from '@/components/ui/Skeleton';
 import { ErrorText } from '@/components/ui/StatusMessage';
 import { getMerchants, getMyMerchants } from '@/lib/api/merchants';
-import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
+import { merchantTypeBadgeVariants, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
 import { useAuthStore } from '@/lib/store/auth';
 import type { MerchantSummary } from '@/lib/types/merchant';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
+import { cn } from '@/lib/utils/cn';
 
 function MerchantCard({ merchant, isMerchant }: { merchant: MerchantSummary; isMerchant: boolean }) {
   const router = useRouter();
@@ -22,7 +23,7 @@ function MerchantCard({ merchant, isMerchant }: { merchant: MerchantSummary; isM
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 min-w-0">
           <h2 className="text-base font-semibold text-gray-900 truncate">{merchant.name}</h2>
-          <span className={`shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full ${MERCHANT_TYPE_COLORS[merchant.type]}`}>
+          <span className={cn(merchantTypeBadgeVariants({ type: merchant.type }), 'shrink-0')}>
             {MERCHANT_TYPE_LABELS[merchant.type]}
           </span>
         </div>

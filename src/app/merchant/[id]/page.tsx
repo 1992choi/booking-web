@@ -11,7 +11,7 @@ import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import { getMerchant } from '@/lib/api/merchants';
 import { deleteResource } from '@/lib/api/resources';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
-import { MERCHANT_TYPE_COLORS, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
+import { merchantTypeBadgeVariants, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
 import { useAuthStore } from '@/lib/store/auth';
 import type { MerchantDetail, Resource } from '@/lib/types/merchant';
 import { ResourceFormModal } from './_components/ResourceFormModal';
@@ -91,7 +91,7 @@ export default function MerchantDetailPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg font-bold text-gray-900">{merchant.name}</h2>
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${MERCHANT_TYPE_COLORS[merchant.type]}`}>
+                  <span className={merchantTypeBadgeVariants({ type: merchant.type })}>
                     {MERCHANT_TYPE_LABELS[merchant.type]}
                   </span>
                 </div>

@@ -15,13 +15,14 @@ import { getPayment, refund } from '@/lib/api/payments';
 import { createReview } from '@/lib/api/reviews';
 import {
   RESERVATION_STATUS_LABELS,
-  RESERVATION_STATUS_STYLES,
+  reservationStatusBadgeVariants,
 } from '@/lib/constants/reservation';
 import { formatDate, formatPrice, formatTime } from '@/lib/utils/format';
 import type { Reservation } from '@/lib/types/reservation';
 import type { Payment, PaymentStatus } from '@/lib/types/payment';
 import type { ApiError } from '@/lib/types/common';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
+import { cn } from '@/lib/utils/cn';
 
 const PAYMENT_STATUS_STYLES: Record<PaymentStatus, string> = {
   PENDING:   'bg-yellow-50 text-yellow-600',
@@ -135,7 +136,7 @@ export default function ReservationDetailPage() {
             <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-4">
               <div className="flex items-start justify-between gap-3 mb-4">
                 <h2 className="text-lg font-bold text-gray-900">{reservation.resourceName}</h2>
-                <span className={`shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${RESERVATION_STATUS_STYLES[reservation.status]}`}>
+                <span className={cn(reservationStatusBadgeVariants({ status: reservation.status, size: 'md' }), 'shrink-0')}>
                   {RESERVATION_STATUS_LABELS[reservation.status]}
                 </span>
               </div>

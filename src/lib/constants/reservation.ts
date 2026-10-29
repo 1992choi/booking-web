@@ -1,3 +1,4 @@
+import { cva } from 'class-variance-authority';
 import type { ReservationStatus } from '@/lib/types/reservation';
 
 export const RESERVATION_STATUS_LABELS: Record<ReservationStatus, string> = {
@@ -6,11 +7,20 @@ export const RESERVATION_STATUS_LABELS: Record<ReservationStatus, string> = {
   CANCELLED: '취소',
 };
 
-export const RESERVATION_STATUS_STYLES: Record<ReservationStatus, string> = {
-  PENDING:   'bg-yellow-50 text-yellow-600',
-  CONFIRMED: 'bg-blue-50 text-blue-600',
-  CANCELLED: 'bg-gray-100 text-gray-400',
-};
+export const reservationStatusBadgeVariants = cva('text-xs font-semibold rounded-full', {
+  variants: {
+    status: {
+      PENDING:   'bg-yellow-50 text-yellow-600',
+      CONFIRMED: 'bg-blue-50 text-blue-600',
+      CANCELLED: 'bg-gray-100 text-gray-400',
+    } satisfies Record<ReservationStatus, string>,
+    size: {
+      sm: 'px-2 py-0.5',
+      md: 'px-2.5 py-1',
+    },
+  },
+  defaultVariants: { size: 'sm' },
+});
 
 export const RESERVATION_STATUS_TABS: { value: ReservationStatus | 'ALL'; label: string }[] = [
   { value: 'ALL',       label: '전체' },
