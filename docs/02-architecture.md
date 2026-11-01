@@ -29,7 +29,7 @@ booking-web/
 │   ├── app/                          # Next.js App Router (폴더 = 라우트)
 │   │   ├── layout.tsx                # 루트 레이아웃 (공통 Provider 포함)
 │   │   ├── page.tsx                  # 홈 (/)
-│   │   ├── providers.tsx             # TanStack Query Provider + 알림 SSE 구독 마운트
+│   │   ├── providers.tsx             # TanStack Query Provider + 알림 SSE 구독 + ChatWidget 마운트
 │   │   ├── globals.css               # 전역 스타일 + Tailwind v4 @theme
 │   │   ├── loading.tsx               # 라우트 전환 중 공용 로딩 스켈레톤
 │   │   ├── error.tsx                 # 라우트 세그먼트 에러 바운더리
@@ -90,6 +90,7 @@ booking-web/
 │   ├── components/
 │   │   ├── Header.tsx
 │   │   ├── ReservationSummary.tsx     # 예약 상태 배지·요약 행 (여러 페이지 공용)
+│   │   ├── ChatWidget.tsx             # AI 어시스턴트 플로팅 위젯 (로그인 시에만 노출)
 │   │   └── ui/
 │   │       ├── BackButton.tsx
 │   │       ├── Modal.tsx              # 오버레이+접근성을 갖춘 공용 모달 셸
@@ -110,7 +111,8 @@ booking-web/
 │   │   │   ├── adminReservations.ts  # 관리자 캘린더 조회, 확정/취소
 │   │   │   ├── payments.ts           # 결제 조회, 환불
 │   │   │   ├── notifications.ts      # 알림 조회, 회원에게 메시지 발송(ADMIN)
-│   │   │   └── reviews.ts            # 리뷰 조회/작성/수정/삭제
+│   │   │   ├── reviews.ts            # 리뷰 조회/작성/수정/삭제
+│   │   │   └── assistant.ts          # AI 어시스턴트 챗봇 질의
 │   │   │
 │   │   ├── store/
 │   │   │   ├── auth.ts                # Zustand: accessToken, user 정보
@@ -151,7 +153,8 @@ booking-web/
 │   │       ├── notification.ts
 │   │       ├── admin.ts
 │   │       ├── review.ts
-│   │       └── common.ts
+│   │       ├── common.ts
+│   │       └── assistant.ts
 │   │
 │   └── proxy.ts                       # 라우트 보호 (미인증 → /login 리디렉션, exp 만료 검증)
 │

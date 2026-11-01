@@ -2,6 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
+import ChatWidget from '@/components/ChatWidget';
 import ToastContainer from '@/components/ui/ToastContainer';
 import { useNotificationStream } from '@/lib/hooks/useNotificationStream';
 
@@ -28,6 +29,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       {children}
       <ToastContainer />
       <NotificationStream />
+      <ChatWidget />
     </QueryClientProvider>
   );
 }
