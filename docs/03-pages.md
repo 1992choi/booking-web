@@ -15,6 +15,7 @@
 | DELETE | `/api/v1/users/me` | 회원 탈퇴 |
 | GET | `/api/v1/admin/users?role=` | 회원 목록 조회 (ADMIN) |
 | POST | `/api/v1/admin/users/{id}/message` | 회원에게 메시지 발송 (ADMIN) |
+| POST | `/api/v1/assistant/chat` | AI 어시스턴트 챗봇 질의 (로그인 필요, 전역 플로팅 위젯) |
 
 ### reservation 서비스 (8081)
 
@@ -56,6 +57,7 @@
 | 메서드 | 경로 | 설명 |
 |--------|------|------|
 | GET | `/api/v1/notifications/me` | 내 알림 목록 |
+| PATCH | `/api/v1/notifications/{id}/read` | 알림 읽음 처리 |
 | GET | `/api/v1/notifications/stream?token=` | 실시간 알림 구독 (SSE, `EventSource`) |
 
 ### review 서비스 (8084)
@@ -82,7 +84,7 @@
 
 | 페이지 | URL | 사용 API |
 |--------|-----|---------|
-| 홈 (업체 목록 + 카테고리 필터) | `/` | `GET /merchants?type=&page=&size=` |
+| 홈 (업체 목록 + 카테고리 필터 + 이름 검색) | `/` | `GET /merchants?type=&page=&size=` (카테고리는 `?category=` URL 쿼리와 동기화, 이름 검색은 이미 불러온 페이지 범위 내 클라이언트 필터링) |
 | 업체 상세 + 예약 + 리뷰 | `/owners/{id}` | `GET /merchants/{id}`, `GET /resources/{id}/available-times`, `POST /reservations`, `GET /reviews?merchantId=`, `PATCH /reviews/{id}`, `DELETE /reviews/{id}` |
 
 ### 마이페이지
@@ -90,9 +92,9 @@
 | 페이지 | URL | 사용 API |
 |--------|-----|---------|
 | 내 정보 | `/my` | `GET /users/me`, `PUT /users/me`, `DELETE /users/me` |
-| 내 예약 목록 | `/my/reservations` | `GET /reservations/me` |
+| 내 예약 목록 (상태 필터) | `/my/reservations` | `GET /reservations/me` (상태 필터는 `?status=` URL 쿼리와 동기화) |
 | 예약 상세 + 결제 + 취소/환불 + 리뷰 작성 | `/my/reservations/{id}` | `GET /reservations/{id}`, `GET /payments/{id}`, `PUT /reservations/{id}/cancel`, `POST /payments/{id}/refund`, `POST /reviews` |
-| 내 알림 | `/my/notifications` | `GET /notifications/me`, `GET /notifications/stream` (SSE, 전역 구독) |
+| 내 알림 | `/my/notifications` | `GET /notifications/me`, `PATCH /notifications/{id}/read`, `GET /notifications/stream` (SSE, 전역 구독) |
 
 ### 업체 운영자 (role=MERCHANT 이상)
 
@@ -102,16 +104,30 @@
 | 내 업체 목록 | `/merchant/dashboard` | `GET /merchants/me` (MERCHANT), `GET /merchants` (ADMIN) |
 | 업체 상세 관리 (리소스·이용시간 CRUD) | `/merchant/{id}` | `GET /merchants/{id}`, `POST /merchants/{id}/resources`, `PUT /resources/{id}`, `DELETE /resources/{id}`, `GET /resources/{id}/available-times`, `POST /resources/{id}/available-times`, `PUT /available-times/{id}`, `DELETE /available-times/{id}` |
 | 업체 정보 수정 | `/merchant/{id}/edit` | `GET /merchants/{id}`, `PUT /merchants/{id}` |
-| 업체별 예약 목록 | `/merchant/{id}/reservations` | `GET /merchants/{id}/reservations`, `PUT /admin/reservations/{id}/confirm`, `PUT /admin/reservations/{id}/cancel` |
-| 일별 매출 통계 | `/merchant/{id}/stats` | `GET /merchants/{id}/stats/daily` |
-| 예약 현황 캘린더 | `/merchant/calendar` | `GET /admin/reservations/calendar`, `PUT /admin/reservations/{id}/confirm`, `PUT /admin/reservations/{id}/cancel` |
+| 업체별 예약 목록 (상태 필터) | `/merchant/{id}/reservations` | `GET /merchants/{id}/reservations`, `PUT /admin/reservations/{id}/confirm`, `PUT /admin/reservations/{id}/cancel` (상태 필터는 `?status=` URL 쿼리와 동기화) |
+| 일별 매출 통계 | `/merchant/{id}/stats` | `GET /merchants/{id}/stats/daily` (연/월은 `?year=&month=` URL 쿼리와 동기화) |
+| 예약 현황 캘린더 | `/merchant/calendar` | `GET /admin/reservations/calendar`, `PUT /admin/reservations/{id}/confirm`, `PUT /admin/reservations/{id}/cancel` (연/월은 `?year=&month=` URL 쿼리와 동기화) |
 
 ### 관리자 (role=ADMIN)
 
 | 페이지 | URL | 사용 API |
 |--------|-----|---------|
-| 회원 관리 | `/admin/users` | `GET /admin/users?role=` |
+| 회원 관리 (역할 필터) | `/admin/users` | `GET /admin/users?role=` (역할 필터는 `?role=` URL 쿼리와 동기화) |
 | 메시지 보내기 | `/admin/users/{id}/message` | `GET /admin/users?role=`, `POST /admin/users/{id}/message` |
+
+### 공용 UI (라우트 없음)
+
+| 컴포넌트 | 노출 조건 | 사용 API |
+|---------|----------|---------|
+| AI 어시스턴트 플로팅 위젯 (`ChatWidget`) | 로그인 상태일 때 모든 화면 우하단에 노출 (`src/app/providers.tsx`에서 전역 마운트) | `POST /assistant/chat` |
+
+### 메타데이터 라우트 (페이지 아님)
+
+| 경로 | 파일 | 설명 |
+|------|------|------|
+| `/robots.txt` | `src/app/robots.ts` | 크롤러 규칙 — `/my/`, `/merchant/`, `/admin/`은 비공개라 크롤링 제외 |
+| `/sitemap.xml` | `src/app/sitemap.ts` | 정적 공개 경로(`/`, `/login`, `/signup`)만 등록 — 업체 상세 등 동적 경로는 미포함 (이유는 파일 내 주석 참고) |
+| `/manifest.webmanifest` | `src/app/manifest.ts` | PWA 매니페스트 (앱 이름, 테마 색상 등) |
 
 ---
 
@@ -131,6 +147,7 @@
 | API_002 | 401 | 이메일 또는 비밀번호가 올바르지 않습니다. |
 | API_003 | 429 | 요청이 너무 많습니다. 잠시 후 다시 시도해 주세요. |
 | API_004 | 503 | 알림 서비스를 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도해 주세요. (서킷브레이커 OPEN) |
+| API_005 | 503 | AI 어시스턴트를 일시적으로 사용할 수 없습니다. 잠시 후 다시 시도해 주세요. |
 | PAY_001 | 422 | 결제가 실패했습니다. 다시 시도해 주세요. |
 | PAY_002 | 409 | 환불 가능한 상태가 아닙니다. |
 | PAY_003 | 404 | 결제 내역을 찾을 수 없습니다. |

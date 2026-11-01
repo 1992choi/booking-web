@@ -6,13 +6,15 @@
 
 - React Server Components 전환 — 현재 `src/app`의 페이지 17개가 전부 `'use client'`. Next 16 App Router를 쓰면서 서버 컴포넌트를 하나도 안 씀. 홈 화면처럼 초기 데이터 패칭이 큰 화면 하나를 서버 컴포넌트로 바꾸고 인터랙션만 client leaf로 분리
 - Cache Components(`"use cache"`) 적용 검토 — Next 16 신규 캐싱 모델(`node_modules/next/dist/docs/01-app/02-guides/migrating-to-cache-components.md`). RSC 전환과 함께 가면 자연스러움
-- Intersection Observer 기반 무한 스크롤 — 홈/대시보드/통계 페이징이 전부 "더 보기" 버튼 수동 클릭(`fetchNextPage`)
+- Intersection Observer 기반 무한 스크롤 — 홈/내 예약 목록/업체 대시보드/업체별 예약 목록 페이징이 전부 "더 보기" 버튼 수동 클릭(`fetchNextPage`)
 - React 19 `useOptimistic` 적용 — 알림 읽음 처리(`src/app/my/notifications/page.tsx`)가 현재 `onSuccess` 캐시 갱신 패턴
 - Playwright E2E 테스트 도입 — 현재 테스트는 vitest + RTL 컴포넌트/통합 테스트뿐, 로그인→탐색→예약 흐름을 실제 브라우저로 검증하는 E2E 없음
+- 결제 상태·이용시간 상태 뱃지의 cva 전환 — `merchantTypeBadgeVariants`/`roleBadgeVariants`/`reservationStatusBadgeVariants`로 정리했지만, `PAYMENT_STATUS_STYLES`(`src/app/my/reservations/[id]/page.tsx`)와 `STATUS_COLORS`(`src/app/merchant/[id]/_components/helpers.ts`, `AvailableTime` 상태)는 현재 단일 파일에서만 쓰여 중복은 아니라 전환 대상에서 빠졌음. 같은 뱃지가 다른 화면에도 쓰이게 되면 일관성을 위해 같은 패턴으로 옮길 것
 
 ## 미구현 기능
 
 - 동적 SEO 메타데이터 — 업체 상세(`/owners/[id]`) 등 공개 페이지가 전부 client component라 `generateMetadata` 못 씀(루트 레이아웃 고정 메타데이터뿐). RSC 전환과 묶으면 자연스럽게 해결
+- PWA 매니페스트에 아이콘 없음 — `src/app/manifest.ts`에 `icons` 배열이 없어 홈 화면에 추가해도 아이콘이 비어 보임. `public/`에 192×192/512×512 앱 아이콘 PNG 추가 필요 (현재 `public/icons/`에는 카테고리 탭용 이미지만 있음)
 
 ---
 

@@ -30,10 +30,13 @@ booking-web/
 │   │   ├── layout.tsx                # 루트 레이아웃 (공통 Provider 포함)
 │   │   ├── page.tsx                  # 홈 (/)
 │   │   ├── providers.tsx             # TanStack Query Provider + 알림 SSE 구독 + ChatWidget 마운트
-│   │   ├── globals.css               # 전역 스타일 + Tailwind v4 @theme
+│   │   ├── globals.css               # 전역 스타일 + Tailwind v4 @theme (다크 모드 미지원, 시스템 설정과 무관하게 라이트 모드 강제)
 │   │   ├── loading.tsx               # 라우트 전환 중 공용 로딩 스켈레톤
 │   │   ├── error.tsx                 # 라우트 세그먼트 에러 바운더리
 │   │   ├── not-found.tsx             # 404 화면
+│   │   ├── robots.ts                 # /robots.txt (MetadataRoute.Robots)
+│   │   ├── sitemap.ts                # /sitemap.xml (MetadataRoute.Sitemap, 현재 정적 공개 경로만)
+│   │   ├── manifest.ts               # /manifest.webmanifest (PWA 메타데이터)
 │   │   │
 │   │   ├── (auth)/                   # 인증 라우트 그룹 (헤더 없음)
 │   │   │   ├── layout.tsx
@@ -93,7 +96,7 @@ booking-web/
 │   │   ├── ChatWidget.tsx             # AI 어시스턴트 플로팅 위젯 (로그인 시에만 노출)
 │   │   └── ui/
 │   │       ├── BackButton.tsx
-│   │       ├── Modal.tsx              # 오버레이+접근성을 갖춘 공용 모달 셸
+│   │       ├── Modal.tsx              # 오버레이 + 포커스 트랩/복원(useFocusTrap)을 갖춘 공용 모달 셸
 │   │       ├── Row.tsx
 │   │       ├── MonthNav.tsx           # 연/월 이동 네비게이션 UI
 │   │       ├── Skeleton.tsx           # 로딩 스켈레톤 블록 (단일/반복 목록)
@@ -110,19 +113,20 @@ booking-web/
 │   │   │   ├── merchantReservations.ts # 업체별 예약 조회
 │   │   │   ├── adminReservations.ts  # 관리자 캘린더 조회, 확정/취소
 │   │   │   ├── payments.ts           # 결제 조회, 환불
-│   │   │   ├── notifications.ts      # 알림 조회, 회원에게 메시지 발송(ADMIN)
+│   │   │   ├── notifications.ts      # 알림 조회, 읽음 처리, 회원에게 메시지 발송(ADMIN)
 │   │   │   ├── reviews.ts            # 리뷰 조회/작성/수정/삭제
-│   │   │   └── assistant.ts          # AI 어시스턴트 챗봇 질의
+│   │   │   └── assistant.ts          # AI 어시스턴트 챗봇 질의 (내부적으로 api 서비스로 라우팅)
 │   │   │
 │   │   ├── store/
 │   │   │   ├── auth.ts                # Zustand: accessToken, user 정보
 │   │   │   └── toast.ts               # Zustand: 전역 토스트 알림
 │   │   │
-│   │   ├── constants/                 # 라벨·색상 등 화면 상수
-│   │   │   ├── merchant.ts
-│   │   │   ├── reservation.ts
-│   │   │   ├── notification.ts
-│   │   │   └── user.ts
+│   │   ├── constants/                 # 라벨·색상(variant) 등 화면 상수
+│   │   │   ├── merchant.ts            # 업체 유형 라벨 + 뱃지 색상 cva(merchantTypeBadgeVariants)
+│   │   │   ├── reservation.ts         # 예약 상태 라벨 + 뱃지 색상 cva(reservationStatusBadgeVariants)
+│   │   │   ├── notification.ts        # 알림 타입 라벨
+│   │   │   ├── user.ts                # 역할 라벨 + 뱃지 색상 cva(roleBadgeVariants)
+│   │   │   └── site.ts                # SITE_URL (robots.txt/sitemap.xml용 배포 주소)
 │   │   │
 │   │   ├── validation/                # React Hook Form용 zod 스키마
 │   │   │   ├── common.ts              # 공용 필드 스키마 (전화번호 등)
@@ -132,10 +136,13 @@ booking-web/
 │   │   ├── hooks/
 │   │   │   ├── useDocumentTitle.ts    # 라우트별 <title> 설정
 │   │   │   ├── useEscapeKey.ts        # ESC 키로 모달 닫기
-│   │   │   ├── useMonthNavigation.ts  # 연/월 상태 + 이전/다음 달 이동
+│   │   │   ├── useFocusTrap.ts        # 모달/패널 포커스 트랩 + 포커스 복원
+│   │   │   ├── useMonthNavigation.ts  # 연/월 상태 + 이전/다음 달 이동, URL `year`/`month` 쿼리와 동기화
+│   │   │   ├── useQueryParamState.ts  # 탭/필터 상태를 URL 쿼리 파라미터와 동기화하는 범용 훅
 │   │   │   └── useNotificationStream.ts # SSE 알림 구독 (캐시 갱신 + 토스트)
 │   │   │
 │   │   ├── utils/
+│   │   │   ├── cn.ts                 # clsx + tailwind-merge 기반 className 병합 유틸
 │   │   │   ├── format.ts             # 날짜/가격 포맷 헬퍼
 │   │   │   └── calendar.ts           # 월 이동/캘린더 그리드 계산
 │   │   │
@@ -171,7 +178,7 @@ booking-web/
 
 ## 라우트 보호 전략
 
-`proxy.ts`에서 JWT 토큰 유무·만료(`exp`)·role을 확인한다.
+`proxy.ts`(서버에서 실행)는 `localStorage`에 접근할 수 없으므로, `access-token` **쿠키**(평문 JWT, `auth.ts` 스토어가 로그인/토큰 갱신 시마다 동기화)에서 토큰 유무·만료(`exp`)·role을 확인한다.
 
 ```
 /login, /signup          → 누구나 접근 가능
@@ -194,3 +201,4 @@ role 불충족 시 `/`로 리디렉션.
 | 인증 상태 (토큰, 유저 정보) | Zustand | 페이지 간 공유, localStorage 동기화 |
 | 폼 상태 | React Hook Form | 로컬 컴포넌트 내부 |
 | UI 상태 (모달 열림 등) | React useState | 로컬 컴포넌트 내부 |
+| 탭/필터/월 선택 상태 | `useQueryParamState`, `useMonthNavigation` (next/navigation) | URL 쿼리 파라미터로 동기화 — 새로고침·뒤로가기에도 유지 |

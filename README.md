@@ -93,29 +93,19 @@ npm run test:watch
 
 테스트 러너로 [Vitest](https://vitest.dev)를 사용한다. 테스트 파일은 대상 파일과 같은 위치에 `*.test.ts`로 작성한다 (예: `src/lib/utils/format.ts` → `src/lib/utils/format.test.ts`).
 
+기본 테스트 환경은 `node`(`vitest.config.ts`)이므로, DOM이 필요한 컴포넌트/훅 테스트(`*.test.tsx`, `renderHook`/`render` 사용)는 파일 맨 위에 `// @vitest-environment jsdom` 주석을 추가해야 한다. 안 그러면 `document`가 없어 실패한다 — 기존 `*.test.tsx` 파일을 참고.
+
 ### 7. CI
 
 `master`로의 push/PR마다 GitHub Actions(`.github/workflows/ci.yml`)가 `lint` → `test` → `build` 순서로 동일한 명령을 실행한다. 로컬에서 세 명령이 모두 통과하면 CI도 통과한다.
 
 ---
 
-## shadcn/ui 컴포넌트 추가 방법
+## UI 컴포넌트
 
-개발 중 새로운 UI 컴포넌트가 필요할 때 아래 명령으로 추가한다.
-(최초 1회 `npx shadcn@latest init` 초기화 필요)
-
-```bash
-# 초기화 (처음 한 번만)
-npx shadcn@latest init
-
-# 컴포넌트 개별 추가 예시
-npx shadcn@latest add button
-npx shadcn@latest add input
-npx shadcn@latest add dialog
-npx shadcn@latest add calendar
-```
-
-추가된 컴포넌트는 `src/components/ui/` 에 생성된다.
+shadcn/ui 등 외부 컴포넌트 라이브러리는 쓰지 않는다 (`components.json` 없음, radix 계열 의존성 없음).
+`src/components/ui/`의 모든 컴포넌트(`Modal`, `MonthNav`, `Skeleton` 등)는 직접 작성한 커스텀 컴포넌트이며, 새 컴포넌트가 필요하면 이 디렉터리에 같은 방식으로 추가한다.
+타입별 variant 스타일(뱃지 색상 등)은 `class-variance-authority`(`cva`) + `src/lib/utils/cn.ts`(`clsx` + `tailwind-merge`) 조합으로 작성한다 — 예시는 `src/lib/constants/{merchant,user,reservation}.ts`.
 
 ---
 
@@ -131,8 +121,9 @@ src/
     ├── constants/    # 라벨·색상 등 화면 상수
     ├── validation/   # React Hook Form용 zod 스키마
     ├── hooks/        # 커스텀 훅
-    ├── utils/        # 포맷/캘린더 등 순수 함수
+    ├── utils/        # 포맷/캘린더/cn() 등 순수 함수
     ├── test-utils/   # 테스트 렌더 헬퍼
+    ├── test/         # 테스트 공용 목 데이터
     └── types/        # TypeScript 타입
 ```
 
@@ -148,5 +139,6 @@ src/
 | [02-architecture](docs/02-architecture.md) | 폴더 구조, 라우트 보호, 상태 관리 전략 |
 | [03-pages](docs/03-pages.md) | 페이지 목록, API 매핑, 에러 코드 |
 | [04-api-client](docs/04-api-client.md) | Axios 설정, API 함수 목록, 타입 정의 |
+| [99-backlog](docs/99-backlog.md) | 프론트엔드 개선/기능 추가 후보 (백엔드 의존 항목은 별도 분류) |
 
 백엔드 문서: [`../booking/docs/`](../booking/docs/)

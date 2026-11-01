@@ -17,7 +17,7 @@ CORS 문제 없이 백엔드 5개 서비스로 자동 프록시된다.
 | `/api/v1/payments/**` | `localhost:8082` (payment) |
 | `/api/v1/notifications/**` | `localhost:8083` (notification) |
 | `/api/v1/reviews/**` | `localhost:8084` (review) |
-| `/api/v1/**` (나머지, 예: auth, users) | `localhost:8080` (api) |
+| `/api/v1/**` (나머지, 예: auth, users, assistant) | `localhost:8080` (api) |
 
 라우팅 우선순위는 `next.config.ts`에 정의된 rewrites 순서를 따른다 (더 구체적인 규칙이 먼저 매칭).
 
@@ -28,7 +28,7 @@ CORS 문제 없이 백엔드 5개 서비스로 자동 프록시된다.
 - baseURL: `/api/v1`
 - 요청 인터셉터: Zustand 스토어에서 `accessToken`을 읽어 `Authorization: Bearer {token}` 헤더 자동 주입
 - 응답 인터셉터 (401): `refreshToken`으로 토큰 갱신 후 실패한 요청 재시도. 갱신 중 추가 요청은 큐에서 대기. refresh 자체가 401이거나 refreshToken이 없으면 로그아웃 후 `/login` 리디렉션
-- 에러 변환: 백엔드 `problem+json` 응답의 `code` 필드 기반으로 한국어 메시지 변환 (`getErrorMessage()`)
+- 에러 변환 (`getErrorMessage()`): 백엔드 `problem+json` 응답의 `code` 필드를 매핑 테이블로 한국어 메시지 변환. 매핑에 없는 `code`는 `detail` 필드 그대로 노출, `code`/`detail` 둘 다 없거나 axios 에러가 아니면 "알 수 없는 오류가 발생했습니다." 기본 메시지로 폴백
 
 ---
 
@@ -96,6 +96,7 @@ refund(reservationId) → void
 ### notifications.ts
 ```
 getMyNotifications() → Notification[]
+markNotificationRead(notificationId) → void  // PATCH /notifications/{id}/read
 sendNotificationToUser(userId, message) → void  // ADMIN only
 getNotificationStreamUrl(token) → string  // EventSource로 구독할 SSE URL (JWT를 쿼리로 전달)
 ```
@@ -106,6 +107,11 @@ getReviewsByMerchant(merchantId) → Review[]
 createReview(body: ReviewCreateRequest) → Review
 updateReview(reviewId, body: ReviewUpdateRequest) → Review
 deleteReview(reviewId) → void
+```
+
+### assistant.ts
+```
+sendChatMessage(request: ChatRequest) → ChatResponse  // POST /assistant/chat (timeout 60s, 대화 history 포함)
 ```
 
 ---
@@ -135,6 +141,12 @@ Zustand + `persist` 미들웨어로 `localStorage` 동기화. 페이지 로드 �
 
 백엔드 DTO와 1:1 매핑. `src/lib/types/` 에 정의.
 
+### 날짜/시간 처리 (`src/lib/utils/format.ts`)
+
+백엔드의 `LocalDateTime` 필드(예: `"2024-01-15T10:30:00"`)는 타임존 정보 없이 직렬화되지만, 모든 백엔드 서비스가 `Asia/Seoul`로 동작하므로 값 자체가 이미 한국 시간이다.
+`formatTime`/`formatDate`/`formatDateTime`은 이 문자열에 `+09:00` 오프셋을 붙여 파싱한 뒤 `timeZone: 'Asia/Seoul'`로 렌더링한다 — 브라우저의 로컬 타임존과 무관하게 항상 한국 시간으로 표시된다 (예약 시간은 업체의 KST 영업시간에 고정되므로).
+새 화면에서 백엔드 날짜/시간 문자열을 직접 `new Date()`로 파싱하면 해외 타임존 브라우저에서 시간이 틀어지므로, 반드시 이 유틸을 거쳐야 한다.
+
 ### 예약 상태
 ```
 PENDING   → 결제 대기 중
@@ -155,4 +167,12 @@ REFUNDED  → 환불 완료
 PENSION  → 펜션
 CLASS    → 수업
 FACILITY → 시설
+```
+
+### 알림 타입
+```
+CONFIRMED     → 예약 확정
+CANCELLED     → 예약 취소
+ADMIN_MESSAGE → 관리자 메시지
+REMINDER      → 예약 리마인더
 ```
