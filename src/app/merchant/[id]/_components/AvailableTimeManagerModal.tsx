@@ -7,7 +7,7 @@ import Modal, { ModalHeader } from '@/components/ui/Modal';
 import { SkeletonList } from '@/components/ui/Skeleton';
 import { EmptyText, ErrorText } from '@/components/ui/StatusMessage';
 import type { Resource, AvailableTime } from '@/lib/types/merchant';
-import { STATUS_COLORS, STATUS_LABELS, formatTime, todayString } from './helpers';
+import { availableTimeStatusBadgeVariants, STATUS_LABELS, formatTime, todayString } from './helpers';
 import { AvailableTimeFormModal } from './AvailableTimeFormModal';
 import { AvailableTimeDeleteModal } from './AvailableTimeDeleteModal';
 
@@ -81,7 +81,7 @@ export function AvailableTimeManagerModal({
                   {formatTime(t.startTime)} ~ {formatTime(t.endTime)}
                 </p>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[t.status]}`}>
+                  <span className={availableTimeStatusBadgeVariants({ status: t.status })}>
                     {STATUS_LABELS[t.status]}
                   </span>
                   <button

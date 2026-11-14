@@ -17,26 +17,13 @@ import {
   RESERVATION_STATUS_LABELS,
   reservationStatusBadgeVariants,
 } from '@/lib/constants/reservation';
+import { PAYMENT_STATUS_LABELS, paymentStatusBadgeVariants } from '@/lib/constants/payment';
 import { formatDate, formatPrice, formatTime } from '@/lib/utils/format';
 import type { Reservation } from '@/lib/types/reservation';
-import type { Payment, PaymentStatus } from '@/lib/types/payment';
+import type { Payment } from '@/lib/types/payment';
 import type { ApiError } from '@/lib/types/common';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 import { cn } from '@/lib/utils/cn';
-
-const PAYMENT_STATUS_STYLES: Record<PaymentStatus, string> = {
-  PENDING:   'bg-yellow-50 text-yellow-600',
-  COMPLETED: 'bg-green-50 text-green-600',
-  FAILED:    'bg-red-50 text-red-500',
-  REFUNDED:  'bg-gray-100 text-gray-400',
-};
-
-const PAYMENT_STATUS_LABELS: Record<PaymentStatus, string> = {
-  PENDING:   '결제 대기',
-  COMPLETED: '결제 완료',
-  FAILED:    '결제 실패',
-  REFUNDED:  '환불 완료',
-};
 
 export default function ReservationDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -157,7 +144,7 @@ export default function ReservationDetailPage() {
                 <div>
                   <Row label="결제 금액">{formatPrice(payment.amount)}</Row>
                   <Row label="결제 상태">
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${PAYMENT_STATUS_STYLES[payment.status]}`}>
+                    <span className={paymentStatusBadgeVariants({ status: payment.status })}>
                       {PAYMENT_STATUS_LABELS[payment.status]}
                     </span>
                   </Row>

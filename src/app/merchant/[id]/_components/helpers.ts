@@ -1,3 +1,4 @@
+import { cva } from 'class-variance-authority';
 import type { AvailableTime } from '@/lib/types/merchant';
 
 export const STATUS_LABELS: Record<AvailableTime['status'], string> = {
@@ -5,10 +6,14 @@ export const STATUS_LABELS: Record<AvailableTime['status'], string> = {
   BLOCKED: '차단',
 };
 
-export const STATUS_COLORS: Record<AvailableTime['status'], string> = {
-  OPEN:    'bg-green-50 text-green-600',
-  BLOCKED: 'bg-red-50 text-red-500',
-};
+export const availableTimeStatusBadgeVariants = cva('text-xs font-medium px-2 py-0.5 rounded-full', {
+  variants: {
+    status: {
+      OPEN:    'bg-green-50 text-green-600',
+      BLOCKED: 'bg-red-50 text-red-500',
+    } satisfies Record<AvailableTime['status'], string>,
+  },
+});
 
 export function formatTime(dt: string) {
   return dt.slice(11, 16);

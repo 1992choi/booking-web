@@ -9,7 +9,6 @@
 - Intersection Observer 기반 무한 스크롤 — 홈/내 예약 목록/업체 대시보드/업체별 예약 목록 페이징이 전부 "더 보기" 버튼 수동 클릭(`fetchNextPage`)
 - React 19 `useOptimistic` 적용 — 알림 읽음 처리(`src/app/my/notifications/page.tsx`)가 현재 `onSuccess` 캐시 갱신 패턴
 - Playwright E2E 테스트 도입 — 현재 테스트는 vitest + RTL 컴포넌트/통합 테스트뿐, 로그인→탐색→예약 흐름을 실제 브라우저로 검증하는 E2E 없음
-- 결제 상태·이용시간 상태 뱃지의 cva 전환 — `merchantTypeBadgeVariants`/`roleBadgeVariants`/`reservationStatusBadgeVariants`로 정리했지만, `PAYMENT_STATUS_STYLES`(`src/app/my/reservations/[id]/page.tsx`)와 `STATUS_COLORS`(`src/app/merchant/[id]/_components/helpers.ts`, `AvailableTime` 상태)는 현재 단일 파일에서만 쓰여 중복은 아니라 전환 대상에서 빠졌음. 같은 뱃지가 다른 화면에도 쓰이게 되면 일관성을 위해 같은 패턴으로 옮길 것
 
 ## 미구현 기능
 

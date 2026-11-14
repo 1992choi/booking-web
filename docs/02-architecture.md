@@ -124,6 +124,7 @@ booking-web/
 │   │   ├── constants/                 # 라벨·색상(variant) 등 화면 상수
 │   │   │   ├── merchant.ts            # 업체 유형 라벨 + 뱃지 색상 cva(merchantTypeBadgeVariants)
 │   │   │   ├── reservation.ts         # 예약 상태 라벨 + 뱃지 색상 cva(reservationStatusBadgeVariants)
+│   │   │   ├── payment.ts             # 결제 상태 라벨 + 뱃지 색상 cva(paymentStatusBadgeVariants)
 │   │   │   ├── notification.ts        # 알림 타입 라벨
 │   │   │   ├── user.ts                # 역할 라벨 + 뱃지 색상 cva(roleBadgeVariants)
 │   │   │   └── site.ts                # SITE_URL (robots.txt/sitemap.xml용 배포 주소)
