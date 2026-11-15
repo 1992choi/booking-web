@@ -94,4 +94,33 @@ describe('NotificationsPage', () => {
 
     expect(markNotificationRead).not.toHaveBeenCalled();
   });
+
+  it('서버 응답 전에 낙관적으로 안읽음 표시를 지운다', async () => {
+    getMyNotifications.mockResolvedValue([notification]);
+    let resolveMarkRead: () => void = () => {};
+    markNotificationRead.mockImplementation(
+      () => new Promise<void>((resolve) => { resolveMarkRead = resolve; }),
+    );
+    const { container } = renderWithQuery(<NotificationsPage />);
+
+    await screen.findByText('[예약 확정]');
+    await userEvent.click(screen.getByText('[예약 확정]'));
+
+    // 서버 응답(markNotificationRead의 Promise)을 아직 resolve하지 않았는데도 UI가 먼저 반영된다.
+    await vi.waitFor(() => expect(container.querySelector('.bg-blue-400')).not.toBeInTheDocument());
+
+    resolveMarkRead();
+    await vi.waitFor(() => expect(markNotificationRead).toHaveBeenCalledWith(1));
+  });
+
+  it('읽음 처리 요청이 실패하면 안읽음 상태로 되돌아간다', async () => {
+    getMyNotifications.mockResolvedValue([notification]);
+    markNotificationRead.mockRejectedValue(new Error('network error'));
+    const { container } = renderWithQuery(<NotificationsPage />);
+
+    await screen.findByText('[예약 확정]');
+    await userEvent.click(screen.getByText('[예약 확정]'));
+
+    await vi.waitFor(() => expect(container.querySelector('.bg-blue-400')).toBeInTheDocument());
+  });
 });

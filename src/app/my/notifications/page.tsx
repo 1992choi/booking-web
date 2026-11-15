@@ -1,5 +1,6 @@
 'use client';
 
+import { useOptimistic, useTransition } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Header from '@/components/Header';
 import BackButton from '@/components/ui/BackButton';
@@ -45,13 +46,19 @@ function NotificationItem({
 export default function NotificationsPage() {
   useDocumentTitle('알림');
   const queryClient = useQueryClient();
+  const [, startTransition] = useTransition();
 
   const { data: notifications = [], isLoading, isError } = useQuery({
     queryKey: ['my-notifications'],
     queryFn: getMyNotifications,
   });
 
-  const { mutate: markRead } = useMutation({
+  const [optimisticNotifications, markReadOptimistic] = useOptimistic(
+    notifications,
+    (state, id: number) => state.map((n) => (n.id === id ? { ...n, readAt: new Date().toISOString() } : n)),
+  );
+
+  const { mutateAsync: markRead } = useMutation({
     mutationFn: (id: number) => markNotificationRead(id),
     onSuccess: (_, id) => {
       queryClient.setQueryData<Notification[]>(['my-notifications'], (prev) =>
@@ -59,6 +66,19 @@ export default function NotificationsPage() {
       );
     },
   });
+
+  function handleRead(id: number) {
+    // 트랜지션이 markRead를 기다리는 동안 낙관적 상태가 유지된다.
+    // 실패하면 캐시가 그대로라 트랜지션이 끝난 뒤 안읽음 상태로 되돌아간다.
+    startTransition(async () => {
+      markReadOptimistic(id);
+      try {
+        await markRead(id);
+      } catch {
+        // 에러는 무시 — 위 주석대로 낙관적 상태가 자동으로 되돌아간다.
+      }
+    });
+  }
 
   return (
     <>
@@ -75,14 +95,14 @@ export default function NotificationsPage() {
           <ErrorText className="py-16">알림을 불러오지 못했습니다.</ErrorText>
         )}
 
-        {!isLoading && !isError && notifications.length === 0 && (
+        {!isLoading && !isError && optimisticNotifications.length === 0 && (
           <EmptyText className="py-16">알림이 없습니다.</EmptyText>
         )}
 
-        {!isLoading && !isError && notifications.length > 0 && (
+        {!isLoading && !isError && optimisticNotifications.length > 0 && (
           <div className="space-y-2">
-            {notifications.map((n) => (
-              <NotificationItem key={n.id} notification={n} onRead={markRead} />
+            {optimisticNotifications.map((n) => (
+              <NotificationItem key={n.id} notification={n} onRead={handleRead} />
             ))}
           </div>
         )}
