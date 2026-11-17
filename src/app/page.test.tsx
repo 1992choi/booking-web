@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import HomePage from './page';
 import { useAuthStore } from '@/lib/store/auth';
 import { renderWithQuery } from '@/lib/test-utils/renderWithQuery';
+import { mockIntersectionObserver } from '@/lib/test-utils/mockIntersectionObserver';
 
 const replace = vi.fn();
 let searchParams = new URLSearchParams();
@@ -80,7 +81,8 @@ describe('HomePage', () => {
     expect(await screen.findByText('해당 유형의 업체가 없습니다.')).toBeInTheDocument();
   });
 
-  it('다음 페이지가 있으면 더 보기 버튼으로 추가 로드한다', async () => {
+  it('다음 페이지가 있으면 스크롤로 화면에 들어왔을 때 추가 로드한다', async () => {
+    const io = mockIntersectionObserver();
     getMerchants.mockResolvedValueOnce({ content: merchants, page: 0, totalPages: 2 });
     renderWithQuery(<HomePage />);
     await screen.findByText('한적한 펜션');
@@ -90,7 +92,7 @@ describe('HomePage', () => {
       page: 1,
       totalPages: 2,
     });
-    await userEvent.click(screen.getByText('더 보기'));
+    io.trigger();
 
     expect(await screen.findByText('테니스장')).toBeInTheDocument();
   });

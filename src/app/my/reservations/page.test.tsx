@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import MyReservationsPage from './page';
 import { renderWithQuery } from '@/lib/test-utils/renderWithQuery';
+import { mockIntersectionObserver } from '@/lib/test-utils/mockIntersectionObserver';
 
 vi.mock('next/navigation', () => ({
   usePathname: () => '/my/reservations',
@@ -36,7 +36,6 @@ describe('MyReservationsPage', () => {
     renderWithQuery(<MyReservationsPage />);
 
     expect(await screen.findByText('A동')).toBeInTheDocument();
-    expect(screen.queryByText('더 보기')).not.toBeInTheDocument();
   });
 
   it('예약이 없으면 안내 문구를 보여준다', async () => {
@@ -53,7 +52,8 @@ describe('MyReservationsPage', () => {
     expect(await screen.findByText('예약 목록을 불러오지 못했습니다.')).toBeInTheDocument();
   });
 
-  it('다음 페이지가 있으면 더 보기 버튼으로 추가 로드한다', async () => {
+  it('다음 페이지가 있으면 스크롤로 화면에 들어왔을 때 추가 로드한다', async () => {
+    const io = mockIntersectionObserver();
     getMyReservations.mockResolvedValueOnce({ content: [reservation], page: 0, totalPages: 2 });
     renderWithQuery(<MyReservationsPage />);
     await screen.findByText('A동');
@@ -63,7 +63,7 @@ describe('MyReservationsPage', () => {
       page: 1,
       totalPages: 2,
     });
-    await userEvent.click(screen.getByText('더 보기'));
+    io.trigger();
 
     expect(await screen.findByText('B동')).toBeInTheDocument();
     expect(screen.getByText('A동')).toBeInTheDocument();

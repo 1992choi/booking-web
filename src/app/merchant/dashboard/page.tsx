@@ -11,6 +11,7 @@ import { merchantTypeBadgeVariants, MERCHANT_TYPE_LABELS } from '@/lib/constants
 import { useAuthStore } from '@/lib/store/auth';
 import type { MerchantSummary } from '@/lib/types/merchant';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
+import { useInfiniteScroll } from '@/lib/hooks/useInfiniteScroll';
 import { cn } from '@/lib/utils/cn';
 
 function MerchantCard({ merchant, isMerchant }: { merchant: MerchantSummary; isMerchant: boolean }) {
@@ -68,12 +69,19 @@ export default function MerchantDashboardPage() {
     isError: allError,
     hasNextPage,
     fetchNextPage,
+    isFetchingNextPage,
   } = useInfiniteQuery({
     queryKey: ['merchants-dashboard-all'],
     queryFn: ({ pageParam }) => getMerchants(undefined, pageParam),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.page < lastPage.totalPages - 1 ? lastPage.page + 1 : undefined),
     enabled: isAdmin,
+  });
+
+  const sentinelRef = useInfiniteScroll({
+    hasNextPage: isAdmin && !!hasNextPage,
+    isFetchingNextPage,
+    onLoadMore: fetchNextPage,
   });
 
   const {
@@ -140,12 +148,9 @@ export default function MerchantDashboardPage() {
             ))}
 
             {isAdmin && hasNextPage && (
-              <button
-                onClick={() => fetchNextPage()}
-                className="w-full text-sm text-gray-500 border border-gray-200 rounded-xl py-3 hover:border-blue-300 hover:text-blue-500 transition-colors"
-              >
-                더 보기
-              </button>
+              <div ref={sentinelRef} className="h-10 flex items-center justify-center">
+                {isFetchingNextPage && <span className="text-sm text-gray-400">불러오는 중...</span>}
+              </div>
             )}
           </div>
         )}

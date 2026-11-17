@@ -11,6 +11,7 @@ import { getMerchants } from '@/lib/api/merchants';
 import { merchantTypeBadgeVariants, MERCHANT_TYPE_LABELS } from '@/lib/constants/merchant';
 import type { MerchantType } from '@/lib/types/merchant';
 import { useQueryParamState } from '@/lib/hooks/useQueryParamState';
+import { useInfiniteScroll } from '@/lib/hooks/useInfiniteScroll';
 import { cn } from '@/lib/utils/cn';
 
 type FilterType = MerchantType | 'ALL';
@@ -41,11 +42,18 @@ export default function HomePage() {
     isError,
     hasNextPage,
     fetchNextPage,
+    isFetchingNextPage,
   } = useInfiniteQuery({
     queryKey: ['merchants', selected],
     queryFn: ({ pageParam }) => getMerchants(selected === 'ALL' ? undefined : selected, pageParam),
     initialPageParam: 0,
     getNextPageParam: (lastPage) => (lastPage.page < lastPage.totalPages - 1 ? lastPage.page + 1 : undefined),
+  });
+
+  const sentinelRef = useInfiniteScroll({
+    hasNextPage: !!hasNextPage,
+    isFetchingNextPage,
+    onLoadMore: fetchNextPage,
   });
 
   const merchants = data?.pages.flatMap((p) => p.content) ?? [];
@@ -150,12 +158,9 @@ export default function HomePage() {
             </div>
 
             {hasNextPage && (
-              <button
-                onClick={() => fetchNextPage()}
-                className="mt-5 w-full text-sm text-gray-500 border border-gray-200 rounded-xl py-3 hover:border-blue-300 hover:text-blue-500 transition-colors"
-              >
-                더 보기
-              </button>
+              <div ref={sentinelRef} className="mt-5 h-10 flex items-center justify-center">
+                {isFetchingNextPage && <span className="text-sm text-gray-400">불러오는 중...</span>}
+              </div>
             )}
           </>
         )}

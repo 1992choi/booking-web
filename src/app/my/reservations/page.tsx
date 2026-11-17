@@ -12,6 +12,7 @@ import { ReservationStatusBadge, ReservationSummaryRows } from '@/components/Res
 import type { Reservation, ReservationStatus } from '@/lib/types/reservation';
 import { useDocumentTitle } from '@/lib/hooks/useDocumentTitle';
 import { useQueryParamState } from '@/lib/hooks/useQueryParamState';
+import { useInfiniteScroll } from '@/lib/hooks/useInfiniteScroll';
 
 const RESERVATION_STATUS_TAB_VALUES = RESERVATION_STATUS_TABS.map((t) => t.value);
 
@@ -45,6 +46,7 @@ export default function MyReservationsPage() {
     isError: error,
     hasNextPage,
     fetchNextPage,
+    isFetchingNextPage,
   } = useInfiniteQuery({
     queryKey: ['my-reservations', tab],
     queryFn: ({ pageParam }) => getMyReservations(tab === 'ALL' ? undefined : tab, pageParam),
@@ -52,8 +54,13 @@ export default function MyReservationsPage() {
     getNextPageParam: (lastPage) => (lastPage.page < lastPage.totalPages - 1 ? lastPage.page + 1 : undefined),
   });
 
+  const sentinelRef = useInfiniteScroll({
+    hasNextPage: !!hasNextPage,
+    isFetchingNextPage,
+    onLoadMore: fetchNextPage,
+  });
+
   const reservations: Reservation[] = data?.pages.flatMap((p) => p.content) ?? [];
-  const isLast = !hasNextPage;
 
   return (
     <>
@@ -99,13 +106,10 @@ export default function MyReservationsPage() {
               ))}
             </div>
 
-            {!isLast && (
-              <button
-                onClick={() => fetchNextPage()}
-                className="mt-5 w-full text-sm text-gray-500 border border-gray-200 rounded-xl py-3 hover:border-blue-300 hover:text-blue-500 transition-colors"
-              >
-                더 보기
-              </button>
+            {hasNextPage && (
+              <div ref={sentinelRef} className="mt-5 h-10 flex items-center justify-center">
+                {isFetchingNextPage && <span className="text-sm text-gray-400">불러오는 중...</span>}
+              </div>
             )}
           </>
         )}

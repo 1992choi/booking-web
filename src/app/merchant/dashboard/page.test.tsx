@@ -1,10 +1,10 @@
 // @vitest-environment jsdom
 import { screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import MerchantDashboardPage from './page';
 import { useAuthStore } from '@/lib/store/auth';
 import { renderWithQuery } from '@/lib/test-utils/renderWithQuery';
+import { mockIntersectionObserver } from '@/lib/test-utils/mockIntersectionObserver';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn() }),
@@ -63,7 +63,8 @@ describe('MerchantDashboardPage', () => {
     expect(getMerchants).toHaveBeenCalled();
   });
 
-  it('ADMIN 목록에 다음 페이지가 있으면 더 보기 버튼으로 추가 로드한다', async () => {
+  it('ADMIN 목록에 다음 페이지가 있으면 스크롤로 화면에 들어왔을 때 추가 로드한다', async () => {
+    const io = mockIntersectionObserver();
     setRole('ADMIN');
     getMerchants.mockResolvedValueOnce({ content: [{ id: 1, name: '한적한 펜션', type: 'PENSION' }], page: 0, totalPages: 2 });
 
@@ -71,7 +72,7 @@ describe('MerchantDashboardPage', () => {
     await screen.findByText('한적한 펜션');
 
     getMerchants.mockResolvedValueOnce({ content: [{ id: 2, name: '요가 클래스', type: 'CLASS' }], page: 1, totalPages: 2 });
-    await userEvent.click(screen.getByText('더 보기'));
+    io.trigger();
 
     expect(await screen.findByText('요가 클래스')).toBeInTheDocument();
   });

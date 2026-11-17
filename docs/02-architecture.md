@@ -140,6 +140,7 @@ booking-web/
 │   │   │   ├── useFocusTrap.ts        # 모달/패널 포커스 트랩 + 포커스 복원
 │   │   │   ├── useMonthNavigation.ts  # 연/월 상태 + 이전/다음 달 이동, URL `year`/`month` 쿼리와 동기화
 │   │   │   ├── useQueryParamState.ts  # 탭/필터 상태를 URL 쿼리 파라미터와 동기화하는 범용 훅
+│   │   │   ├── useInfiniteScroll.ts   # IntersectionObserver로 목록 하단 sentinel 감지 → 다음 페이지 자동 로드
 │   │   │   └── useNotificationStream.ts # SSE 알림 구독 (캐시 갱신 + 토스트)
 │   │   │
 │   │   ├── utils/
@@ -148,7 +149,8 @@ booking-web/
 │   │   │   └── calendar.ts           # 월 이동/캘린더 그리드 계산
 │   │   │
 │   │   ├── test-utils/
-│   │   │   └── renderWithQuery.tsx    # QueryClientProvider로 감싼 테스트 렌더 헬퍼
+│   │   │   ├── renderWithQuery.tsx    # QueryClientProvider로 감싼 테스트 렌더 헬퍼
+│   │   │   └── mockIntersectionObserver.ts # jsdom에 없는 IntersectionObserver 스텁 (무한 스크롤 테스트용)
 │   │   │
 │   │   ├── test/
 │   │   │   └── fixtures.ts            # 테스트 공용 목 데이터
