@@ -11,7 +11,6 @@
 ## 미구현 기능
 
 - 동적 SEO 메타데이터 — 업체 상세(`/owners/[id]`) 등 공개 페이지가 전부 client component라 `generateMetadata` 못 씀(루트 레이아웃 고정 메타데이터뿐). RSC 전환과 묶으면 자연스럽게 해결
-- PWA 매니페스트에 아이콘 없음 — `src/app/manifest.ts`에 `icons` 배열이 없어 홈 화면에 추가해도 아이콘이 비어 보임. `public/`에 192×192/512×512 앱 아이콘 PNG 추가 필요 (현재 `public/icons/`에는 카테고리 탭용 이미지만 있음)
 
 ---
 
@@ -26,3 +25,4 @@
 - 알림 전체 읽음 처리용 일괄 엔드포인트가 없음 — 현재 단건 `PATCH /notifications/{id}/read`만 있어 "모두 읽음"을 프론트에서 구현하려면 안읽은 개수만큼 반복 호출해야 함. 백엔드에 벌크 엔드포인트(예: `PATCH /notifications/read-all`) 추가 후 진행
 - 리뷰에 사진 첨부 기능이 없음
 - 리뷰에 별점(rating) 필드가 없어 텍스트만 저장됨 (`Review` 엔티티에 컬럼 추가 + 업체 평균 평점 집계 필요)
+- 목록 API가 전부 페이지 번호 기반(`page`/`totalPages`) 페이지네이션이라 진짜 커서 기반 무한 스크롤이 아님 — 스크롤 도중 목록에 항목이 추가/삭제되면 뒤 페이지의 offset이 밀려 항목이 중복되거나 하나 누락될 수 있음. 최소 홈 화면 업체 목록 정도는 응답에 `nextCursor`(마지막 항목 id/정렬 키) 필드를 추가해 커서 기반으로 바꿔볼 만함 (프론트는 `useInfiniteQuery`의 `getNextPageParam`만 바꾸면 되므로 API 계약 변경이 끝나면 적용은 쉬움)

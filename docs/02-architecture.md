@@ -36,7 +36,10 @@ booking-web/
 │   │   ├── not-found.tsx             # 404 화면
 │   │   ├── robots.ts                 # /robots.txt (MetadataRoute.Robots)
 │   │   ├── sitemap.ts                # /sitemap.xml (MetadataRoute.Sitemap, 현재 정적 공개 경로만)
-│   │   ├── manifest.ts               # /manifest.webmanifest (PWA 메타데이터)
+│   │   ├── manifest.ts               # /manifest.webmanifest (PWA 메타데이터, icons는 pwa-icon 라우트 참조)
+│   │   ├── icon.tsx                  # 브라우저 탭 파비콘 (next/og ImageResponse로 생성, 32×32)
+│   │   ├── apple-icon.tsx            # iOS 홈 화면 아이콘 (next/og ImageResponse로 생성, 180×180)
+│   │   ├── pwa-icon/[size]/route.tsx # PWA 홈 화면 아이콘 (192/512만 지원, manifest.ts의 icons가 참조)
 │   │   │
 │   │   ├── (auth)/                   # 인증 라우트 그룹 (헤더 없음)
 │   │   │   ├── layout.tsx
@@ -127,7 +130,7 @@ booking-web/
 │   │   │   ├── payment.ts             # 결제 상태 라벨 + 뱃지 색상 cva(paymentStatusBadgeVariants)
 │   │   │   ├── notification.ts        # 알림 타입 라벨
 │   │   │   ├── user.ts                # 역할 라벨 + 뱃지 색상 cva(roleBadgeVariants)
-│   │   │   └── site.ts                # SITE_URL (robots.txt/sitemap.xml용 배포 주소)
+│   │   │   └── site.ts                # SITE_URL (robots.txt/sitemap.xml용 배포 주소) + BRAND_COLOR (앱 아이콘용)
 │   │   │
 │   │   ├── validation/                # React Hook Form용 zod 스키마
 │   │   │   ├── common.ts              # 공용 필드 스키마 (전화번호 등)

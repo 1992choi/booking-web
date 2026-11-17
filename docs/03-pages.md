@@ -127,7 +127,10 @@
 |------|------|------|
 | `/robots.txt` | `src/app/robots.ts` | 크롤러 규칙 — `/my/`, `/merchant/`, `/admin/`은 비공개라 크롤링 제외 |
 | `/sitemap.xml` | `src/app/sitemap.ts` | 정적 공개 경로(`/`, `/login`, `/signup`)만 등록 — 업체 상세 등 동적 경로는 미포함 (이유는 파일 내 주석 참고) |
-| `/manifest.webmanifest` | `src/app/manifest.ts` | PWA 매니페스트 (앱 이름, 테마 색상 등) |
+| `/manifest.webmanifest` | `src/app/manifest.ts` | PWA 매니페스트 (앱 이름, 테마 색상, `icons` 배열) |
+| `/icon` | `src/app/icon.tsx` | 브라우저 탭 파비콘 (32×32, `next/og`로 생성) |
+| `/apple-icon` | `src/app/apple-icon.tsx` | iOS 홈 화면 추가 아이콘 (180×180, `next/og`로 생성) |
+| `/pwa-icon/{192\|512}` | `src/app/pwa-icon/[size]/route.tsx` | PWA 홈 화면 아이콘 — manifest의 `icons`가 참조, 그 외 크기는 404 |
 
 ---
 
